@@ -564,6 +564,47 @@
       text-decoration: underline;
     }
 
+
+    /* Callout destacado para secciones */
+    .section-callout {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 197, 94, 0.65);
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), rgba(2, 6, 23, 0.85));
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+      margin-top: 14px;
+      margin-bottom: 10px;
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    .section-callout .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+      flex: 0 0 auto;
+    }
+
+    .section-callout .text {
+      line-height: 1.2;
+    }
+
+    .section-callout .hint {
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 6px;
+      font-size: 0.82em;
+    }
+
 </style>
 </head>
 <body>
@@ -585,12 +626,18 @@
         <div class="status" id="dataStatus"></div>
       </header>
 
-      <!-- 1) Vehículo -->
+      
+      <!-- Callout: selección de vehículo -->
+      <div class="section-callout" aria-label="Guía de selección de vehículo">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="text">Elegí marca y modelo de tu vehículo eléctrico<span class="hint">• podés usar “Vehículo personalizado” si no está en la lista</span></span>
+      </div>
+
+<!-- 1) Vehículo -->
       <div class="card" style="margin-top:16px;">
         <div class="card-title">
           <span>Vehículo</span>
-          <span class="badge-small">Elegí marca y modelo de tu vehículo eléctrico</span>
-        </div>
+</div>
         <div class="grid-2">
           <div class="field">
             <label for="brandSelect">Marca</label>
@@ -609,6 +656,10 @@
           <div class="field">
             <label>Capacidad de batería (kWh)</label>
             <input id="batteryKwh" type="text" readonly />
+          </div>
+          <div class="field">
+            <label>Autonomía WLTP (km)</label>
+            <input id="wltpRangeKm" type="text" readonly placeholder="—" />
           </div>
         </div>
 
@@ -670,9 +721,42 @@
           </div>
         </div>
         <div class="field-inline">
-          <input type="checkbox" id="includeIva" />
+          <input type="checkbox" id="includeIva" checked />
           <label for="includeIva">Incluir IVA 22% en el costo de energía</label>
         </div>
+
+        <!-- Valores de referencia (desplegable) -->
+        <div class="collapsible" id="panelPliego" data-open="false" style="margin-top:12px;">
+          <div class="card-title" style="margin-bottom:0;">
+            <span>Valores de referencia según pliego tarifario de UTE a enero de 2026</span>
+            <button class="collapse-btn" type="button" data-target="panelPliego">
+              <span class="collapse-btn-label">Mostrar</span>
+              <span class="collapse-btn-icon">▼</span>
+            </button>
+          </div>
+          <div class="collapsible-body">
+            <table class="tarifa-table">
+              <thead>
+                <tr>
+                  <th>Tarifa</th>
+                  <th>Franja</th>
+                  <th>$/kWh (sin IVA)</th>
+                </tr>
+              </thead>
+              <tbody id="tarifaTableBody">
+                <tr>
+                  <td colspan="3">Cargando tarifas…</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p class="note">
+              Los valores muestran solo el <strong>cargo por energía</strong>. No se incluyen cargos fijos ni potencia contratada.
+            </p>
+          </div>
+        </div>
+
+
       </div>
 
       <!-- 3) Estado de carga (SOC) - 3er panel y desplegable oculto -->
@@ -728,36 +812,7 @@
         <div class="chip-row" id="chipRow"></div>
       </div>
 
-      <!-- Pliego tarifario UTE - desplegable y oculto por defecto -->
-      <div class="card collapsible" id="panelPliego" data-open="false">
-        <div class="card-title">
-          <span>Valores de referencia según pliego tarifario de UTE a enero de 2026</span>
-          <button class="collapse-btn" type="button" data-target="panelPliego">
-            <span class="collapse-btn-label">Mostrar</span>
-            <span class="collapse-btn-icon">▼</span>
-          </button>
-        </div>
-        <div class="collapsible-body">
-          <table class="tarifa-table">
-            <thead>
-              <tr>
-                <th>Tarifa</th>
-                <th>Franja</th>
-                <th>$/kWh (sin IVA)</th>
-              </tr>
-            </thead>
-            <tbody id="tarifaTableBody">
-              <tr>
-                <td colspan="3">Cargando tarifas…</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <p class="note">
-            Los valores muestran solo el <strong>cargo por energía</strong>. No se incluyen cargos fijos ni potencia contratada.
-          </p>
-        </div>
-      </div>
+      
 
       <div class="footer"></div>
     </div>
@@ -960,6 +1015,7 @@
     const brandSelect = document.getElementById("brandSelect");
     const modelSelect = document.getElementById("modelSelect");
     const batteryKwhInput = document.getElementById("batteryKwh");
+    const wltpRangeKmInput = document.getElementById("wltpRangeKm");
 
     const customBatteryKwhInput = document.getElementById("customBatteryKwh");
     const customWltpKmInput = document.getElementById("customWltpKm");
@@ -1019,6 +1075,8 @@
 
       const delimiter = detectDelimiter(lines[0]);
       const headers = lines[0].split(delimiter).map(h => h.trim());
+      // Quitar BOM (Excel/UTF-8) del primer header si existe
+      if (headers.length > 0) headers[0] = headers[0].replace(/^\ufeff/, "");
       const rows = [];
 
       for (let i = 1; i < lines.length; i++) {
@@ -1226,6 +1284,7 @@
         opt.textContent = brand ? "Sin modelos para esta marca" : "Seleccioná primero una marca…";
         modelSelect.appendChild(opt);
         batteryKwhInput.value = "";
+        if (wltpRangeKmInput) wltpRangeKmInput.value = "";
       } else {
         modelSelect.disabled = false;
         const def = document.createElement("option");
@@ -1249,6 +1308,18 @@
         batteryKwhInput.value = selected.dataset.battery.replace(".", ",");
       } else {
         batteryKwhInput.value = "";
+      }
+
+      const car = getSelectedCar();
+      if (wltpRangeKmInput) {
+        if (car && car.wltpKm && car.wltpKm > 0) {
+          wltpRangeKmInput.value = formatNumber(car.wltpKm);
+        } else if (car && car.wltpKwh100 && car.wltpKwh100 > 0 && car.batteryKwh && car.batteryKwh > 0) {
+          const km = (car.batteryKwh * 100) / car.wltpKwh100;
+          wltpRangeKmInput.value = formatNumber(km);
+        } else {
+          wltpRangeKmInput.value = "";
+        }
       }
     }
 
