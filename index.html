@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calculá los costos de carga y tu ahorro en EVUruguay</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#020617" />
+  <style>
+    html {
+      background-color: #020617; /* Fondo oscuro para el rebote del scroll */
+      color-scheme: dark;
+    }
+
+    :root {
+      --bg: #0f172a;
+      --card-bg: #111827;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border: #1f2933;
+      --error: #ef4444;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
+      --radius-xl: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overscroll-behavior-y: contain;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 980px;
+      background: linear-gradient(145deg, #020617 0%, #020617 40%, #0b1120 100%);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 800px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.badge {
+      font-size: 0.72rem;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      background: rgba(34, 197, 94, 0.06);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .pill-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.72rem;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text-muted);
+    }
+
+    .pill strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 60%);
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      padding: 16px 16px 18px;
+    }
+
+    .card + .card {
+      margin-top: 12px;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e5e7eb;
+      gap: 8px;
+    }
+
+    .card-title small {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 0.75rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.8rem;
+    }
+
+    label {
+      color: var(--text-muted);
+    }
+
+    select,
+    input[type="number"],
+    input[type="text"] {
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      color: var(--text);
+      font-size: 0.86rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease,
+        background 0.15s ease;
+      width: 100%;
+      -moz-appearance: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+    }
+
+    .field-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .badge-small {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+    }
+
+    .results-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+    }
+
+    .result-main {
+      background: radial-gradient(circle at top, #16a34a22 0, #020617 65%);
+      border-radius: var(--radius-xl);
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(34, 197, 94, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .result-cost {
+      font-size: 1.9rem;
+      font-weight: 650;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .result-cost span.currency {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    .result-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .result-sub strong {
+      color: var(--accent);
+    }
+
+    .chip-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.72rem;
+    }
+
+    .chip {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .chip strong {
+      color: var(--accent);
+    }
+
+    .note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .tarifa-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      margin-top: 6px;
+    }
+
+    .tarifa-table th,
+    .tarifa-table td {
+      padding: 6px 6px;
+      border-bottom: 1px dashed rgba(51, 65, 85, 0.9);
+      text-align: left;
+    }
+
+    .tarifa-table th {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .tarifa-table td strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tarifa-pill {
+      font-size: 0.66rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .error {
+      margin-top: 6px;
+      font-size: 0.76rem;
+      color: var(--error);
+    }
+
+    .footer {
+      margin-top: 12px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .status {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .status strong {
+      color: var(--accent);
+    }
+
+    /* Collapsibles */
+    .collapsible .card-title {
+      cursor: pointer;
+    }
+
+    .collapse-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .collapse-btn-icon {
+      display: inline-block;
+      transition: transform 0.18s ease;
+      font-size: 0.7rem;
+    }
+
+    .collapsible-body {
+      margin-top: 8px;
+    }
+
+    .collapsible[data-open="false"] .collapsible-body {
+      display: none;
+    }
+
+    .collapsible[data-open="false"] .collapse-btn-icon {
+      transform: rotate(-90deg);
+    }
+
+    /* Comparación con combustión */
+    .comparison-card {
+      grid-column: 1 / -1;
+      background: radial-gradient(circle at top, #1d4ed822 0, #020617 70%);
+      border-radius: var(--radius-xl);
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(59, 130, 246, 0.7);
+      margin-top: 8px;
+    }
+
+    .comparison-card .card-title span {
+      font-size: 0.9rem;
+    }
+
+    .comp-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .comp-col {
+      flex: 1 1 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comp-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .comp-stat strong {
+      color: var(--text);
+    }
+
+    .comp-highlight strong {
+      color: var(--accent);
+    }
+
+    .comp-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .comp-bars {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.75rem;
+    }
+
+    .comp-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .comp-bar-label {
+      width: 88px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .comp-bar-track {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .comp-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.2s ease-out;
+    }
+
+    .comp-bar-fill-ev {
+      background: #22c55e;
+    }
+
+    .comp-bar-fill-ice {
+      background: #ef4444;
+    }
+
+    /* Ahorro en el tiempo */
+    .savings-card {
+      grid-column: 1 / -1;
+      background: radial-gradient(circle at top, #16a34a33 0, #020617 70%);
+      border-radius: var(--radius-xl);
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(34, 197, 94, 0.7);
+      margin-top: 8px;
+    }
+
+    .savings-card .card-title span {
+      font-size: 0.9rem;
+    }
+
+    .savings-highlight {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.08);
+      border-radius: 999px;
+      padding: 8px 14px;
+      text-align: center;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+
+    .savings-subnote {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Cargadores públicos / privados */
+    .chargers-card {
+      grid-column: 1 / -1;
+      background: radial-gradient(circle at top, #22c55e22 0, #020617 70%);
+      border-radius: var(--radius-xl);
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(34, 197, 94, 0.7);
+      margin-top: 8px;
+    }
+
+    .chargers-card .card-title span {
+      font-size: 0.9rem;
+    }
+
+    .chargers-bars {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.75rem;
+    }
+
+    .charger-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .charger-bar-label {
+      width: 120px;
+      color: var(--text-muted);
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .charger-bar-track {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .charger-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.2s ease-out;
+    }
+  
+    /* Pie de página global */
+    .app-footer {
+      grid-column: 1 / -1;
+      margin-top: 18px;
+      font-size: 0.7rem;
+      color: #9ca3af;
+      text-align: center;
+    }
+    .app-footer-separator {
+      height: 1px;
+      width: 100%;
+      background: radial-gradient(circle, rgba(148, 163, 184, 0.35), transparent);
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+    .app-footer a {
+      color: #22c55e;
+      text-decoration: none;
+    }
+    .app-footer a:hover {
+      text-decoration: underline;
+    }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <!-- Panel Izquierdo -->
+    <div>
+      <header>
+        <h1>
+          Calculadora de carga EV
+          <span class="badge">URUGUAY</span>
+        </h1>
+        <p class="subtitle">
+          Estimá el costo de la carga eléctrica y comparalo con tu auto a combustión.
+        </p>
+        <div class="pill-row">
+          <div class="pill">Podés elegir carga parcial (ej: <strong>20% → 80%</strong>)</div>
+          <div class="pill">Opción para <strong>incluir IVA 22%</strong></div>
+        </div>
+        <div class="status" id="dataStatus"></div>
+      </header>
+
+      <!-- 1) Vehículo -->
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">
+          <span>Vehículo</span>
+          <span class="badge-small">Elegí marca y modelo de tu vehículo eléctrico</span>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="brandSelect">Marca</label>
+            <select id="brandSelect" disabled>
+              <option value="">Cargando marcas…</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="modelSelect">Modelo</label>
+            <select id="modelSelect" disabled>
+              <option value="">Seleccioná una marca</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:10px;">
+          <div class="field">
+            <label>Capacidad de batería (kWh)</label>
+            <input id="batteryKwh" type="text" readonly />
+          </div>
+        </div>
+
+        <!-- Vehículo personalizado -->
+        <div class="collapsible" id="panelCustomEv" data-open="false" style="margin-top:12px;">
+          <div class="card-title" style="margin-bottom:0;">
+            <span style="font-size:0.8rem;">Vehículo personalizado (si tu modelo no está en la lista)</span>
+            <button class="collapse-btn" type="button" data-target="panelCustomEv">
+              <span class="collapse-btn-label">Mostrar</span>
+              <span class="collapse-btn-icon">▼</span>
+            </button>
+          </div>
+          <div class="collapsible-body">
+            <div class="grid-2">
+              <div class="field">
+                <label for="customBatteryKwh">Capacidad batería (kWh)</label>
+                <input
+                  id="customBatteryKwh"
+                  type="number"
+                  min="1"
+                  step="0.1"
+                  placeholder="Ej: 64.8"
+                />
+              </div>
+              <div class="field">
+                <label for="customWltpKm">Autonomía WLTP (km)</label>
+                <input
+                  id="customWltpKm"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="Ej: 420"
+                />
+              </div>
+            </div>
+            <p class="note" style="margin-top:8px;">
+              Si completás estos valores se usarán para el cálculo de energía, kilómetros equivalentes y comparaciones,
+              aunque tu vehículo no esté en la lista.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) Tarifa UTE -->
+      <div class="card">
+        <div class="card-title">
+          <span>Tarifa UTE</span>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="tarifaTipo">Tipo de tarifa</label>
+            <select id="tarifaTipo" disabled>
+              <option value="">Cargando tarifas…</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="franjaSelect">Franja horaria</label>
+            <select id="franjaSelect" disabled></select>
+          </div>
+        </div>
+        <div class="field-inline">
+          <input type="checkbox" id="includeIva" />
+          <label for="includeIva">Incluir IVA 22% en el costo de energía</label>
+        </div>
+      </div>
+
+      <!-- 3) Estado de carga (SOC) - 3er panel y desplegable oculto -->
+      <div class="card collapsible" id="panelSoc" data-open="false">
+        <div class="card-title">
+          <span>Estado de carga</span>
+          <small>Calcula solo el tramo que realmente cargás</small>
+          <button class="collapse-btn" type="button" data-target="panelSoc">
+            <span class="collapse-btn-label">Mostrar</span>
+            <span class="collapse-btn-icon">▼</span>
+          </button>
+        </div>
+        <div class="collapsible-body">
+          <div class="grid-2">
+            <div class="field">
+              <label for="socStart">SOC inicial (%)</label>
+              <input
+                id="socStart"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value="0"
+              />
+            </div>
+            <div class="field">
+              <label for="socEnd">SOC final (%)</label>
+              <input
+                id="socEnd"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value="100"
+              />
+            </div>
+          </div>
+          <div class="error" id="socError" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Derecho: Resultados -->
+    <div class="results-card">
+      <div class="result-main">
+        <div class="result-tag">Costo estimado de la carga</div>
+        <div class="result-cost" id="resultCost">
+          <span class="currency">$U</span>0,00
+        </div>
+        <div class="result-sub" id="resultSub">
+          Esperando datos y selección de vehículo…
+        </div>
+        <div class="chip-row" id="chipRow"></div>
+      </div>
+
+      <!-- Pliego tarifario UTE - desplegable y oculto por defecto -->
+      <div class="card collapsible" id="panelPliego" data-open="false">
+        <div class="card-title">
+          <span>Valores de referencia según pliego tarifario de UTE a enero de 2026</span>
+          <button class="collapse-btn" type="button" data-target="panelPliego">
+            <span class="collapse-btn-label">Mostrar</span>
+            <span class="collapse-btn-icon">▼</span>
+          </button>
+        </div>
+        <div class="collapsible-body">
+          <table class="tarifa-table">
+            <thead>
+              <tr>
+                <th>Tarifa</th>
+                <th>Franja</th>
+                <th>$/kWh (sin IVA)</th>
+              </tr>
+            </thead>
+            <tbody id="tarifaTableBody">
+              <tr>
+                <td colspan="3">Cargando tarifas…</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class="note">
+            Los valores muestran solo el <strong>cargo por energía</strong>. No se incluyen cargos fijos ni potencia contratada.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer"></div>
+    </div>
+
+    <!-- Comparación con combustión (desplegable) -->
+    <div class="comparison-card collapsible" id="panelComparacion" data-open="false">
+      <div class="card-title">
+        <span>Comparación con tu vehículo a combustión</span>
+        <button class="collapse-btn" type="button" data-target="panelComparacion">
+          <span class="collapse-btn-label">Mostrar</span>
+          <span class="collapse-btn-icon">▼</span>
+        </button>
+      </div>
+      <div class="collapsible-body">
+        <div class="comp-row">
+          <div class="comp-col">
+            <div class="field">
+              <label for="fuelSelect">Combustible actual</label>
+              <select id="fuelSelect" disabled>
+                <option value="">Cargando precios…</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="iceConsumo">Consumo de tu auto (km/l)</label>
+              <input
+                id="iceConsumo"
+                type="number"
+                min="1"
+                step="0.1"
+                placeholder="Ej: 12"
+              />
+            </div>
+          </div>
+          <div class="comp-col">
+            <div class="comp-stat">
+              <span>Km equivalentes con esta carga</span>
+              <strong id="compKm">—</strong>
+            </div>
+            <div class="comp-stat">
+              <span>Costo en tu EV</span>
+              <strong id="compEvCost">—</strong>
+            </div>
+            <div class="comp-stat">
+              <span>Costo en combustión</span>
+              <strong id="compIceCost">—</strong>
+            </div>
+            <div class="comp-stat comp-highlight">
+              <span>Ahorro aproximado</span>
+              <strong id="compSavings">—</strong>
+            </div>
+
+            <div class="comp-bars">
+              <div class="comp-bar-row">
+                <span class="comp-bar-label">EV</span>
+                <div class="comp-bar-track">
+                  <div id="barEv" class="comp-bar-fill comp-bar-fill-ev"></div>
+                </div>
+              </div>
+              <div class="comp-bar-row">
+                <span class="comp-bar-label">Combustión</span>
+                <div class="comp-bar-track">
+                  <div id="barIce" class="comp-bar-fill comp-bar-fill-ice"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="comp-note">
+          En tu vehículo actual gastarías aproximadamente <strong id="compSentenceIce">—</strong> para recorrer lo mismo que con esta carga.
+        </p>
+      </div>
+    </div>
+
+    <!-- Ahorro en el tiempo (desplegable) -->
+    <div class="savings-card collapsible" id="panelAhorro" data-open="false">
+      <div class="card-title">
+        <span>Ahorro estimado en el tiempo</span>
+        <button class="collapse-btn" type="button" data-target="panelAhorro">
+          <span class="collapse-btn-label">Mostrar</span>
+          <span class="collapse-btn-icon">▼</span>
+        </button>
+      </div>
+      <div class="collapsible-body">
+        <div class="comp-row">
+          <div class="comp-col">
+            <div class="field">
+              <label for="monthlyKm">Km que recorrés por mes con tu auto actual</label>
+              <input
+                id="monthlyKm"
+                type="number"
+                min="1"
+                step="10"
+                placeholder="Ej: 1000"
+              />
+            </div>
+            <p class="note">
+              Usamos el mismo <strong>tipo de combustible</strong> y <strong>consumo (km/l)</strong> del panel de comparación,
+              junto con la <strong>autonomía WLTP</strong> del EV y la tarifa de UTE seleccionada.
+            </p>
+          </div>
+          <div class="comp-col">
+            <table class="tarifa-table">
+              <thead>
+                <tr>
+                  <th>Plazo</th>
+                  <th>Costo EV ($U)</th>
+                  <th>Costo combustión ($U)</th>
+                  <th>Ahorro ($U)</th>
+                  <th>Ahorro (USD)</th>
+                </tr>
+              </thead>
+              <tbody id="savingsTableBody">
+                <tr>
+                  <td colspan="5">Ingresá tus km mensuales para ver el ahorro estimado.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div id="savingsHighlightContainer">
+              <p class="savings-highlight" id="savingsHighlight">
+                Tu ahorro en 5 años será de un total de <strong>—</strong>.
+              </p>
+              <p class="savings-subnote">
+                Y no estamos teniendo en cuenta el ahorro por mantenimiento, patente y otras bonificaciones.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparación con cargadores públicos/privados -->
+    <div class="chargers-card collapsible" id="panelCargadores" data-open="false">
+      <div class="card-title">
+        <span>Comparación con cargadores públicos y privados</span>
+        <button class="collapse-btn" type="button" data-target="panelCargadores">
+          <span class="collapse-btn-label">Mostrar</span>
+          <span class="collapse-btn-icon">▼</span>
+        </button>
+      </div>
+      <div class="collapsible-body">
+        <p class="note">
+          Se calcula el costo total de la misma carga considerando la <strong>bajada de bandera</strong> y el
+          <strong>precio por kWh</strong> de cada operador, incluyendo la opción de <strong>cargar en casa (UTE)</strong>.
+        </p>
+        <table class="tarifa-table">
+          <thead>
+            <tr>
+              <th>Opción</th>
+              <th>Bajada ($U)</th>
+              <th>$/kWh</th>
+              <th>Costo total ($U)</th>
+              <th>Costo total (USD)</th>
+            </tr>
+          </thead>
+          <tbody id="chargersTableBody">
+            <tr>
+              <td colspan="5">Calculá primero una carga para ver la comparación.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="chargers-bars" id="chargersBars">
+          <!-- Barras dinámicas -->
+        </div>
+      </div>
+    </div>
+  
+    <!-- Pie de página -->
+    <div class="app-footer">
+      <div class="app-footer-separator"></div>
+      <p>
+        Los valores mostrados son estimaciones de carácter informativo, calculadas a partir de datos públicos
+        y referencias disponibles en internet. Los costos pueden variar según condiciones reales de uso,
+        instalaciones, contratos y factores externos. Esta herramienta no constituye asesoramiento técnico 
+        o comercial y no asume responsabilidad por decisiones basadas en estos cálculos.
+        Para comentarios o sugerencias: 
+        <a href="mailto:evuyapp@gmail.com">evuyapp@gmail.com</a>.
+      </p>
+    </div>
+
+</div>
+
+  <script>
+    // ============================
+    // Datos en memoria
+    // ============================
+    let carData = {};        // { marca: [ {model, batteryKwh, wltpKm} ] }
+    let tarifas = {};        // { tipo: { nombre, franjas: { key: {label, precio} } } }
+    let combustibles = {};   // { clave: { label, precio } }
+    let usdRate = null;      // Cotización USD desde dolar.csv
+    let cargadores = [];     // [ {empresa, bajada, precioKwh} ]
+
+    let lastEnergyKwh = null;
+    let lastEvCost = null;
+
+    // ============================
+    // Referencias DOM
+    // ============================
+    const brandSelect = document.getElementById("brandSelect");
+    const modelSelect = document.getElementById("modelSelect");
+    const batteryKwhInput = document.getElementById("batteryKwh");
+
+    const customBatteryKwhInput = document.getElementById("customBatteryKwh");
+    const customWltpKmInput = document.getElementById("customWltpKm");
+
+    const socStartInput = document.getElementById("socStart");
+    const socEndInput = document.getElementById("socEnd");
+    const socError = document.getElementById("socError");
+
+    const tarifaTipoSelect = document.getElementById("tarifaTipo");
+    const franjaSelect = document.getElementById("franjaSelect");
+    const includeIvaCheckbox = document.getElementById("includeIva");
+
+    const resultCost = document.getElementById("resultCost");
+    const resultSub = document.getElementById("resultSub");
+    const chipRow = document.getElementById("chipRow");
+
+    const dataStatus = document.getElementById("dataStatus");
+    const tarifaTableBody = document.getElementById("tarifaTableBody");
+
+    // Comparación combustión
+    const fuelSelect = document.getElementById("fuelSelect");
+    const iceConsumoInput = document.getElementById("iceConsumo");
+    const compKm = document.getElementById("compKm");
+    const compEvCost = document.getElementById("compEvCost");
+    const compIceCost = document.getElementById("compIceCost");
+    const compSavings = document.getElementById("compSavings");
+    const compSentenceIce = document.getElementById("compSentenceIce");
+    const barEv = document.getElementById("barEv");
+    const barIce = document.getElementById("barIce");
+
+    // Ahorro en el tiempo
+    const monthlyKmInput = document.getElementById("monthlyKm");
+    const savingsTableBody = document.getElementById("savingsTableBody");
+
+    // Cargadores
+    const chargersTableBody = document.getElementById("chargersTableBody");
+    const chargersBars = document.getElementById("chargersBars");
+
+    // ============================
+    // Utilidades CSV
+    // ============================
+    function detectDelimiter(line) {
+      if (line.includes(";") && line.includes(",")) {
+        const countSemi = (line.match(/;/g) || []).length;
+        const countComma = (line.match(/,/g) || []).length;
+        return countSemi >= countComma ? ";" : ",";
+      } else if (line.includes(";")) {
+        return ";";
+      } else {
+        return ",";
+      }
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (lines.length === 0) return [];
+
+      const delimiter = detectDelimiter(lines[0]);
+      const headers = lines[0].split(delimiter).map(h => h.trim());
+      const rows = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(delimiter);
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = (parts[idx] || "").trim();
+        });
+        rows.push(obj);
+      }
+
+      return rows;
+    }
+
+    async function loadCSV(path) {
+      const res = await fetch(path);
+      if (!res.ok) {
+        throw new Error(`Error HTTP ${res.status}`);
+      }
+      const text = await res.text();
+      return parseCSV(text);
+    }
+
+    // ============================
+    // Carga y aplicación de datos
+    // ============================
+    function applyVehiculosData(rows) {
+      const newCarData = {};
+      rows.forEach(r => {
+        const marca = (r.marca || r.Marca || "").toString().trim();
+        const modelo = (r.modelo || r.Modelo || "").toString().trim();
+        let bat = (r.bateria_kwh || r["batería_kwh"] || r.bateria || r.Bateria || "").toString().trim();
+        // WLTP en km de autonomía
+        let wltpKmStr = (
+          r.wltp_km ||
+          r.autonomia_wltp_km ||
+          r.autonomia_wltp ||
+          r.wltp ||
+          ""
+        ).toString().trim();
+
+        if (!marca || !modelo || !bat) return;
+        bat = bat.replace(",", ".");
+        const n = parseFloat(bat);
+        if (isNaN(n) || n <= 0) return;
+
+        let wltpKm = null;
+        if (wltpKmStr) {
+          wltpKmStr = wltpKmStr.replace(",", ".");
+          const cw = parseFloat(wltpKmStr);
+          if (!isNaN(cw) && cw > 0) {
+            wltpKm = cw;
+          }
+        }
+
+        if (!newCarData[marca]) newCarData[marca] = [];
+        newCarData[marca].push({ model: modelo, batteryKwh: n, wltpKm });
+      });
+
+      carData = newCarData;
+    }
+
+    function applyTarifasData(rows) {
+      const newTarifas = {};
+
+      rows.forEach(r => {
+        const tipoRaw = (r.tipo_tarifa || r.tipo || "").toString().trim().toLowerCase();
+        if (!tipoRaw) return;
+
+        const tipo = tipoRaw;
+        const franjaKeyRaw = (r.franja || "").toString().trim().toLowerCase();
+        if (!franjaKeyRaw) return;
+
+        const franjaKey = franjaKeyRaw;
+        const etiqueta = (r.etiqueta || r.label || r.etiqueta_franja || "").toString().trim() || franjaKey;
+        let precio = (r.precio_sin_iva || r.precio || "").toString().trim();
+        if (!precio) return;
+
+        precio = precio.replace(",", ".");
+        const n = parseFloat(precio);
+        if (isNaN(n) || n <= 0) return;
+
+        if (!newTarifas[tipo]) {
+          newTarifas[tipo] = {
+            nombre: tipo === "doble" ? "Residencial Doble Horario" :
+                    tipo === "triple" ? "Residencial Triple Horario" :
+                    tipo,
+            franjas: {}
+          };
+        }
+
+        newTarifas[tipo].franjas[franjaKey] = {
+          label: etiqueta,
+          precio: n
+        };
+      });
+
+      tarifas = newTarifas;
+    }
+
+    function applyCombustiblesData(rows) {
+      const newComb = {};
+      rows.forEach(r => {
+        const key = (r.combustible || r.tipo || "").toString().trim();
+        if (!key) return;
+        const label = (r.etiqueta || r.descripcion || "").toString().trim() || key;
+        let precio = (r.precio_litro || r.precio || "").toString().trim();
+        if (!precio) return;
+        precio = precio.replace(",", ".");
+        const n = parseFloat(precio);
+        if (isNaN(n) || n <= 0) return;
+        newComb[key] = { label, precio: n };
+      });
+      combustibles = newComb;
+      populateFuelSelect();
+    }
+
+    function applyUsdData(rows) {
+      for (const r of rows) {
+        const candidates = [
+          r.cotizacion,
+          r.cotización,
+          r.cotizacion_usd,
+          r.cotizacion_uyu_usd,
+          r.precio,
+          r.valor,
+          r.usd,
+          r.uyu_usd
+        ];
+        for (const c of candidates) {
+          if (c == null) continue;
+          const str = c.toString().trim();
+          if (!str) continue;
+          const n = parseFloat(str.replace(",", "."));
+          if (!isNaN(n) && n > 0) {
+            usdRate = n;
+            return;
+          }
+        }
+      }
+    }
+
+    function applyChargersData(rows) {
+      const list = [];
+      rows.forEach(r => {
+        const nombre = (r.empresa || r.nombre || r.operador || "").toString().trim();
+        if (!nombre) return;
+        let bajada = (r.bajada || r.bajada_bandera || r.costo_fijo || "").toString().trim();
+        let precioKwh = (r.precio_kwh || r.precio || r.costo_kwh || "").toString().trim();
+        if (!precioKwh) return;
+
+        bajada = bajada ? bajada.replace(",", ".") : "0";
+        precioKwh = precioKwh.replace(",", ".");
+
+        const bajNum = parseFloat(bajada);
+        const pkNum = parseFloat(precioKwh);
+        if (isNaN(pkNum) || pkNum <= 0) return;
+
+        list.push({
+          empresa: nombre,
+          bajada: isNaN(bajNum) ? 0 : bajNum,
+          precioKwh: pkNum
+        });
+      });
+      cargadores = list;
+    }
+
+    function populateBrandSelect() {
+      brandSelect.innerHTML = "";
+      const marcas = Object.keys(carData).sort();
+
+      if (marcas.length === 0) {
+        brandSelect.disabled = true;
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Sin vehículos cargados (revisar vehiculos.csv)";
+        brandSelect.appendChild(opt);
+        return;
+      }
+
+      const def = document.createElement("option");
+      def.value = "";
+      def.textContent = "Seleccionar marca";
+      brandSelect.appendChild(def);
+
+      marcas.forEach(marca => {
+        const opt = document.createElement("option");
+        opt.value = marca;
+        opt.textContent = marca;
+        brandSelect.appendChild(opt);
+      });
+
+      brandSelect.disabled = false;
+    }
+
+    function updateModels() {
+      const brand = brandSelect.value;
+      modelSelect.innerHTML = "";
+      if (!brand || !carData[brand] || carData[brand].length === 0) {
+        modelSelect.disabled = true;
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = brand ? "Sin modelos para esta marca" : "Seleccioná primero una marca…";
+        modelSelect.appendChild(opt);
+        batteryKwhInput.value = "";
+      } else {
+        modelSelect.disabled = false;
+        const def = document.createElement("option");
+        def.value = "";
+        def.textContent = "Seleccionar modelo…";
+        modelSelect.appendChild(def);
+
+        carData[brand].forEach(car => {
+          const opt = document.createElement("option");
+          opt.value = car.model;
+          opt.textContent = car.model;
+          opt.dataset.battery = car.batteryKwh;
+          modelSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function updateBatteryFromModel() {
+      const selected = modelSelect.options[modelSelect.selectedIndex];
+      if (selected && selected.dataset.battery) {
+        batteryKwhInput.value = selected.dataset.battery.replace(".", ",");
+      } else {
+        batteryKwhInput.value = "";
+      }
+    }
+
+    function populateTarifaTipoSelect() {
+      tarifaTipoSelect.innerHTML = "";
+      const tipos = Object.keys(tarifas);
+
+      if (tipos.length === 0) {
+        tarifaTipoSelect.disabled = true;
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Sin tarifas cargadas (revisar tarifas.csv)";
+        tarifaTipoSelect.appendChild(opt);
+        franjaSelect.disabled = true;
+        franjaSelect.innerHTML = "";
+        return;
+      }
+
+      tipos.forEach(tipo => {
+        const opt = document.createElement("option");
+        opt.value = tipo;
+        opt.textContent = tarifas[tipo].nombre || tipo;
+        tarifaTipoSelect.appendChild(opt);
+      });
+
+      tarifaTipoSelect.disabled = false;
+
+      let defaultTipo = "triple";
+      if (!tarifas[defaultTipo]) {
+        defaultTipo = tipos[0];
+      }
+      tarifaTipoSelect.value = defaultTipo;
+      initFranjas();
+    }
+
+    function initFranjas() {
+      franjaSelect.innerHTML = "";
+      const tipo = tarifaTipoSelect.value;
+      if (!tarifas[tipo]) {
+        franjaSelect.disabled = true;
+        return;
+      }
+
+      const franjas = tarifas[tipo].franjas;
+      const keys = Object.keys(franjas);
+      if (keys.length === 0) {
+        franjaSelect.disabled = true;
+        return;
+      }
+
+      keys.forEach(key => {
+        const data = franjas[key];
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = `${data.label} (${data.precio.toString().replace(".", ",")} $/kWh)`;
+        franjaSelect.appendChild(opt);
+      });
+
+      franjaSelect.disabled = false;
+
+      let cheapestKey = keys[0];
+      let minPrice = franjas[cheapestKey].precio;
+      keys.forEach(k => {
+        if (franjas[k].precio < minPrice) {
+          minPrice = franjas[k].precio;
+          cheapestKey = k;
+        }
+      });
+      franjaSelect.value = cheapestKey;
+    }
+
+    function populateTarifaTable() {
+      tarifaTableBody.innerHTML = "";
+      const tipos = Object.keys(tarifas);
+      if (tipos.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 3;
+        td.textContent = "Sin datos de tarifas (revisar tarifas.csv).";
+        tr.appendChild(td);
+        tarifaTableBody.appendChild(tr);
+        return;
+      }
+
+      tipos.forEach(tipo => {
+        const t = tarifas[tipo];
+        const nombre = t.nombre || tipo;
+        Object.entries(t.franjas).forEach(([key, data]) => {
+          const tr = document.createElement("tr");
+          const td1 = document.createElement("td");
+          const td2 = document.createElement("td");
+          const td3 = document.createElement("td");
+
+          td1.textContent = nombre;
+          td2.textContent = data.label;
+          td3.innerHTML = `<strong>${data.precio.toString().replace(".", ",")}</strong>`;
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tr.appendChild(td3);
+          tarifaTableBody.appendChild(tr);
+        });
+      });
+    }
+
+    function populateFuelSelect() {
+      fuelSelect.innerHTML = "";
+      const keys = Object.keys(combustibles);
+      if (keys.length === 0) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Sin datos de combustibles (revisar ancap.csv)";
+        fuelSelect.appendChild(opt);
+        fuelSelect.disabled = true;
+        return;
+      }
+
+      const def = document.createElement("option");
+      def.value = "";
+      def.textContent = "Seleccionar combustible…";
+      fuelSelect.appendChild(def);
+
+      keys.forEach(k => {
+        const c = combustibles[k];
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = `${c.label} (${c.precio.toString().replace(".", ",")} $/l)`;
+        fuelSelect.appendChild(opt);
+      });
+
+      fuelSelect.disabled = false;
+    }
+
+    // ============================
+    // Helpers de datos
+    // ============================
+    function getSelectedCar() {
+      const brand = brandSelect.value;
+      const model = modelSelect.value;
+      if (!brand || !model || !carData[brand]) return null;
+      return carData[brand].find(c => c.model === model) || null;
+    }
+
+    function getCurrentWltpKm() {
+      const wCustomStr = customWltpKmInput.value.trim().replace(",", ".");
+      const wCustom = parseFloat(wCustomStr);
+      if (!isNaN(wCustom) && wCustom > 0) {
+        return wCustom;
+      }
+
+      const car = getSelectedCar();
+      if (car && car.wltpKm && car.wltpKm > 0) {
+        return car.wltpKm;
+      }
+
+      return null;
+    }
+
+    function parseBatteryKwh() {
+      const vCustom = customBatteryKwhInput.value.trim().replace(",", ".");
+      const nCustom = parseFloat(vCustom);
+      if (!isNaN(nCustom) && nCustom > 0) {
+        return nCustom;
+      }
+
+      const txt = batteryKwhInput.value.trim().replace(",", ".");
+      const n = parseFloat(txt);
+      if (!isNaN(n) && n > 0) return n;
+
+      return null;
+    }
+
+    function validateSoc() {
+      const start = Number(socStartInput.value);
+      const end = Number(socEndInput.value);
+
+      if (
+        isNaN(start) || isNaN(end) ||
+        start < 0 || start > 100 ||
+        end < 0 || end > 100
+      ) {
+        socError.textContent = "El SOC debe estar entre 0 y 100%.";
+        socError.style.display = "block";
+        return null;
+      }
+
+      if (end <= start) {
+        socError.textContent = "El SOC final debe ser mayor que el inicial.";
+        socError.style.display = "block";
+        return null;
+      }
+
+      socError.style.display = "none";
+      return { start, end };
+    }
+
+    function getTarifaSeleccionada() {
+      const tipo = tarifaTipoSelect.value;
+      const franjaKey = franjaSelect.value;
+      if (!tarifas[tipo] || !tarifas[tipo].franjas[franjaKey]) return null;
+      return {
+        tipo,
+        franjaKey,
+        franja: tarifas[tipo].franjas[franjaKey],
+        nombre: tarifas[tipo].nombre
+      };
+    }
+
+    function formatCurrency(value) {
+      return value.toLocaleString("es-UY", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatNumber(value) {
+      return value.toLocaleString("es-UY", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function resetComparisonOutputs() {
+      compKm.textContent = "—";
+      compEvCost.textContent = "—";
+      compIceCost.textContent = "—";
+      compSavings.textContent = "—";
+      compSentenceIce.textContent = "—";
+      barEv.style.width = "0%";
+      barIce.style.width = "0%";
+    }
+
+    function resetSavingsTable(msg) {
+      if (!savingsTableBody) return;
+      savingsTableBody.innerHTML = "";
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.textContent = msg;
+      tr.appendChild(td);
+      savingsTableBody.appendChild(tr);
+    }
+
+    function resetChargersTable(msg) {
+      if (!chargersTableBody) return;
+      chargersTableBody.innerHTML = "";
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.textContent = msg;
+      tr.appendChild(td);
+      chargersTableBody.appendChild(tr);
+
+      if (chargersBars) {
+        chargersBars.innerHTML = "";
+      }
+    }
+
+    // ============================
+    // Cálculos de comparación
+    // ============================
+    function updateComparison() {
+      if (!lastEnergyKwh || !lastEvCost) {
+        resetComparisonOutputs();
+        return;
+      }
+
+      const wltpKm = getCurrentWltpKm();
+      const soc = validateSoc();
+      if (!wltpKm || wltpKm <= 0 || !soc) {
+        resetComparisonOutputs();
+        return;
+      }
+
+      const deltaPercent = soc.end - soc.start;
+      const kmEquivalentes = (wltpKm * deltaPercent) / 100;
+
+      const fuelKey = fuelSelect.value;
+      const fuel = combustibles[fuelKey];
+      const consStr = iceConsumoInput.value.trim().replace(",", ".");
+      const cons = parseFloat(consStr);
+
+      compKm.textContent = formatNumber(kmEquivalentes) + " km";
+      compEvCost.textContent = "$U " + formatCurrency(lastEvCost);
+
+      if (!fuel || !cons || cons <= 0) {
+        compIceCost.textContent = "—";
+        compSavings.textContent = "—";
+        compSentenceIce.textContent = "—";
+        barEv.style.width = "0%";
+        barIce.style.width = "0%";
+        return;
+      }
+
+      const litros = kmEquivalentes / cons;
+      const costoIce = litros * fuel.precio;
+      const ahorro = costoIce - lastEvCost;
+      const ahorroPct = costoIce > 0 ? (ahorro / costoIce) * 100 : 0;
+
+      compIceCost.textContent = "$U " + formatCurrency(costoIce);
+
+      let signo = ahorro >= 0 ? "" : "-";
+      const ahorroAbs = Math.abs(ahorro);
+      const ahorroPctAbs = Math.abs(ahorroPct);
+
+      compSavings.textContent =
+        signo + "$U " + formatCurrency(ahorroAbs) +
+        " (" + formatNumber(ahorroPctAbs) + " %)";
+
+      compSentenceIce.textContent = "$U " + formatCurrency(costoIce);
+
+      const maxCost = Math.max(lastEvCost, costoIce);
+      if (maxCost <= 0) {
+        barEv.style.width = "0%";
+        barIce.style.width = "0%";
+        return;
+      }
+      const evPct = (lastEvCost / maxCost) * 100;
+      const icePct = (costoIce / maxCost) * 100;
+      barEv.style.width = evPct.toFixed(1) + "%";
+      barIce.style.width = icePct.toFixed(1) + "%";
+    }
+
+    function updateTimeSavings() {
+      if (!savingsTableBody) return;
+
+      const wltpKm = getCurrentWltpKm();
+      const batteryFull = parseBatteryKwh();
+      if (!wltpKm || wltpKm <= 0 || !batteryFull || batteryFull <= 0) {
+        resetSavingsTable("Ingresá batería y autonomía WLTP o seleccioná un vehículo con esos datos definidos.");
+        const h = document.getElementById("savingsHighlight");
+        if (h) {
+          h.innerHTML = 'Tu ahorro en 5 años será de un total de <strong>—</strong>.';
+        }
+        return;
+      }
+
+      const tarifaSel = getTarifaSeleccionada();
+      if (!tarifaSel) {
+        resetSavingsTable("Seleccioná una tarifa y franja horaria.");
+        const h = document.getElementById("savingsHighlight");
+        if (h) {
+          h.innerHTML = 'Tu ahorro en 5 años será de un total de <strong>—</strong>.';
+        }
+        return;
+      }
+
+      const fuelKey = fuelSelect.value;
+      const fuel = combustibles[fuelKey];
+      const consStr = iceConsumoInput.value.trim().replace(",", ".");
+      const cons = parseFloat(consStr);
+      const monthlyStr = monthlyKmInput.value.trim().replace(",", ".");
+      const monthly = parseFloat(monthlyStr);
+
+      if (!monthly || monthly <= 0) {
+        resetSavingsTable("Ingresá los km que recorrés por mes.");
+        const h = document.getElementById("savingsHighlight");
+        if (h) {
+          h.innerHTML = 'Tu ahorro en 5 años será de un total de <strong>—</strong>.';
+        }
+        return;
+      }
+
+      if (!fuel || !cons || cons <= 0) {
+        resetSavingsTable("Completá combustible y consumo (km/l) en el panel de comparación.");
+        const h = document.getElementById("savingsHighlight");
+        if (h) {
+          h.innerHTML = 'Tu ahorro en 5 años será de un total de <strong>—</strong>.';
+        }
+        return;
+      }
+
+      const incluyeIva = includeIvaCheckbox.checked;
+      let precioEnergia = tarifaSel.franja.precio;
+      if (incluyeIva) precioEnergia *= 1.22;
+
+      const costEvPerKm = (batteryFull / wltpKm) * precioEnergia;
+      const costIcePerKm = fuel.precio / cons;
+
+      const horizons = [
+        { label: "1 año", years: 1 },
+        { label: "3 años", years: 3 },
+        { label: "5 años", years: 5 },
+        { label: "8 años", years: 8 },
+      ];
+
+      savingsTableBody.innerHTML = "";
+
+      let savings5Years = null;
+
+      horizons.forEach(h => {
+        const km = monthly * 12 * h.years;
+        const evCost = km * costEvPerKm;
+        const iceCost = km * costIcePerKm;
+        const savings = iceCost - evCost;
+        const savingsPct = iceCost > 0 ? (savings / iceCost) * 100 : 0;
+
+        if (h.years === 5) {
+          savings5Years = savings;
+        }
+
+        const tr = document.createElement("tr");
+        const td1 = document.createElement("td");
+        const td2 = document.createElement("td");
+        const td3 = document.createElement("td");
+        const td4 = document.createElement("td");
+        const td5 = document.createElement("td");
+
+        td1.textContent = h.label;
+        td2.textContent = "$U " + formatCurrency(evCost);
+        td3.textContent = "$U " + formatCurrency(iceCost);
+
+        const signo = savings >= 0 ? "" : "-";
+        const savingsAbs = Math.abs(savings);
+        const pctAbs = Math.abs(savingsPct);
+        td4.textContent =
+          signo + "$U " + formatCurrency(savingsAbs) +
+          " (" + formatNumber(pctAbs) + " %)";
+
+        if (usdRate && usdRate > 0) {
+          const savingsUsd = savings / usdRate;
+          const savingsUsdAbs = Math.abs(savingsUsd);
+          td5.textContent =
+            signo + "USD " + savingsUsdAbs.toLocaleString("es-UY", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
+        } else {
+          td5.textContent = "—";
+        }
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
+        savingsTableBody.appendChild(tr);
+      });
+
+      const highlight = document.getElementById("savingsHighlight");
+      if (highlight) {
+        if (savings5Years != null && usdRate && usdRate > 0) {
+          const signo = savings5Years >= 0 ? "" : "-";
+          const savingsUsd = savings5Years / usdRate;
+          const savingsUsdAbs = Math.abs(savingsUsd);
+          const textoMonto = `${signo}USD ${savingsUsdAbs.toLocaleString("es-UY", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}`;
+          highlight.innerHTML =
+            'Tu ahorro en 5 años será de un total de <strong>' +
+            textoMonto +
+            "</strong>.";
+        } else {
+          highlight.innerHTML =
+            'Tu ahorro en 5 años será de un total de <strong>—</strong>.';
+        }
+      }
+    }
+
+    function updateChargersComparison() {
+      if (!chargersTableBody || !chargersBars) return;
+
+      if (!lastEnergyKwh || lastEnergyKwh <= 0 || !lastEvCost) {
+        resetChargersTable("Calculá primero una carga para ver la comparación.");
+        return;
+      }
+
+      const tarifaSel = getTarifaSeleccionada();
+      if (!tarifaSel) {
+        resetChargersTable("Seleccioná una tarifa y franja horaria.");
+        return;
+      }
+
+      chargersTableBody.innerHTML = "";
+      chargersBars.innerHTML = "";
+
+      const resultados = [];
+
+      // Opción: carga en casa (UTE)
+      const incluyeIva = includeIvaCheckbox.checked;
+      let precioEnergiaBase = tarifaSel.franja.precio;
+      if (incluyeIva) precioEnergiaBase *= 1.22;
+
+      const precioEfectivoKwhCasa =
+        lastEnergyKwh > 0 ? lastEvCost / lastEnergyKwh : precioEnergiaBase;
+
+      resultados.push({
+        empresa: "Carga en casa (UTE)",
+        bajada: 0,
+        precioKwh: precioEfectivoKwhCasa,
+        costoTotal: lastEvCost,
+        esCasa: true
+      });
+
+      // Cargadores externos (si hay)
+      if (cargadores && cargadores.length > 0) {
+        cargadores.forEach(ch => {
+          const costoTotal = ch.bajada + lastEnergyKwh * ch.precioKwh;
+          resultados.push({
+            empresa: ch.empresa,
+            bajada: ch.bajada,
+            precioKwh: ch.precioKwh,
+            costoTotal,
+            esCasa: false
+          });
+        });
+      }
+
+      if (resultados.length === 0) {
+        resetChargersTable("Sin datos de cargadores (revisar cargadores.csv).");
+        return;
+      }
+
+      // Ordenar por costo total (la más barata primero)
+      resultados.sort((a, b) => a.costoTotal - b.costoTotal);
+
+      let maxCost = 0;
+      resultados.forEach(r => {
+        if (r.costoTotal > maxCost) maxCost = r.costoTotal;
+      });
+
+      if (maxCost <= 0) {
+        resetChargersTable("No se pudieron calcular costos válidos para los cargadores.");
+        return;
+      }
+
+      resultados.forEach((r, index) => {
+        const isCheapest = index === 0;
+        const color = isCheapest ? "#22c55e" : "#ef4444";
+
+        // Tabla
+        const tr = document.createElement("tr");
+        const td1 = document.createElement("td");
+        const td2 = document.createElement("td");
+        const td3 = document.createElement("td");
+        const td4 = document.createElement("td");
+        const td5 = document.createElement("td");
+
+        td1.textContent = r.empresa;
+        td2.textContent = "$U " + formatCurrency(r.bajada || 0);
+        td3.textContent = "$U " + formatCurrency(r.precioKwh);
+        td4.textContent = "$U " + formatCurrency(r.costoTotal);
+
+        if (isCheapest) {
+          td4.style.color = "#22c55e";
+        } else {
+          td4.style.color = "#ef4444";
+        }
+
+        if (usdRate && usdRate > 0) {
+          const usdVal = r.costoTotal / usdRate;
+          td5.textContent = "USD " + usdVal.toLocaleString("es-UY", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        } else {
+          td5.textContent = "—";
+        }
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
+        chargersTableBody.appendChild(tr);
+
+        // Barras
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "charger-bar-row";
+
+        const labelDiv = document.createElement("div");
+        labelDiv.className = "charger-bar-label";
+        labelDiv.textContent = r.empresa;
+
+        const trackDiv = document.createElement("div");
+        trackDiv.className = "charger-bar-track";
+
+        const fillDiv = document.createElement("div");
+        fillDiv.className = "charger-bar-fill";
+
+        const pct = (r.costoTotal / maxCost) * 100;
+        fillDiv.style.width = pct.toFixed(1) + "%";
+        fillDiv.style.backgroundColor = color;
+
+        trackDiv.appendChild(fillDiv);
+        rowDiv.appendChild(labelDiv);
+        rowDiv.appendChild(trackDiv);
+        chargersBars.appendChild(rowDiv);
+      });
+    }
+
+    // ============================
+    // Re-cálculo principal
+    // ============================
+    function recalculate() {
+      chipRow.innerHTML = "";
+
+      const batteryKwh = parseBatteryKwh();
+      const soc = validateSoc();
+      const tarifaSel = getTarifaSeleccionada();
+
+      if (!batteryKwh || !soc || !tarifaSel) {
+        resultCost.innerHTML = '<span class="currency">$U</span>0,00';
+        if (!batteryKwh) {
+          resultSub.textContent = "Falta seleccionar vehículo o definir batería.";
+        } else if (!tarifaSel) {
+          resultSub.textContent = "Falta seleccionar una tarifa/franja válida.";
+        } else {
+          resultSub.textContent = "Falta información para calcular.";
+        }
+        lastEnergyKwh = null;
+        lastEvCost = null;
+        resetComparisonOutputs();
+        resetSavingsTable("Ingresá tus km mensuales para ver el ahorro estimado.");
+        const h = document.getElementById("savingsHighlight");
+        if (h) {
+          h.innerHTML = 'Tu ahorro en 5 años será de un total de <strong>—</strong>.';
+        }
+        resetChargersTable("Calculá primero una carga para ver la comparación.");
+        return;
+      }
+
+      const deltaPercent = soc.end - soc.start;
+      const energyKwh = (batteryKwh * deltaPercent) / 100;
+
+      let precioEnergia = tarifaSel.franja.precio;
+      const incluyeIva = includeIvaCheckbox.checked;
+      if (incluyeIva) precioEnergia *= 1.22;
+
+      const costo = energyKwh * precioEnergia;
+
+      lastEnergyKwh = energyKwh;
+      lastEvCost = costo;
+
+      resultCost.innerHTML =
+        '<span class="currency">$U</span>' + formatCurrency(costo);
+      resultSub.innerHTML =
+        `Carga de <strong>${formatNumber(energyKwh)} kWh</strong> ` +
+        `(${deltaPercent}% de la batería) en <strong>${tarifaSel.franja.label}</strong>.`;
+
+      const chip1 = document.createElement("div");
+      chip1.className = "chip";
+      chip1.innerHTML = `<strong>Batería:</strong> ${formatNumber(batteryKwh)} kWh`;
+
+      const chip2 = document.createElement("div");
+      chip2.className = "chip";
+      chip2.innerHTML =
+        `<strong>Tarifa:</strong> ${tarifaSel.nombre} – ${tarifaSel.franja.label}`;
+
+      const chip3 = document.createElement("div");
+      chip3.className = "chip";
+      chip3.innerHTML =
+        `<strong>Precio energía:</strong> ${formatNumber(
+          tarifaSel.franja.precio * (incluyeIva ? 1.22 : 1)
+        )} $/kWh` +
+        (incluyeIva ? " (con IVA)" : " (sin IVA)");
+
+      chipRow.appendChild(chip1);
+      chipRow.appendChild(chip2);
+      chipRow.appendChild(chip3);
+
+      const vCustomBatStr = customBatteryKwhInput.value.trim().replace(",", ".");
+      const customBat = parseFloat(vCustomBatStr);
+      const hasCustomBat = !isNaN(customBat) && customBat > 0;
+
+      const vCustomWltpStr = customWltpKmInput.value.trim().replace(",", ".");
+      const customWltp = parseFloat(vCustomWltpStr);
+      const hasCustomWltp = !isNaN(customWltp) && customWltp > 0;
+
+      if (hasCustomBat || hasCustomWltp) {
+        const chipCustom = document.createElement("div");
+        chipCustom.className = "chip";
+        let desc = "Modo personalizado: ";
+        if (hasCustomBat && hasCustomWltp) {
+          desc += "batería y WLTP propios";
+        } else if (hasCustomBat) {
+          desc += "batería propia";
+        } else {
+          desc += "WLTP propio";
+        }
+        chipCustom.innerHTML = `<strong>${desc}</strong>`;
+        chipRow.appendChild(chipCustom);
+      }
+
+      updateComparison();
+      updateTimeSavings();
+      updateChargersComparison();
+    }
+
+    // ============================
+    // Listeners
+    // ============================
+    brandSelect.addEventListener("change", () => {
+      updateModels();
+      updateBatteryFromModel();
+      recalculate();
+    });
+
+    modelSelect.addEventListener("change", () => {
+      updateBatteryFromModel();
+      recalculate();
+    });
+
+    customBatteryKwhInput.addEventListener("input", () => {
+      recalculate();
+    });
+
+    customWltpKmInput.addEventListener("input", () => {
+      updateComparison();
+      updateTimeSavings();
+      updateChargersComparison();
+    });
+
+    socStartInput.addEventListener("input", recalculate);
+    socEndInput.addEventListener("input", recalculate);
+
+    tarifaTipoSelect.addEventListener("change", () => {
+      initFranjas();
+      recalculate();
+    });
+
+    franjaSelect.addEventListener("change", recalculate);
+    includeIvaCheckbox.addEventListener("change", () => {
+      recalculate();
+    });
+
+    fuelSelect.addEventListener("change", () => {
+      updateComparison();
+      updateTimeSavings();
+    });
+
+    iceConsumoInput.addEventListener("input", () => {
+      updateComparison();
+      updateTimeSavings();
+    });
+
+    monthlyKmInput.addEventListener("input", updateTimeSavings);
+
+    // Collapsibles
+    document.querySelectorAll(".collapse-btn").forEach(btn => {
+      const targetId = btn.dataset.target;
+      const panel = document.getElementById(targetId);
+      const labelSpan = btn.querySelector(".collapse-btn-label");
+
+      function syncLabel() {
+        const open = panel.getAttribute("data-open") !== "false";
+        labelSpan.textContent = open ? "Ocultar" : "Mostrar";
+      }
+
+      syncLabel();
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const open = panel.getAttribute("data-open") !== "false";
+        panel.setAttribute("data-open", open ? "false" : "true");
+        syncLabel();
+      });
+
+      const title = panel.querySelector(".card-title");
+      if (title && !title._collapseBound) {
+        title._collapseBound = true;
+        title.addEventListener("click", (e) => {
+          if (e.target.closest(".collapse-btn")) return;
+          const open = panel.getAttribute("data-open") !== "false";
+          panel.setAttribute("data-open", open ? "false" : "true");
+          syncLabel();
+        });
+      }
+    });
+
+    // ============================
+    // Inicialización global
+    // ============================
+    async function init() {
+      try {
+        const vehRows = await loadCSV("vehiculos.csv");
+        const tarRows = await loadCSV("tarifas.csv");
+
+        let fuelRows = null;
+        let usdRows = null;
+        let chargersRows = null;
+
+        try {
+          fuelRows = await loadCSV("ancap.csv");
+        } catch (e) {
+          console.warn("No se pudo cargar ancap.csv:", e);
+        }
+
+        try {
+          usdRows = await loadCSV("dolar.csv");
+        } catch (e) {
+          console.warn("No se pudo cargar dolar.csv:", e);
+        }
+
+        try {
+          chargersRows = await loadCSV("cargadores.csv");
+        } catch (e) {
+          console.warn("No se pudo cargar cargadores.csv:", e);
+        }
+
+        applyVehiculosData(vehRows);
+        applyTarifasData(tarRows);
+
+        if (fuelRows) {
+          applyCombustiblesData(fuelRows);
+        } else {
+          fuelSelect.innerHTML = "";
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "Sin datos de combustibles (ancap.csv no encontrado)";
+          fuelSelect.appendChild(opt);
+          fuelSelect.disabled = true;
+        }
+
+        if (usdRows) {
+          applyUsdData(usdRows);
+        }
+
+        if (chargersRows) {
+          applyChargersData(chargersRows);
+        }
+
+        populateBrandSelect();
+        populateTarifaTipoSelect();
+        populateTarifaTable();
+
+        dataStatus.innerHTML = "";
+        resultSub.textContent = "Seleccioná un vehículo o ingresá los datos personalizados y una franja para calcular el costo.";
+      } catch (err) {
+        console.error(err);
+        dataStatus.innerHTML = "";
+        tarifaTableBody.innerHTML = `
+          <tr><td colspan="3">No se pudieron cargar las tarifas.</td></tr>
+        `;
+      } finally {
+        recalculate();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
