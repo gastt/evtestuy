@@ -81,6 +81,51 @@
       letter-spacing: 0.08em;
     }
 
+    /* ============================
+       HERO title (color + glow)
+       ============================ */
+    .hero-title {
+      margin: 0 0 4px;
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-title-text {
+      background: linear-gradient(90deg, #22c55e 0%, #4ade80 35%, #86efac 70%, #22c55e 100%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: titleShimmer 3.2s ease-in-out infinite;
+    }
+
+    @keyframes titleShimmer {
+      0%   { background-position: 0% 50%; filter: drop-shadow(0 0 0 rgba(34,197,94,0.0)); }
+      45%  { filter: drop-shadow(0 0 10px rgba(34,197,94,0.35)); }
+      100% { background-position: 100% 50%; filter: drop-shadow(0 0 3px rgba(34,197,94,0.22)); }
+    }
+
+    .hero-tagline {
+      margin: 0 0 10px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+
+    /* Mobile: center header title/tagline */
+    @media (max-width: 560px) {
+      header { text-align: center; }
+      .hero-title { justify-content: center; width: 100%; }
+      .pill-row { justify-content: center; }
+      .status { text-align: center; }
+    }
+
+
     .subtitle {
       margin: 0;
       font-size: 0.86rem;
@@ -306,6 +351,39 @@
       font-size: 0.76rem;
       color: var(--error);
     }
+
+
+    /* Share PDF button */
+    .share-row{
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .share-btn{
+      border-radius: 999px;
+      padding: 9px 14px;
+      border: 1px solid rgba(34, 197, 94, 0.65);
+      background: rgba(34, 197, 94, 0.10);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .share-btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+      background: rgba(34, 197, 94, 0.14);
+    }
+    .share-btn:active{ transform: translateY(0); box-shadow: none; }
+    .share-note{ font-size: 0.72rem; color: var(--text-muted); }
+    @media (max-width:560px){
+      .share-row{ justify-content: center; }
+      .share-btn{ width: 100%; max-width: 280px; }
+    }
+
 
     .footer {
       margin-top: 12px;
@@ -599,11 +677,173 @@
     }
 
     .section-callout .hint {
+      display: block;
+      margin-top: 4px;
       font-weight: 500;
       color: var(--text-muted);
       margin-left: 6px;
       font-size: 0.82em;
     }
+
+
+    /* ============================
+       Mejor UX en móviles
+       - 1 campo por línea (selects/inputs)
+       ============================ */
+    @media (max-width: 560px) {
+      .grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+      }
+
+      select,
+      input[type="number"],
+      input[type="text"] {
+        padding: 10px 12px;
+        font-size: 0.92rem;
+      }
+
+      .field-inline {
+        align-items: flex-start;
+      }
+
+      .section-callout {
+        width: 100%;
+        border-radius: 16px;
+        padding: 10px 12px;
+      }
+    }
+
+
+    /* ============================
+       Mobile: ocultar columnas de ahorro para simplificar
+       ============================ */
+    @media (max-width: 560px) {
+      /* Tablas de ahorro en el tiempo */
+      .savings-card table th:nth-child(5),
+      .savings-card table td:nth-child(5) {
+        display: none;
+      }
+
+      /* Tabla de comparación de cargadores */
+      .chargers-card table th:nth-child(5),
+      .chargers-card table td:nth-child(5) {
+        display: none;
+      }
+    }
+
+
+    /* ============================
+       Share Card (Story)
+       ============================ */
+    .share-card-wrap {
+      position: fixed;
+      left: -10000px;
+      top: 0;
+      width: 1080px;
+      height: auto; /* Auto height: se ajusta al contenido */
+      max-height: none;
+
+      padding: 56px;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+      overflow: hidden;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .share-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .share-brand { display: flex; flex-direction: column; gap: 6px; }
+
+    .share-title {
+      font-size: 64px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      background: linear-gradient(90deg,#22c55e,#4ade80,#86efac);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 10px rgba(34,197,94,0.35));
+    }
+
+    .share-subtitle {
+      font-size: 26px;
+      color: rgba(229,231,235,0.75);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .share-badge {
+      font-size: 20px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.65);
+      background: rgba(34,197,94,0.10);
+      color: #a7f3d0;
+      white-space: nowrap;
+      height: fit-content;
+    }
+
+    .share-card-main { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+    .share-hero {
+      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.20) 0, rgba(2, 6, 23, 0.82) 70%);
+      border: 1px solid rgba(34, 197, 94, 0.65);
+      border-radius: 24px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .share-hero-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+
+    .share-vehicle { font-size: 28px; color: rgba(229,231,235,0.9); font-weight: 800; }
+
+    .share-cost { font-size: 78px; font-weight: 900; line-height: 1; color: #e5e7eb; }
+    .share-cost small { font-size: 32px; color: rgba(229,231,235,0.65); font-weight: 700; margin-right: 8px; }
+
+    .share-meta { font-size: 22px; color: rgba(229,231,235,0.65); line-height: 1.25; }
+
+    .share-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+    .share-highlight {
+      border-radius: 22px;
+      padding: 20px 22px;
+      background: radial-gradient(circle at top, rgba(245, 158, 11, 0.20) 0, rgba(2, 6, 23, 0.80) 70%);
+      border: 1px solid rgba(245, 158, 11, 0.7);
+      color: rgba(229,231,235,0.88);
+      font-size: 26px;
+      line-height: 1.25;
+      box-shadow: 0 16px 45px rgba(0,0,0,0.35);
+    }
+
+    .share-highlight strong { color: #fbbf24; font-weight: 900; }
+
+    .share-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 20px;
+      color: rgba(229,231,235,0.55);
+      border-top: 1px solid rgba(148, 163, 184, 0.18);
+      padding-top: 14px;
+    }
+
+    .share-footer .link { color: rgba(167, 243, 208, 0.85); font-weight: 800; letter-spacing: 0.06em; }
 
 </style>
 </head>
@@ -612,10 +852,10 @@
     <!-- Panel Izquierdo -->
     <div>
       <header>
-        <h1>
-          Calculadora de carga EV
-          <span class="badge">URUGUAY</span>
+        <h1 class="hero-title" aria-label="Calculadora de carga EV">
+          <span class="hero-title-text">Calculadora de carga EV</span>
         </h1>
+        <p class="hero-tagline">Calcula tu ahorro</p>
         <p class="subtitle">
           Estimá el costo de la carga eléctrica y comparalo con tu auto a combustión.
         </p>
@@ -630,7 +870,7 @@
       <!-- Callout: selección de vehículo -->
       <div class="section-callout" aria-label="Guía de selección de vehículo">
         <span class="dot" aria-hidden="true"></span>
-        <span class="text">Elegí marca y modelo de tu vehículo eléctrico<span class="hint">• podés usar “Vehículo personalizado” si no está en la lista</span></span>
+        <span class="text">Elegí marca y modelo de tu vehículo eléctrico<span class="hint">Podés usar “Vehículo personalizado” si no está en la lista</span></span>
       </div>
 
 <!-- 1) Vehículo -->
@@ -709,7 +949,7 @@
         <span class="dot" aria-hidden="true"></span>
         <span class="text">
           Elegí la tarifa de UTE que más se adapte a ti.
-          <span class="hint">• El horario más conveniente para cargar es de 00:00 a 7:00 horas en Tarifa Residencial Triple Horario</span>
+          <span class="hint">En Triple Horario desde 00:00 a 7:00 es el horario más económico para cargar</span>
         </span>
       </div>
 
@@ -820,6 +1060,14 @@
           Esperando datos y selección de vehículo…
         </div>
         <div class="chip-row" id="chipRow"></div>
+
+      <div class="share-row">
+	<button class="share-btn" id="shareImgBtn" type="button" title="Generar imagen para stories">
+          Compartir (Imagen)
+        </button>
+        <span class="share-note" id="sharePdfNote" aria-live="polite"></span>
+      </div>
+
       </div>
 
       
@@ -890,7 +1138,12 @@
             </div>
           </div>
         </div>
-        <p class="comp-note">
+        
+        <p class="savings-highlight" id="iceSummaryHighlight" style="margin-top:14px;">
+          Con tu <strong id="iceSummaryCar">—</strong> te ahorrás <strong id="iceSummarySavings">—</strong> para recorrer <strong id="iceSummaryKm">—</strong> comparado con tu vehículo a combustión.
+        </p>
+
+<p class="comp-note">
           En tu vehículo actual gastarías aproximadamente <strong id="compSentenceIce">—</strong> para recorrer lo mismo que con esta carga.
         </p>
       </div>
@@ -988,6 +1241,12 @@
         <div class="chargers-bars" id="chargersBars">
           <!-- Barras dinámicas -->
         </div>
+
+        <p class="savings-highlight" id="bestChargerSummary" style="margin-top:14px;">
+          El método de carga que más te conviene es <strong id="bestChargerMethod">—</strong>,
+          con un costo de <strong id="bestChargerCost">—</strong> por carga para recorrer <strong id="bestChargerKm">—</strong>.
+        </p>
+
       </div>
     </div>
   
@@ -998,13 +1257,48 @@
         Los valores mostrados son estimaciones de carácter informativo, calculadas a partir de datos públicos
         y referencias disponibles en internet. Los costos pueden variar según condiciones reales de uso,
         instalaciones, contratos y factores externos. Esta herramienta no constituye asesoramiento técnico 
-        o comercial y no asume responsabilidad por decisiones basadas en estos cálculos. Muchos vehículos del listado no declaran su rango en ciclo WLTP (el ciclo más realista), 
-por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP según corresponda. De igual manera en circunstancias reales de uso el rendimiento en carretera puede ser entre un 10% o 20% menor según condiciones de uso y factores externos. Para comentarios o sugerencias: 
+        o comercial y no asume responsabilidad por decisiones basadas en estos cálculos. Muchos vehículos del listado no declaran 	su rango en ciclo WLTP (el ciclo más realista), 
+	por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP según corresponda. De igual manera en 	circunstancias reales de uso el rendimiento en carretera puede ser entre un 10% o 20% menor según condiciones de uso y 	factores externos. Para comentarios o sugerencias: 
         <a href="mailto:evuyapp@gmail.com">evuyapp@gmail.com</a>.
       </p>
     </div>
 
 </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <!-- Share Card (Story) -->
+    <div class="share-card-wrap" id="shareCard" aria-hidden="true">
+      <div class="share-card-top">
+        <div class="share-brand">
+          <div class="share-title">EVUruguay</div>
+          <div class="share-subtitle">Calculá tu ahorro</div>
+        </div>
+        <div class="share-badge" id="shareBadge">Resumen</div>
+      </div>
+
+      <div class="share-card-main">
+        <div class="share-hero">
+          <div class="share-hero-row">
+            <div class="share-vehicle" id="shareVehicle">—</div>
+            <div class="share-meta" id="shareTarifa">—</div>
+          </div>
+          <div class="share-cost" id="shareCost"><small>$U</small>0,00</div>
+          <div class="share-meta" id="shareMetaLine">—</div>
+        </div>
+
+        <div class="share-grid">
+          <div class="share-highlight" id="shareHighlight1">—</div>
+          <div class="share-highlight" id="shareHighlight2">—</div>
+          <div class="share-highlight" id="shareHighlight3">—</div>
+        </div>
+      </div>
+
+      <div class="share-footer">
+        <div>Estimativo • Puede variar</div>
+        <div class="link">evuruguay.com</div>
+      </div>
+    </div>
 
   <script>
     // ============================
@@ -1104,7 +1398,10 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
     }
 
     async function loadCSV(path) {
-      const res = await fetch(path);
+      const url = new URL(path, window.location.href);
+      url.searchParams.set("v", Date.now().toString()); // cache-busting
+
+      const res = await fetch(url.toString(), { cache: "no-store" });
       if (!res.ok) {
         throw new Error(`Error HTTP ${res.status}`);
       }
@@ -1559,6 +1856,14 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
       compSentenceIce.textContent = "—";
       barEv.style.width = "0%";
       barIce.style.width = "0%";
+
+      const sCar = document.getElementById("iceSummaryCar");
+      const sSav = document.getElementById("iceSummarySavings");
+      const sKm = document.getElementById("iceSummaryKm");
+      if (sCar) sCar.textContent = "—";
+      if (sSav) sSav.textContent = "—";
+      if (sKm) sKm.textContent = "—";
+
     }
 
     function resetSavingsTable(msg) {
@@ -1584,6 +1889,13 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
 
       if (chargersBars) {
         chargersBars.innerHTML = "";
+
+      const bestMethod = document.getElementById("bestChargerMethod");
+      const bestCost = document.getElementById("bestChargerCost");
+      const bestKm = document.getElementById("bestChargerKm");
+      if (bestMethod) bestMethod.textContent = "—";
+      if (bestCost) bestCost.textContent = "—";
+      if (bestKm) bestKm.textContent = "—";
       }
     }
 
@@ -1620,6 +1932,13 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
         compSentenceIce.textContent = "—";
         barEv.style.width = "0%";
         barIce.style.width = "0%";
+
+        const sCar = document.getElementById("iceSummaryCar");
+        const sSav = document.getElementById("iceSummarySavings");
+        const sKm = document.getElementById("iceSummaryKm");
+        if (sCar) sCar.textContent = "—";
+        if (sSav) sSav.textContent = "—";
+        if (sKm) sKm.textContent = "—";
         return;
       }
 
@@ -1639,6 +1958,22 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
         " (" + formatNumber(ahorroPctAbs) + " %)";
 
       compSentenceIce.textContent = "$U " + formatCurrency(costoIce);
+
+      // Destacado resumen (mismo estilo que el panel de ahorro)
+      const sCar = document.getElementById("iceSummaryCar");
+      const sSav = document.getElementById("iceSummarySavings");
+      const sKm = document.getElementById("iceSummaryKm");
+      if (sCar && sSav && sKm) {
+        const brand = brandSelect.value || "";
+        const model = modelSelect.value || "";
+        const carLabel = (brand && model) ? (brand + " " + model) : "EV";
+        sCar.textContent = carLabel;
+        // ahorro puede ser negativo, respetamos el signo
+        const prefix = ahorro >= 0 ? "" : "-";
+        sSav.textContent = prefix + "$U " + formatCurrency(Math.abs(ahorro));
+        sKm.textContent = formatNumber(kmEquivalentes) + " km";
+      }
+
 
       const maxCost = Math.max(lastEvCost, costoIce);
       if (maxCost <= 0) {
@@ -1803,6 +2138,16 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
         return;
       }
 
+      // Km equivalentes estimados con esta carga (si el CSV trae WLTP km del vehículo)
+      let kmEquivalentesBase = null;
+      const carSel = getSelectedCar();
+      const socSel = validateSoc();
+      if (carSel && carSel.wltpKm && carSel.wltpKm > 0 && socSel) {
+        const deltaPercent = socSel.end - socSel.start;
+        kmEquivalentesBase = (carSel.wltpKm * deltaPercent) / 100;
+      }
+
+
       chargersTableBody.innerHTML = "";
       chargersBars.innerHTML = "";
 
@@ -1821,7 +2166,8 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
         bajada: 0,
         precioKwh: precioEfectivoKwhCasa,
         costoTotal: lastEvCost,
-        esCasa: true
+        esCasa: true,
+        kmEquivalentes: kmEquivalentesBase
       });
 
       // Cargadores externos (si hay)
@@ -1833,7 +2179,8 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
             bajada: ch.bajada,
             precioKwh: ch.precioKwh,
             costoTotal,
-            esCasa: false
+            esCasa: false,
+            kmEquivalentes: kmEquivalentesBase
           });
         });
       }
@@ -1845,6 +2192,24 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
 
       // Ordenar por costo total (la más barata primero)
       resultados.sort((a, b) => a.costoTotal - b.costoTotal);
+
+      // Destacado: método más conveniente (el más barato)
+      const best = resultados[0];
+      const bestSummary = document.getElementById("bestChargerSummary");
+      const bestMethod = document.getElementById("bestChargerMethod");
+      const bestCost = document.getElementById("bestChargerCost");
+      const bestKm = document.getElementById("bestChargerKm");
+      if (bestSummary && bestMethod && bestCost && bestKm) {
+        bestMethod.textContent = best.empresa;
+        bestCost.textContent = "$U " + formatCurrency(best.costoTotal);
+        // Si tenemos WLTP km equivalentes, los mostramos; si no, mostramos "—"
+        if (best.kmEquivalentes && best.kmEquivalentes > 0) {
+          bestKm.textContent = formatNumber(best.kmEquivalentes) + " km";
+        } else {
+          bestKm.textContent = "—";
+        }
+      }
+
 
       let maxCost = 0;
       resultados.forEach(r => {
@@ -2170,7 +2535,151 @@ por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP seg�
     }
 
     init();
-  </script>
+
+    // ============================
+    // Compartir: PDF con resúmenes
+    // ============================
+    const sharePdfBtn = document.getElementById("sharePdfBtn");
+    const sharePdfNote = document.getElementById("sharePdfNote");
+
+    function safeText(id) {
+      const el = document.getElementById(id);
+      if (!el) return "—";
+      const t = (el.innerText || el.textContent || "").trim();
+      return t || "—";
+    }
+
+    function getVehicleLabel() {
+      const brand = (brandSelect && brandSelect.value) ? brandSelect.value.trim() : "";
+      const model = (modelSelect && modelSelect.value) ? modelSelect.value.trim() : "";
+      if (brand && model) return `${brand} ${model}`;
+
+      const b = parseBatteryKwh();
+      const w = getCurrentWltpKm();
+      if (b || w) return "Vehículo personalizado";
+
+      return "—";
+    }
+
+    function wrapText(doc, text, x, y, maxWidth, lineHeight) {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      lines.forEach((line, i) => {
+        doc.text(line, x, y + i * lineHeight);
+      });
+      return y + (lines.length - 1) * lineHeight;
+    }
+
+    
+    // ============================
+    // Compartir: tarjeta estilo story (PDF o Imagen)
+    // ============================
+    function setShareNote(msg) {
+      const note = document.getElementById("sharePdfNote");
+      if (note) note.textContent = msg || "";
+    }
+
+    async function renderShareCard() {
+      const shareCard = document.getElementById("shareCard");
+      if (!shareCard) throw new Error("shareCard no encontrado");
+
+      const brand = brandSelect?.value || "";
+      const model = modelSelect?.value || "";
+      const vehicleLabel = (brand && model) ? (brand + " " + model) : "Vehículo";
+      document.getElementById("shareVehicle").textContent = vehicleLabel;
+
+      const costText = (document.getElementById("resultCost")?.innerText || "").trim();
+      const normalized = costText.replace(/\s+/g, " ").replace("$U", "").trim();
+      document.getElementById("shareCost").innerHTML = "<small>$U</small>" + (normalized || "0,00");
+
+      const tarifaSel = getTarifaSeleccionada();
+      const tarifaLine = tarifaSel ? (tarifaSel.nombre + " – " + tarifaSel.franja.label) : "—";
+      document.getElementById("shareTarifa").textContent = tarifaLine;
+
+      const subLine = (document.getElementById("resultSub")?.innerText || "").trim();
+      document.getElementById("shareMetaLine").textContent = subLine || "—";
+
+      const h1 = document.getElementById("iceSummaryHighlight")?.innerText?.trim() || "—";
+      const h2 = document.querySelector("#panelAhorro .savings-highlight")?.innerText?.trim() || "—";
+      const h3 = document.getElementById("bestChargerSummary")?.innerText?.trim() || "—";
+
+      document.getElementById("shareHighlight1").textContent = h1;
+      document.getElementById("shareHighlight2").textContent = h2;
+      document.getElementById("shareHighlight3").textContent = h3;
+
+      const now = new Date();
+      const dd = now.toLocaleDateString("es-UY", { year: "numeric", month: "2-digit", day: "2-digit" });
+      document.getElementById("shareBadge").textContent = "Resumen • " + dd;
+
+      return shareCard;
+    }
+
+    async function captureShareCanvas() {
+      if (!window.html2canvas) throw new Error("html2canvas no cargó");
+      const card = await renderShareCard();
+
+      // Ajuste dinámico de alto para evitar espacio vacío
+      card.style.height = "auto";
+      // Forzamos reflow
+      void card.offsetHeight;
+      const h = Math.max(card.scrollHeight, card.getBoundingClientRect().height);
+      card.style.height = Math.ceil(h) + "px";
+
+      const canvas = await html2canvas(card, { backgroundColor: null, scale: 2, useCORS: true });
+      return canvas;
+    }
+
+    async function shareAsImage() {
+      try {
+        setShareNote("Generando imagen…");
+        const canvas = await captureShareCanvas();
+        const link = document.createElement("a");
+        link.download = "evuruguay-resumen.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        setShareNote("Imagen lista ✅");
+        setTimeout(() => setShareNote(""), 1200);
+      } catch (e) {
+        console.error(e);
+        setShareNote("No se pudo generar la imagen.");
+      }
+    }
+
+    async function shareAsPDFStory() {
+      try {
+        setShareNote("Generando PDF…");
+        const canvas = await captureShareCanvas();
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
+
+        const jspdf = window.jspdf;
+        if (!jspdf || !jspdf.jsPDF) throw new Error("jsPDF no cargó");
+        const { jsPDF } = jspdf;
+
+        const wPx = canvas.width;
+        const hPx = canvas.height;
+
+        const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [wPx, hPx], hotfixes: ["px_scaling"] });
+        pdf.addImage(imgData, "JPEG", 0, 0, wPx, hPx, undefined, "FAST");
+        pdf.save("evuruguay-resumen.pdf");
+
+        setShareNote("PDF listo ✅");
+        setTimeout(() => setShareNote(""), 1200);
+      } catch (e) {
+        console.error(e);
+        setShareNote("No se pudo generar el PDF.");
+      }
+    }
+
+    window.addEventListener("load", () => {
+      const btnPdf = document.getElementById("sharePdfBtn");
+      const btnImg = document.getElementById("shareImgBtn");
+      if (btnPdf) btnPdf.addEventListener("click", shareAsPDFStory);
+      if (btnImg) btnImg.addEventListener("click", shareAsImage);
+    });
+</script>
+
+  <!-- Librerías para compartir (captura con estilo del sitio) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </body>
 </html>
 
