@@ -1,6 +1,7 @@
 tipo_tarifa,franja,etiqueta,precio_sin_iva
-doble,fuera_punta,Fuera de Punta,4.771
-doble,punta,Punta,12.034
-triple,valle,Valle,2.443
-triple,llano,Llano,5.172
-triple,punta,Punta,12.034
+doble,fuera_punta,Fuera de Punta,4.961
+doble,punta,Punta,12.515
+triple,valle,Valle,2.540
+triple,llano,Llano,5.378
+triple,punta,Punta,12.515
+
