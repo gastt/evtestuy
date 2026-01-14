@@ -845,6 +845,25 @@
 
     .share-footer .link { color: rgba(167, 243, 208, 0.85); font-weight: 800; letter-spacing: 0.06em; }
 
+
+/* --- Override SOLO para el último menú (Comparador de redes) --- */
+#panelComparadorRedes {
+  background: radial-gradient(circle at top, rgba(239, 68, 68, 0.22) 0, #020617 70%) !important;
+  border: 1px solid rgba(239, 68, 68, 0.7) !important;
+}
+
+#panelComparadorRedes .collapse-btn {
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #ef4444 !important;
+}
+
+#panelComparadorRedes a {
+  border: 1px solid rgba(239, 68, 68, 0.65) !important;
+  background: rgba(239, 68, 68, 0.10) !important;
+  color: #fca5a5 !important;
+}
+
 </style>
 </head>
 <body>
@@ -949,7 +968,7 @@
         <span class="dot" aria-hidden="true"></span>
         <span class="text">
           Elegí la tarifa de UTE que más se adapte a ti.
-          <span class="hint">El horario más conveniente para cargar es de 00:00 a 7:00 horas en Tarifa Residencial Triple Horario</span>
+          <span class="hint">En Triple Horario desde 00:00 a 7:00 es el horario más económico para cargar</span>
         </span>
       </div>
 
@@ -1250,6 +1269,39 @@
       </div>
     </div>
   
+    <!-- Compará el costo de carga en diferentes redes -->
+    <div class="chargers-card collapsible" id="panelComparadorRedes" data-open="false">
+      <div class="card-title">
+        <span>Compará el costo de tu carga en las diferentes redes de carga de Uruguay</span>
+        <button class="collapse-btn" type="button" data-target="panelComparadorRedes">
+          <span class="collapse-btn-label">Mostrar</span>
+          <span class="collapse-btn-icon">▼</span>
+        </button>
+      </div>
+
+      <div class="collapsible-body">
+        <p class="note">
+          Accedé a la herramienta donde podés comparar cuánto cuesta la misma carga
+          en cada red pública y privada del país.
+        </p>
+
+        <a href="/carga.html" 
+           style="
+             display:inline-block;
+             margin-top:12px;
+             padding:10px 16px;
+             border-radius:999px;
+             border:1px solid rgba(34, 197, 94, 0.65);
+             color:#e5e7eb;
+             background:rgba(34, 197, 94, 0.10);
+             text-decoration:none;
+             font-weight:600;
+             transition:0.15s;">
+          Ir al comparador de redes →
+        </a>
+      </div>
+    </div>
+
     <!-- Pie de página -->
     <div class="app-footer">
       <div class="app-footer-separator"></div>
@@ -1257,9 +1309,9 @@
         Los valores mostrados son estimaciones de carácter informativo, calculadas a partir de datos públicos
         y referencias disponibles en internet. Los costos pueden variar según condiciones reales de uso,
         instalaciones, contratos y factores externos. Esta herramienta no constituye asesoramiento técnico 
-        o comercial y no asume responsabilidad por decisiones basadas en estos cálculos. Muchos vehículos del listado no declaran su rango en ciclo WLTP (el ciclo más realista), 
-por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP según corresponda. De igual manera en circunstancias reales de uso el rendimiento en carretera puede ser entre un 10% o 20% menor según condiciones de uso y factores externos. Para comentarios o sugerencias: 
-        <a href="mailto:evuyapp@gmail.com">evuyapp@gmail.com</a>.
+        o comercial y no asume responsabilidad por decisiones basadas en estos cálculos. Muchos vehículos del listado no declaran 	su rango en ciclo WLTP (el ciclo más realista), 
+	por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP según corresponda. De igual manera en 	circunstancias reales de uso el rendimiento en carretera puede ser entre un 10% o 20% menor según condiciones de uso y 	factores externos. Para comentarios o sugerencias: 
+        <a href="mailto:contacto@evuruguay.com">contacto@evuruguay.com</a>.
       </p>
     </div>
 

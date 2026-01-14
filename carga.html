@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EVUruguay · Costos por operador</title>
+<style>
+:root{
+  --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#9ca3af; --border:#1f2933;
+  --accent:#22c55e; --accent2:#3b82f6; --warn:#fbbf24; --shadow:0 18px 45px rgba(0,0,0,.45);
+  --radius:18px;
+}
+*{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#1f2937 0,#020617 55%);color:var(--text);display:flex;justify-content:center;align-items:flex-start;padding:18px}
+.app{width:100%;max-width:980px;background:linear-gradient(145deg,#020617 0%,#020617 40%,#0b1120 100%);
+ border-radius:24px;padding:22px;box-shadow:var(--shadow);border:1px solid rgba(148,163,184,.2);}
+header{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+h1{margin:0;font-size:1.6rem;letter-spacing:.02em}
+.sub{margin:0;color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:18px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:radial-gradient(circle at top left,#111827 0,#020617 60%);border-radius:var(--radius);
+ border:1px solid rgba(148,163,184,.15);padding:16px}
+.card + .card{margin-top:12px}
+.card-title{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.95rem;font-weight:650;margin-bottom:10px}
+.badge{font-size:.7rem;padding:2px 10px;border-radius:999px;border:1px solid rgba(34,197,94,.6);color:var(--accent);background:rgba(34,197,94,.08);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.field{display:flex;flex-direction:column;gap:5px;font-size:.82rem}
+label{color:var(--muted)}
+select,input[type="number"],input[type="text"]{
+  background:#020617;border-radius:999px;border:1px solid var(--border);padding:9px 12px;color:var(--text);
+  font-size:.9rem;outline:none;transition:border-color .15s ease, box-shadow .15s ease;
+  -webkit-appearance:none;appearance:none;
+}
+select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 1px rgba(34,197,94,.35)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+.readonly{opacity:.95}
+.small{font-size:.74rem;color:var(--muted);line-height:1.35}
+.callout{padding:12px 14px;border-radius:16px;border:1px solid rgba(148,163,184,.18);background:rgba(2,6,23,.35);
+ display:flex;flex-direction:column;gap:4px;margin:10px 0 12px}
+.callout strong{color:var(--text);font-weight:700}
+.callout span{color:var(--muted);font-size:.82rem}
+
+/* Dual range slider */
+.soc-wrap{margin-top:6px}
+.soc-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.soc-val{font-size:.78rem;color:var(--muted)}
+.soc-track{
+  position:relative;
+  height:34px; /* más grueso */
+  border-radius:999px;
+  padding:0 3px;
+  background:#0b1224; /* mismo tono que las barras */
+  border:1px solid rgba(148,163,184,.35);
+  overflow:hidden;
+  margin-top:10px;
+  box-shadow:
+    inset 0 0 0 1px rgba(15,23,42,.9),
+    0 12px 28px rgba(0,0,0,.7);
+}
+.soc-fill{
+  position:absolute;
+  height:100%;
+  left:0;
+  right:0;
+  background:linear-gradient(90deg, rgba(34,197,94,.95), rgba(59,130,246,.95)); /* mismos colores que las gráficas */
+  opacity:.85;
+}
+.range{
+  position:absolute;
+  left:0;
+  top:-12px;
+  width:100%;
+  height:50px;
+  pointer-events:none;
+}
+.range input[type="range"]{
+  pointer-events:none;
+  width:100%;
+  position:absolute;
+  left:0;
+  top:0;
+  background:transparent;
+  -webkit-appearance:none;
+  appearance:none;
+  height:50px;
+  margin:0;
+}
+.range input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:26px;
+  height:26px;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 30% 30%, #f9fafb 0, #e5e7eb 45%, #9ca3af 70%, #020617 100%);
+  border:2px solid rgba(59,130,246,.95);
+  box-shadow:0 10px 22px rgba(0,0,0,.7);
+  pointer-events:auto;
+  cursor:grab;
+}
+.range input[type="range"]::-moz-range-thumb{
+  width:26px;
+  height:26px;
+  border-radius:999px;
+  background:
+    radial-gradient(circle at 30% 30%, #f9fafb 0, #e5e7eb 45%, #9ca3af 70%, #020617 100%);
+  border:2px solid rgba(59,130,246,.95);
+  box-shadow:0 10px 22px rgba(0,0,0,.7);
+  pointer-events:auto;
+  cursor:grab;
+}
+.range input[type="range"]::-webkit-slider-runnable-track{
+  height:16px;
+  background:transparent;
+}
+.range input[type="range"]::-moz-range-track{
+  height:16px;
+  background:transparent;
+}
+#socStart{z-index:6}
+#socEnd{z-index:7}
+
+/* Results */
+.result-box{border:1px solid rgba(59,130,246,.6);background:radial-gradient(circle at top, #1d4ed822 0, #020617 70%);
+ border-radius:18px;padding:14px 14px 16px}
+.result-cost{font-size:1.7rem;font-weight:750;line-height:1;margin:2px 0 6px}
+.result-cost span{font-size:1rem;font-weight:500;color:var(--muted);margin-right:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{padding:4px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.25);background:rgba(2,6,23,.6);font-size:.74rem;color:var(--muted)}
+.chip strong{color:var(--accent);font-weight:650}
+
+/* Horizontal bars list */
+.bars{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.bar-row{display:grid;grid-template-columns: minmax(110px, 160px) 1fr minmax(84px, 120px);gap:10px;align-items:center}
+@media (max-width:560px){
+  .bar-row{grid-template-columns:1fr}
+}
+.op-name{font-size:.86rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{height:18px;border-radius:999px;background:#0b1224;border:1px solid rgba(148,163,184,.14);overflow:hidden}
+.fill{height:100%;border-radius:999px;background:linear-gradient(90deg, rgba(34,197,94,.95), rgba(59,130,246,.95));width:0%;transition:width .25s ease}
+.amount{font-variant-numeric:tabular-nums;font-size:.86rem;color:var(--text);text-align:right}
+.amount small{color:var(--muted);font-size:.75rem}
+.note-warn{margin-top:10px;font-size:.74rem;color:var(--muted)}
+.err{margin-top:10px;color:#ef4444;font-size:.8rem;display:none}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>EVUruguay - Calcula tu carga</h1>
+      <p class="sub">Estimá y compará el costo de una carga en cargadores públicos/privados según operador.</p>
+</header>
+
+    <div class="grid">
+      <!-- Left -->
+      <div>
+        <div class="callout">
+          <strong>Elegí marca y modelo de tu vehículo eléctrico</strong>
+          <span>Usamos batería y autonomía WLTP desde <em>vehiculos.csv</em>.</span>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Vehículo</span>
+            <span class="badge">ELIGE TU VEHICULO</span>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="brandSelect">Marca</label>
+              <select id="brandSelect" disabled><option value="">Cargando…</option></select>
+            </div>
+            <div class="field">
+              <label for="modelSelect">Modelo</label>
+              <select id="modelSelect" disabled><option value="">Seleccioná una marca…</option></select>
+            </div>
+          </div>
+
+          <div class="row2" style="margin-top:10px;">
+            <div class="field">
+              <label>Capacidad de batería (kWh)</label>
+              <input id="batteryKwh" class="readonly" type="text" readonly />
+            </div>
+            <div class="field">
+              <label>Autonomía WLTP (km)</label>
+              <input id="wltpKm" class="readonly" type="text" readonly />
+            </div>
+          </div>
+
+
+
+          <div class="err" id="vehError"></div>
+        </div>
+
+
+        <div class="card" style="margin-top:12px;">
+          <div class="card-title">
+            <span>Estado de carga (SOC)</span>
+            <span class="badge">Elige el tramo que cargas</span>
+          </div>
+<div class="soc-wrap" >
+            <div class="soc-top">
+              <div class="field" style="flex:1;">
+                <label>Tramo de carga (SOC)</label>
+                <div class="soc-val" id="socLabel">0% → 100%</div>
+              </div>
+              <div class="soc-val" id="socEnergy">—</div>
+            </div>
+
+            <div class="soc-track">
+              <div id="socFill" class="soc-fill"></div>
+              <div class="range">
+                <input id="socStart" type="range" min="0" max="100" value="0" />
+                <input id="socEnd" type="range" min="0" max="100" value="100" />
+              </div>
+            </div>
+            <div class="note-warn">Tip: arrastrá los extremos para elegir, por ejemplo <strong>20% → 80%</strong>.</div>
+          </div>
+        </div>
+
+
+        <div class="card" style="margin-top:12px;">
+          <div class="card-title">
+            <span>Operador específico</span>
+            <span class="badge">Elige en donde cargas</span>
+          </div>
+          <div class="field">
+            <label for="operatorSelect">Elegí un operador (opcional)</label>
+            <select id="operatorSelect" disabled>
+              <option value="">(Sin selección) · Mostrar el más conveniente</option>
+            </select>
+          </div>
+          <div class="note-warn" style="margin-top:10px;">
+            Si elegís un operador, el <strong>Resumen</strong> mostrará el costo para ese operador y abajo te sugeriremos la opción más conveniente.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right -->
+      <div>
+        <div class="result-box">
+          <div class="small">Resumen</div>
+          <div class="result-cost" id="summaryCost"><span>$U</span>—</div>
+          <div class="small" id="summarySub">Seleccioná un vehículo para ver costos por operador.</div>
+
+          <div class="chips" id="chipRow"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div class="card-title">
+            <span>Costos por operador</span>
+            <span class="badge">Comparación</span>
+          </div>
+          <div class="bars" id="bars"></div>
+          <div class="small" id="bestLine" style="margin-top:12px;"></div>
+          <div class="err" id="opError"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============================
+   CSV utils (con BOM + cache-bust)
+============================ */
+function detectDelimiter(line){
+  if(line.includes(";") && line.includes(",")){
+    const s=(line.match(/;/g)||[]).length, c=(line.match(/,/g)||[]).length;
+    return s>=c?";":",";
+  } else if(line.includes(";")) return ";";
+  return ",";
+}
+
+function parseCSV(text){
+  const cleaned = String(text||"").replace(/^﻿/, "");
+  const lines = cleaned.trim().split(/\r?\n/);
+  if(lines.length===0) return [];
+  const delimiter = detectDelimiter(lines[0]);
+  const headers = lines[0].split(delimiter).map((h,idx)=>{
+    const hh=(h||"").trim();
+    return idx===0 ? hh.replace(/^\uFEFF/, "") : hh;
+  });
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const line = lines[i].trim();
+    if(!line) continue;
+    const parts = line.split(delimiter);
+    const obj={};
+    headers.forEach((h,idx)=> obj[h]= (parts[idx]||"").trim());
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function withCacheBust(path){
+  // si ya tiene ?, agregamos &
+  const sep = path.includes("?") ? "&" : "?";
+  return path + sep + "v=" + Date.now();
+}
+
+async function loadCSV(path){
+  const res = await fetch(withCacheBust(path), { cache: "no-store" });
+  if(!res.ok) throw new Error(`Error HTTP ${res.status} cargando ${path}`);
+  const txt = await res.text();
+  return parseCSV(txt);
+}
+
+/* ============================
+   State
+============================ */
+let carData = {};   // {marca: [{model,batteryKwh,wltpKm}]}
+let operators = []; // [{empresa,bajada,precioKwh}]
+
+let lastEnergyKwh = null;
+let lastKmEquiv = null;
+
+/* ============================
+   DOM refs
+============================ */
+const brandSelect = document.getElementById("brandSelect");
+const modelSelect = document.getElementById("modelSelect");
+const operatorSelect = document.getElementById("operatorSelect");
+const batteryKwhEl = document.getElementById("batteryKwh");
+const wltpKmEl = document.getElementById("wltpKm");
+
+const socStart = document.getElementById("socStart");
+const socEnd = document.getElementById("socEnd");
+const socFill = document.getElementById("socFill");
+const socLabel = document.getElementById("socLabel");
+const socEnergy = document.getElementById("socEnergy");
+
+const summaryCost = document.getElementById("summaryCost");
+const summarySub = document.getElementById("summarySub");
+const chipRow = document.getElementById("chipRow");
+
+const bars = document.getElementById("bars");
+const bestLine = document.getElementById("bestLine");
+const vehError = document.getElementById("vehError");
+const opError = document.getElementById("opError");
+/* ============================
+   Apply vehiculos.csv
+============================ */
+function applyVehiculosData(rows){
+  const out = {};
+  rows.forEach(r=>{
+    const marca = (r.marca || r.Marca || "").toString().trim();
+    const modelo = (r.modelo || r.Modelo || "").toString().trim();
+    let bat = (r.bateria_kwh || r["batería_kwh"] || r.bateria || r.Bateria || "").toString().trim();
+    let wltpKm = (r.wltp_km || r.wltpKm || r.wltp || r.WLTP || r.wltp_km || r.wltp_km || "").toString().trim();
+
+    if(!marca || !modelo || !bat) return;
+
+    bat = bat.replace(",", ".");
+    const nBat = parseFloat(bat);
+    if(!isFinite(nBat) || nBat<=0) return;
+
+    let nWltp = null;
+    if(wltpKm){
+      wltpKm = wltpKm.replace(",", ".").replace(/\s+/g,"");
+      const n = parseFloat(wltpKm);
+      if(isFinite(n) && n>0) nWltp = n;
+    }
+
+    if(!out[marca]) out[marca]=[];
+    out[marca].push({ model: modelo, batteryKwh: nBat, wltpKm: nWltp });
+  });
+
+  // ordenar modelos
+  Object.keys(out).forEach(m=> out[m].sort((a,b)=>a.model.localeCompare(b.model)));
+  carData = out;
+}
+
+function populateBrandSelect(){
+  brandSelect.innerHTML="";
+  const marcas = Object.keys(carData).sort((a,b)=>a.localeCompare(b));
+  if(marcas.length===0){
+    brandSelect.disabled=true;
+    brandSelect.innerHTML = '<option value="">Sin datos (revisá vehiculos.csv)</option>';
+    return;
+  }
+  brandSelect.appendChild(new Option("Seleccionar marca…",""));
+  marcas.forEach(m=> brandSelect.appendChild(new Option(m,m)));
+  brandSelect.disabled=false;
+}
+
+function updateModels(){
+  const brand = brandSelect.value;
+  modelSelect.innerHTML="";
+  if(!brand || !carData[brand] || carData[brand].length===0){
+    modelSelect.disabled=true;
+    modelSelect.appendChild(new Option(brand? "Sin modelos" : "Seleccioná una marca…",""));
+    batteryKwhEl.value=""; wltpKmEl.value="";
+    return;
+  }
+  modelSelect.disabled=false;
+  modelSelect.appendChild(new Option("Seleccionar modelo…",""));
+  carData[brand].forEach(c=>{
+    const opt = new Option(c.model, c.model);
+    opt.dataset.battery = String(c.batteryKwh);
+    opt.dataset.wltpkm = c.wltpKm ? String(c.wltpKm) : "";
+    modelSelect.appendChild(opt);
+  });
+}
+
+function getSelectedCar(){
+  const brand = brandSelect.value, model = modelSelect.value;
+  if(!brand || !model) return null;
+  const list = carData[brand] || [];
+  return list.find(c=>c.model===model) || null;
+}
+
+function updateVehicleFields(){
+  const opt = modelSelect.options[modelSelect.selectedIndex];
+  if(opt && opt.dataset && opt.dataset.battery){
+    batteryKwhEl.value = Number(opt.dataset.battery).toLocaleString("es-UY",{minimumFractionDigits:2, maximumFractionDigits:2});
+    const w = opt.dataset.wltpkm ? Number(opt.dataset.wltpkm) : null;
+    wltpKmEl.value = (w && isFinite(w)) ? Math.round(w).toString() : "";
+  } else {
+    batteryKwhEl.value=""; wltpKmEl.value="";
+  }
+}
+
+/* ============================
+   Apply cargadores.csv
+============================ */
+function toNumber(raw){
+  if(raw===null || raw===undefined) return null;
+  let s = String(raw).trim();
+  if(!s) return null;
+  s = s.replace(",", ".").replace(/\s+/g,"");
+  // corregir casos tipo "19.52." => "19.52"
+  s = s.replace(/\.+$/,"");
+  const n = parseFloat(s);
+  return (isFinite(n) ? n : null);
+}
+
+function applyOperatorsData(rows){
+  const out=[];
+  rows.forEach(r=>{
+    const empresa = (r.empresa || r.Empresa || r.operador || r.Operador || "").toString().trim();
+    if(!empresa) return;
+    const bajada = toNumber(r.bajada || r.Bajada || r["bajada_de_bandera"] || 0);
+    const precio = toNumber(r.precio_kwh || r.Precio_kwh || r.precio || r.Precio || "");
+    if(precio===null) return;
+    out.push({
+      empresa,
+      bajada: bajada===null?0:bajada,
+      precioKwh: precio
+    });
+  });
+  operators = out;
+}
+
+/* NUEVO: poblar el select de operadores */
+function populateOperatorSelect(){
+  operatorSelect.innerHTML = "";
+  // opción por defecto
+  const defaultOpt = new Option("(Sin selección) · Mostrar el más conveniente", "");
+  operatorSelect.appendChild(defaultOpt);
+
+  if(!operators || operators.length === 0){
+    operatorSelect.disabled = true;
+    defaultOpt.textContent = "Sin operadores (revisá cargadores.csv)";
+    return;
+  }
+
+  // ordenar por nombre de empresa
+  const sorted = [...operators].sort((a,b)=>a.empresa.localeCompare(b.empresa));
+  sorted.forEach(op=>{
+    const opt = new Option(op.empresa, op.empresa);
+    operatorSelect.appendChild(opt);
+  });
+
+  operatorSelect.disabled = false;
+}
+
+/* ============================
+   SOC slider (dual)
+============================ */
+function clampSoc(){
+  let a = Number(socStart.value), b = Number(socEnd.value);
+  if(!isFinite(a)) a=0;
+  if(!isFinite(b)) b=100;
+
+  if(a>b){
+    if(socActive === "start"){
+      b = a;
+      socEnd.value = String(b);
+    } else {
+      a = b;
+      socStart.value = String(a);
+    }
+  }
+
+  if(b-a < 1){
+    if(socActive === "start"){
+      a = Math.max(0, b-1);
+      socStart.value = String(a);
+    } else {
+      b = Math.min(100, a+1);
+      socEnd.value = String(b);
+    }
+  }
+
+  const left = Number(socStart.value);
+  const right = Number(socEnd.value);
+
+  socFill.style.left = left + "%";
+  socFill.style.right = (100-right) + "%";
+  socLabel.textContent = `${left}% → ${right}%`;
+  return {start:left, end:right, delta:(right-left)};
+}
+
+function formatU(value){
+  return value.toLocaleString("es-UY",{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+/* ============================
+   Main calc + render
+============================ */
+function recalcAll(){
+  chipRow.innerHTML="";
+  bars.innerHTML="";
+  bestLine.textContent="";
+  opError.style.display="none";
+
+  const car = getSelectedCar();
+  if(!car){
+    summaryCost.innerHTML = '<span>$U</span>—';
+    summarySub.textContent="Seleccioná un vehículo para comparar operadores.";
+    lastEnergyKwh=null; lastKmEquiv=null;
+    return;
+  }
+
+  const soc = clampSoc();
+  const energyKwh = (car.batteryKwh * soc.delta) / 100;
+  lastEnergyKwh = energyKwh;
+
+  // km equivalentes (si hay WLTP km)
+  if(car.wltpKm && car.wltpKm>0){
+    const fullKwh100 = (car.batteryKwh * 100) / car.wltpKm; // kWh/100km
+    lastKmEquiv = (energyKwh * 100) / fullKwh100;
+  } else {
+    lastKmEquiv = null;
+  }
+
+  socEnergy.textContent = energyKwh>0 ? `${formatU(energyKwh)} kWh` : "—";
+
+  // chips
+  const c1=document.createElement("div"); c1.className="chip";
+  c1.innerHTML = `<strong>${car.model}</strong> · ${formatU(car.batteryKwh)} kWh`;
+  chipRow.appendChild(c1);
+
+  const c2=document.createElement("div"); c2.className="chip";
+  c2.innerHTML = `<strong>SOC</strong> ${soc.start}% → ${soc.end}%`;
+  chipRow.appendChild(c2);
+
+  if(lastKmEquiv){
+    const c3=document.createElement("div"); c3.className="chip";
+    c3.innerHTML = `<strong>≈</strong> ${formatU(lastKmEquiv)} km`;
+    chipRow.appendChild(c3);
+  }
+
+  if(!operators || operators.length===0){
+    summaryCost.innerHTML = '<span>$U</span>—';
+    summarySub.textContent="No hay operadores cargados (revisá cargadores.csv).";
+    opError.style.display="block";
+    opError.textContent="No se encontraron filas válidas en cargadores.csv (empresa, bajada, precio_kwh).";
+    return;
+  }
+
+  // calcular costos
+  const costs = operators.map(op=>{
+    const cost = (op.bajada || 0) + energyKwh * op.precioKwh;
+    return { ...op, cost };
+  }).filter(x=> isFinite(x.cost));
+
+  if(costs.length===0){
+    summaryCost.innerHTML = '<span>$U</span>—';
+    summarySub.textContent="No se pudieron calcular costos (revisá datos de operadores).";
+    return;
+  }
+
+  // orden por costo asc
+  costs.sort((a,b)=>a.cost-b.cost);
+
+  // resumen: por defecto el más barato (pero puede elegirse operador)
+  const best = costs[0];
+  const kmText = lastKmEquiv ? `${formatU(lastKmEquiv)} km` : "—";
+  const selectedEmpresa = operatorSelect ? operatorSelect.value : "";
+
+  if(selectedEmpresa){
+    const chosen = costs.find(x => x.empresa === selectedEmpresa) || best;
+    summaryCost.innerHTML = `<span>$U</span>${formatU(chosen.cost)}`;
+    summarySub.innerHTML =
+      `Operador seleccionado: <strong>${chosen.empresa}</strong> · tramo ${soc.start}% → ${soc.end}% · ${kmText}` +
+      `<br><span style="color:rgba(229,231,235,.72);font-size:.9em">Aunque el método que más te convendría en tu caso es <strong>${best.empresa}</strong> por un valor de <strong>$U ${formatU(best.cost)}</strong>.</span>`;
+  } else {
+    summaryCost.innerHTML = `<span>$U</span>${formatU(best.cost)}`;
+    summarySub.innerHTML = `Más conveniente ahora: <strong>${best.empresa}</strong> · tramo ${soc.start}% → ${soc.end}% · ${kmText}`;
+  }
+// barras horizontales (relativas al más caro)
+  const max = Math.max(...costs.map(x=>x.cost));
+  const denom = max>0 ? max : 1;
+
+  costs.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="bar-row";
+
+    const name=document.createElement("div");
+    name.className="op-name";
+    name.textContent = item.empresa;
+
+    const track=document.createElement("div");
+    track.className="track";
+    const fill=document.createElement("div");
+    fill.className="fill";
+    const pct = Math.max(0, Math.min(100, (item.cost/denom)*100));
+    fill.style.width = pct.toFixed(1)+"%";
+    track.appendChild(fill);
+
+    const amt=document.createElement("div");
+    amt.className="amount";
+    amt.innerHTML = `$U ${formatU(item.cost)}<br><small>${formatU(item.precioKwh)} $/kWh · bajada $U ${formatU(item.bajada||0)}</small>`;
+
+    row.appendChild(name);
+    row.appendChild(track);
+    row.appendChild(amt);
+    bars.appendChild(row);
+  });
+
+  const bestKm = lastKmEquiv ? formatU(lastKmEquiv) : "—";
+  bestLine.innerHTML = `✅ <strong>Mejor opción:</strong> ${best.empresa} · <strong>$U ${formatU(best.cost)}</strong> por esta carga para recorrer <strong>${bestKm}</strong> km.`;
+}
+
+/* ============================
+   Events
+============================ */
+brandSelect.addEventListener("change", ()=>{
+  updateModels();
+  updateVehicleFields();
+  recalcAll();
+});
+operatorSelect.addEventListener("change", ()=>{ recalcAll(); });
+
+modelSelect.addEventListener("change", ()=>{
+  updateVehicleFields();
+  recalcAll();
+});
+// SOC: permitir mover ambos extremos (prioridad a la manija tocada)
+let socActive = "end";
+function bringFront(which){
+  socActive = which;
+  if(which === "start"){
+    socStart.style.zIndex = "8";
+    socEnd.style.zIndex = "7";
+  } else {
+    socStart.style.zIndex = "7";
+    socEnd.style.zIndex = "8";
+  }
+}
+
+["pointerdown","touchstart","mousedown"].forEach(evt=>{
+  socStart.addEventListener(evt, ()=>bringFront("start"), {passive:true});
+  socEnd.addEventListener(evt, ()=>bringFront("end"), {passive:true});
+});
+
+socStart.addEventListener("input", ()=>{ bringFront("start"); clampSoc(); recalcAll(); });
+socEnd.addEventListener("input", ()=>{ bringFront("end"); clampSoc(); recalcAll(); });
+/* ============================
+   Init
+============================ */
+async function init(){
+  try{
+    // vehiculos
+    const vehRows = await loadCSV("vehiculos.csv");
+    applyVehiculosData(vehRows);
+    populateBrandSelect();
+
+    // operadores
+    const opRows = await loadCSV("cargadores.csv");
+    applyOperatorsData(opRows);
+    populateOperatorSelect();
+    vehError.style.display="none";
+    opError.style.display="none";
+  } catch(e){
+    console.error(e);
+    vehError.style.display="block";
+    vehError.textContent = "Database Error";
+    opError.style.display="block";
+    opError.textContent = String(e && e.message ? e.message : e);
+  } finally {
+    // habilitar selects aunque haya error parcial
+    brandSelect.disabled = false;
+    updateModels();
+    updateVehicleFields();
+    clampSoc();
+    recalcAll();
+  }
+}
+init();
+</script>
+</body>
+</html>
