@@ -37,6 +37,21 @@
       justify-content: center;
     }
 
+    /* Fix iOS/Android overscroll showing white background */
+    html {
+      background: #000;
+      background-color: #000;
+      height: 100%;
+      overscroll-behavior-y: none;
+    }
+
+    body {
+      min-height: 100dvh;
+      overscroll-behavior-y: none;
+      background-color: var(--bg-main);
+    }
+
+
     .app-shell {
       width: 100%;
       max-width: 1100px;
@@ -565,7 +580,16 @@
       font-size: 11px;
       color: var(--danger);
     }
-  </style>
+  
+
+    /* Mobile: mostrar el detalle (resumen) antes que el listado */
+    @media (max-width: 720px) {
+      .details-panel-wrapper {
+        order: -1;
+      }
+    }
+
+</style>
 </head>
 <body>
   <div class="app-shell">
@@ -581,7 +605,7 @@
       </h1>
       <p>
         Completá tu presupuesto, el tipo de vehículo, autonomía mínima y si necesitás ADAS.
-        El recomendador filtra modelos reales y arma un resumen de equipamiento sólo del modelo que selecciones.
+        El recomendador filtra modelos reales y arma un resumen de equipamiento del modelo que selecciones.
       </p>
     </header>
 
@@ -637,7 +661,7 @@
               <div class="form-field">
                 <label class="field-label" for="range">
                   Autonomía mínima
-                  <span class="field-help">km (WLTP aprox.)</span>
+                  <span class="field-help">km</span>
                 </label>
                 <input
                   id="range"
@@ -654,12 +678,12 @@
               <div class="form-field">
                 <label class="field-label" for="adas">
                   ¿Necesitás ADAS?
-                  <span class="field-help">ayudas a la conducción</span>
+                  <span class="field-help">ayudas avanzadas a la conducción</span>
                 </label>
                 <select id="adas" class="field-select">
                   <option value="indistinto">Indistinto</option>
                   <option value="si">Sí, quiero que tenga ADAS</option>
-                  <option value="no_adas">Prefiero que no tenga</option>
+                  <option value="no">No es diferencial</option>
                 </select>
               </div>
 
@@ -667,14 +691,13 @@
                 <div class="button-row">
                   <div class="status-pill" id="excel-status">
                     <span class="status-dot"></span>
-                    <span>Datos cargados correctamente</span>
                   </div>
                   <button type="submit" class="btn-primary">
                     <span>Ver recomendaciones</span>
                     <span class="btn-primary-icon">➜</span>
                   </button>
                 </div>
-                
+              
                 <p id="error-message" class="error-text" style="display:none;"></p>
               </div>
             </div>
@@ -704,7 +727,7 @@
               </div>
             </div>
 
-            <div id="details-panel" class="details-panel">
+            <div id="details-panel" class="details-panel details-panel-wrapper">
               <div class="details-placeholder">
                 Seleccioná un modelo del listado para ver un resumen de su equipamiento y
                 características principales. El primer resultado se marca como candidato recomendado.
@@ -825,16 +848,6 @@
           );
         }
 
-        // Fila de puntaje
-        let idxPuntaje = labelsCol.indexOf("puntaje");
-        if (idxPuntaje === -1) {
-          idxPuntaje = labelsCol.findIndex(
-            (lbl) =>
-              typeof lbl === "string" &&
-              lbl.trim().toLowerCase() === "puntaje"
-          );
-        }
-
         const parsedVehicles = [];
 
         for (let col = 1; col < headerRow.length; col++) {
@@ -871,11 +884,6 @@
           const bodyTypeNorm = normalizeBodyType(rawBodyType);
           const bodyLabel = bodyTypeLabel(bodyTypeNorm);
 
-          // Leer puntaje (si existe la fila)
-          const score = numFromValue(
-            idxPuntaje !== -1 ? data[idxPuntaje][col] : null
-          );
-
           parsedVehicles.push({
             name: nameStr,
             price,
@@ -884,8 +892,7 @@
             adas,
             bodyTypeNorm,
             bodyLabel,
-            raw: detail,
-            score
+            raw: detail
           });
         }
 
@@ -971,9 +978,6 @@
           if (rangeSource < rangeMin) return false;
 
           if (adasPref === "si" && !v.adas) return false;
-
-          // Si el usuario prefiere que NO tenga ADAS, mostrar solo vehículos sin ADAS
-          if (adasPref === "no_adas" && v.adas) return false;
           return true;
         });
 
@@ -994,13 +998,7 @@
           });
         }
 
-        // Ordenar por puntaje (desc) y luego por precio (asc)
         filtered.sort((a, b) => {
-          const sa = a.score ?? 0;
-          const sb = b.score ?? 0;
-
-          if (sa !== sb) return sb - sa;
-
           const pa = a.price ?? Infinity;
           const pb = b.price ?? Infinity;
           return pa - pb;
@@ -1103,7 +1101,7 @@
       if (vehicle.adas || adasFeatures.length) {
         let txt = vehicle.adas
           ? "Incluye paquetes de ADAS"
-          : "Cuenta con equipamiento";
+          : "Puede contar con ayudas ADAS";
         if (adasFeatures.length) {
           const shown = adasFeatures.slice(0, 4);
           txt += " como " + shown.join(", ");
@@ -1189,7 +1187,7 @@
         summaryEl.textContent =
           "Mostrando " +
           list.length +
-          " modelo(s) que encajan con tu perfil. El primero se considera candidato recomendado.";
+          " modelo(s) que encajan con tu perfil, ordenados por precio. El primero se considera candidato recomendado.";
       }
 
       const pills = [];
@@ -1226,9 +1224,9 @@
         pills.push(
           '<div class="pill-filter"><span class="chip-label">ADAS</span><span>Debe tener</span></div>'
         );
-      } else if (adasPref === "no_adas") {
+      } else if (adasPref === "no") {
         pills.push(
-          '<div class="pill-filter"><span class="chip-label">ADAS</span><span>Prefiero que no tenga</span></div>'
+          '<div class="pill-filter"><span class="chip-label">ADAS</span><span>No es diferencial</span></div>'
         );
       } else {
         pills.push(
