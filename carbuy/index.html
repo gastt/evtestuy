@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recomendador de Vehículos Eléctricos</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-main: #050816;
+      --bg-card: #111827;
+      --bg-card-soft: #020617;
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.14);
+      --accent-strong: #06b6d4;
+      --accent-green-soft: rgba(22, 163, 74, 0.16);
+      --accent-green-border: rgba(34, 197, 94, 0.75);
+      --accent-green-text: #bbf7d0;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --danger: #f97373;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.6);
+      --transition-fast: 150ms ease-out;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      height: 100%;
+      background: #000;
+      overscroll-behavior-y: none;
+    }
+
+    body {
+      min-height: 100svh;
+      background-color: #000;
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937, #020617 55%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 16px;
+    }
+
+    header.app-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.18);
+    }
+
+    header.app-header h1 {
+      font-size: clamp(26px, 4vw, 32px);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    header.app-header h1 span.accent {
+      color: var(--accent);
+    }
+
+    header.app-header p {
+      margin: 0;
+      max-width: 580px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 840px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: linear-gradient(135deg, var(--bg-card-soft), var(--bg-card));
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.16), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.16), transparent 60%);
+      opacity: 0.23;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-title-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--accent-strong);
+    }
+
+    .card-subtitle {
+      margin: 0 0 12px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .form-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .field-label {
+      font-weight: 500;
+      color: #d1d5db;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .field-help {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .field-input,
+    .field-select {
+      appearance: none;
+      border-radius: 10px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      padding: 7px 10px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+        background var(--transition-fast), transform 80ms ease-out;
+    }
+
+    .field-input::placeholder {
+      color: #6b7280;
+    }
+
+    .field-input:focus,
+    .field-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.35);
+      background: rgba(15, 23, 42, 0.98);
+      transform: translateY(-0.5px);
+    }
+
+    .field-select {
+      padding-right: 26px;
+      background-image: linear-gradient(45deg, transparent 50%, #6b7280 50%),
+        linear-gradient(135deg, #6b7280 50%, transparent 50%);
+      background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    .full-span {
+      grid-column: 1 / -1;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.8);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      background: radial-gradient(circle at 0 0, #22d3ee, #0ea5e9);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 14px 30px rgba(8, 47, 73, 0.7);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        filter var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 18px 40px rgba(8, 47, 73, 0.9);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(8, 47, 73, 0.7);
+    }
+
+    .btn-primary-icon {
+      font-size: 15px;
+    }
+
+    .note {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .note strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* RESULTADOS */
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .results-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .results-summary {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pill-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pill-filter strong {
+      color: #e5e7eb;
+    }
+
+    .results-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .results-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 720px) {
+      .results-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 360px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .result-card {
+      border-radius: 14px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.07), #020617);
+      padding: 9px 11px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 4px 10px;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+        transform 80ms ease-out, background 150ms ease-out;
+    }
+
+    .result-card:hover {
+      border-color: rgba(34, 211, 238, 0.7);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    .result-card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 16px 36px rgba(34, 211, 238, 0.4);
+      background: radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.18), #020617);
+    }
+
+    @media (max-width: 640px) {
+      .result-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+    }
+
+    .result-main {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .result-name {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    .result-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .result-price {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .result-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 3px;
+      min-width: 0;
+    }
+
+    .result-side {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-top: 2px;
+    }
+
+    .result-meta .chip {
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .result-meta .chip span:last-child {
+      display: inline-block;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+    }
+
+    .result-thumb {
+      width: 56px;
+      height: 42px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      display: block;
+    }
+
+    .result-thumb.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: rgba(229, 231, 235, 0.75);
+      background: radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.12), rgba(15, 23, 42, 0.9));
+    }
+
+    .chip {
+      font-size: 10.5px;
+      padding: 3px 7px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip span:last-child {
+      white-space: nowrap;
+    }
+
+    .chip-label {
+      font-weight: 500;
+      color: #d1d5db;
+    }
+
+    .chip-accent {
+      border-color: rgba(45, 212, 191, 0.7);
+      background: rgba(5, 150, 105, 0.15);
+      color: #a7f3d0;
+    }
+
+    .chip-accent-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .chip-adas-no {
+      border-color: rgba(248, 113, 113, 0.85);
+      background: rgba(153, 27, 27, 0.25);
+      color: #fecaca;
+    }
+
+    .chip-patente-contado {
+      border-color: var(--accent-green-border);
+      background: var(--accent-green-soft);
+      color: var(--accent-green-text);
+    }
+
+    .result-quick {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px 10px;
+    }
+
+    .empty-state {
+      border-radius: 12px;
+      border: 1px dashed rgba(55, 65, 81, 0.9);
+      padding: 14px 11px;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.75);
+    }
+
+    .empty-state strong {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .details-panel {
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 10px 11px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      min-height: 120px;
+    }
+
+    .details-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: #e5e7eb;
+    }
+
+    .details-subtitle {
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: #9ca3af;
+    }
+
+    .details-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.6);
+      color: #a5f3fc;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .details-price {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .details-body {
+      font-size: 11.5px;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+
+    .details-note {
+      font-size: 10.5px;
+      color: #6b7280;
+    }
+
+    .details-note-contado {
+      margin-top: 4px;
+      padding: 4px 7px;
+      border-radius: 999px;
+      display: inline-block;
+      background: var(--accent-green-soft);
+      border: 1px solid var(--accent-green-border);
+      color: var(--accent-green-text);
+      font-weight: 500;
+    }
+
+    .details-placeholder {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .error-text {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--danger);
+    }
+
+    @media (max-width: 720px) {
+      .details-panel-wrapper {
+        order: -1;
+      }
+    }
+
+    .details-hero {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 8px;
+    }
+
+    .vehicle-image {
+      width: 116px;
+      height: 76px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      background: rgba(2, 6, 23, 0.9);
+      flex: 0 0 auto;
+    }
+
+    .adas-box {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      background: rgba(34, 211, 238, 0.08);
+    }
+
+    .adas-box-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .adas-box-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.18);
+    }
+
+    .adas-list {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .adas-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #e5e7eb;
+      line-height: 1.35;
+    }
+
+    .adas-tick {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: rgba(34, 211, 238, 0.14);
+      border: 1px solid rgba(34, 211, 238, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      flex: 0 0 18px;
+      margin-top: 1px;
+      font-size: 12px;
+    }
+
+    /* Footer */
+    .site-footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      font-size: 10.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .site-footer p {
+      margin: 2px 0;
+    }
+
+    .site-footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>EVUruguay - Recomendador de EV</span>
+      </div>
+      <h1>
+        ¿Qué
+        <span class="accent">vehículo eléctrico</span>
+        te conviene?
+      </h1>
+      <p>
+        Completá tu presupuesto, el tipo de vehículo, autonomía mínima y si necesitás ADAS.
+        El recomendador filtra modelos reales y arma un resumen de equipamiento sólo del modelo que selecciones.
+      </p>
+    </header>
+
+    <main class="layout">
+      <!-- Panel izquierdo: filtros / preguntas -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-title-row">
+            <div class="card-title">
+              <div class="card-title-icon">⚡</div>
+              <span>Tu perfil de búsqueda</span>
+            </div>
+          </div>
+          <p class="card-subtitle">
+            Respondé estas preguntas simples. La recomendación se basa directamente en la planilla de
+            comparación de eléctricos.
+          </p>
+
+          <form id="filters-form" onsubmit="event.preventDefault(); handleRecommendClick();">
+            <div class="form-grid">
+              <!-- Presupuesto -->
+              <div class="form-field">
+                <label class="field-label" for="budget">
+                  Presupuesto máximo
+                  <span class="field-help">(USD)</span>
+                </label>
+                <input
+                  id="budget"
+                  type="number"
+                  min="0"
+                  step="500"
+                  placeholder="Ej. 25000"
+                  class="field-input"
+                  required
+                />
+              </div>
+
+              <!-- Tipo de vehículo -->
+              <div class="form-field">
+                <label class="field-label" for="vehicleType">
+                  Tipo de vehículo
+                  <span class="field-help">auto, SUV o hatchback</span>
+                </label>
+                <select id="vehicleType" class="field-select">
+                  <option value="cualquiera">Cualquiera</option>
+                  <option value="auto">Auto / Sedán / Hatch</option>
+                  <option value="suv">SUV / Crossover</option>
+                  <option value="hatch">Solo hatchback</option>
+                </select>
+              </div>
+
+              <!-- Autonomía mínima -->
+              <div class="form-field">
+                <label class="field-label" for="range">
+                  Autonomía mínima
+                  <span class="field-help">km (WLTP aprox.)</span>
+                </label>
+                <input
+                  id="range"
+                  type="number"
+                  min="0"
+                  step="10"
+                  placeholder="Ej. 300"
+                  class="field-input"
+                  required
+                />
+              </div>
+
+              <!-- ADAS -->
+              <div class="form-field">
+                <label class="field-label" for="adas">
+                  ¿Necesitás ADAS?
+                  <span class="field-help">ayudas a la conducción</span>
+                </label>
+                <select id="adas" class="field-select">
+                  <option value="indistinto">Indistinto</option>
+                  <option value="si">Sí, quiero que tenga ADAS</option>
+                  <option value="no_adas">Prefiero que no tenga</option>
+                </select>
+              </div>
+
+              <div class="form-field full-span">
+                <div class="button-row">
+                  <div class="status-pill" id="excel-status">
+                    <span class="status-dot"></span>
+                    <span>Datos cargados correctamente</span>
+                  </div>
+                  <button type="submit" class="btn-primary">
+                    <span>Ver recomendaciones</span>
+                    <span class="btn-primary-icon">➜</span>
+                  </button>
+                </div>
+                
+                <p id="error-message" class="error-text" style="display:none;"></p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Panel derecho: resultados -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="results-header">
+            <div>
+              <div class="results-title">Resultados recomendados</div>
+              <div class="results-summary" id="results-summary">
+                Definí tus criterios y vamos a sugerirte las mejores opciones dentro de tu rango.
+              </div>
+            </div>
+            <div class="results-pills" id="results-pills"></div>
+          </div>
+
+          <div class="results-layout">
+            <div id="results-list">
+              <div class="empty-state" id="empty-state">
+                <strong>Tip:</strong> empezá poniendo un presupuesto razonable (por ejemplo,
+                20&nbsp;000–30&nbsp;000 USD) y una autonomía mínima cercana a 300 km WLTP.
+                Después podés ajustar filtros según lo que veas en la lista.
+              </div>
+            </div>
+
+            <div id="details-panel" class="details-panel details-panel-wrapper">
+              <div class="details-placeholder">
+                Seleccioná un modelo del listado para ver un resumen de su equipamiento y
+                características principales. El primer resultado se marca como candidato recomendado.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Pie de página / Descargo -->
+    <footer class="site-footer">
+      <p>
+        Esta herramienta tiene carácter meramente <strong>estimativo e informativo</strong>. 
+        Los valores de precios, patentes, autonomías y equipamientos se calculan en base a datos disponibles 
+        al momento de elaborar la planilla y <strong>pueden variar</strong>, contener errores u omisiones.
+      </p>
+      <p>
+        La planilla no incluye necesariamente <strong>todos los vehículos eléctricos disponibles en plaza</strong> 
+        y la configuración de cada modelo puede diferir según versión, año, mercado y equipamiento opcional.
+      </p>
+      <p>
+        Se recomienda siempre <strong>verificar la información</strong> en sitios oficiales de las marcas, 
+        concesionarios y/o fuentes especializadas antes de tomar decisiones de compra.
+      </p>
+      <p>
+        Para comentarios, correcciones o sugerencias podés escribir a 
+        <a href="mailto:contacto@evuruguay.com">contacto@evuruguay.com</a>.
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    const EXCEL_FILE_NAME = "comparativaAutos.xlsx";
+    const DOLAR_FILE_NAME = "dolar.csv";
+    const VAT_RATE = 0.22;
+    const PATENTE_RATE = 0.03;
+    const PATENTE_DISCOUNT_RATE = 0.20; // 20% de descuento por pago contado
+
+    let vehicles = [];
+    let excelLoaded = false;
+    let excelError = null;
+    let lastRenderedList = [];
+
+    let dolarRate = null;
+    let dolarError = null;
+
+    function setExcelStatus(loadingText) {
+      const status = document.getElementById("excel-status");
+      if (!status) return;
+      if (loadingText) {
+        status.innerHTML =
+          '<span class="status-dot" style="background:#facc15; box-shadow:0 0 0 4px rgba(250,204,21,0.25)"></span>' +
+          `<span>${loadingText}</span>`;
+      } else if (excelError) {
+        status.innerHTML =
+          '<span class="status-dot" style="background:#f97373; box-shadow:0 0 0 4px rgba(248,113,113,0.25)"></span>' +
+          '<span>Error al leer <strong>comparativaAutos.xlsx</strong></span>';
+      } else if (excelLoaded) {
+        status.innerHTML =
+          '<span class="status-dot"></span>' +
+          '<span>Datos cargados correctamente</span>';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("error-message");
+      if (!el) return;
+      el.textContent = msg || "";
+      el.style.display = msg ? "block" : "none";
+    }
+
+    function normalizeBodyType(raw) {
+      if (!raw) return null;
+      let txt = String(raw).toLowerCase();
+      txt = txt
+        .replace(/[áàä]/g, "a")
+        .replace(/[éèë]/g, "e")
+        .replace(/[íìï]/g, "i")
+        .replace(/[óòö]/g, "o")
+        .replace(/[úùü]/g, "u");
+      if (txt.includes("suv") || txt.includes("crossover")) return "suv";
+      if (txt.includes("hatch")) return "hatch";
+      if (txt.includes("sedan") || txt.includes("berlina")) return "sedan";
+      if (txt.includes("auto")) return "auto";
+      return null;
+    }
+
+    function bodyTypeLabel(norm) {
+      if (norm === "suv") return "SUV";
+      if (norm === "hatch") return "hatchback urbano";
+      if (norm === "sedan" || norm === "auto") return "sedán/auto compacto";
+      return "vehículo eléctrico";
+    }
+
+    function cleanValue(val) {
+      if (val === null || val === undefined) return null;
+      const s = String(val).trim();
+      if (!s) return null;
+      const u = s.toUpperCase();
+      if (u === "NO" || u === "N/A" || u === "NA" || u === "NONE" || u === "SIN") return null;
+      if (s === "----") return null;
+      return s;
+    }
+
+    async function loadExcelIfNeeded() {
+      if (excelLoaded || excelError) {
+        setExcelStatus();
+        return;
+      }
+      try {
+        setExcelStatus("Cargando planilla de datos…");
+        const res = await fetch(EXCEL_FILE_NAME);
+        if (!res.ok) {
+          throw new Error("No se pudo encontrar " + EXCEL_FILE_NAME);
+        }
+        const arrayBuffer = await res.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        const firstSheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[firstSheetName];
+
+        const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
+        if (!data || !data.length) {
+          throw new Error("La planilla parece estar vacía.");
+        }
+
+        const headerRow = data[0];
+        const labelsCol = data.map((row) => row[0]);
+
+        const idxEPA = labelsCol.indexOf("Autonomía Ciclo EPA(KM mas realista)");
+        const idxWLTP = labelsCol.indexOf("Autonomía Ciclo WLTP(KM)");
+        const idxADAS = labelsCol.indexOf("ADAS");
+        const idxPrice = labelsCol.indexOf("PRECIO U$S:");
+
+        if (idxEPA === -1 || idxWLTP === -1 || idxADAS === -1 || idxPrice === -1) {
+          throw new Error(
+            "No se encontraron todas las filas esperadas (EPA / WLTP / ADAS / PRECIO)."
+          );
+        }
+
+        let idxTipo = labelsCol.indexOf("Tipo");
+        if (idxTipo === -1) {
+          idxTipo = labelsCol.findIndex(
+            (lbl) =>
+              typeof lbl === "string" && lbl.trim().toLowerCase().startsWith("tipo")
+          );
+        }
+
+        let idxPuntaje = labelsCol.indexOf("puntaje");
+        if (idxPuntaje === -1) {
+          idxPuntaje = labelsCol.findIndex(
+            (lbl) =>
+              typeof lbl === "string" &&
+              lbl.trim().toLowerCase() === "puntaje"
+          );
+        }
+
+        let idxImagen = labelsCol.findIndex((lbl) => {
+          if (typeof lbl !== 'string') return false;
+          const k = lbl.trim().toLowerCase();
+          return [
+            'imagen', 'imagen_url', 'imagen url', 'url imagen',
+            'foto', 'foto_url', 'foto url',
+            'image', 'image_url', 'image url'
+          ].includes(k);
+        });
+
+        const parsedVehicles = [];
+
+        for (let col = 1; col < headerRow.length; col++) {
+          const nameRaw = headerRow[col];
+          if (!nameRaw) continue;
+          const nameStr = String(nameRaw).trim();
+          if (!nameStr || nameStr.startsWith("Unnamed")) continue;
+
+          const detail = {};
+          for (let row = 0; row < data.length; row++) {
+            const label = labelsCol[row];
+            if (!label) continue;
+            detail[String(label)] = data[row][col];
+          }
+
+          const numFromValue = (val) => {
+            if (val === null || val === undefined) return null;
+            const n = Number(String(val).replace(/[^\d.]/g, ""));
+            return Number.isFinite(n) ? n : null;
+          };
+
+          const price = numFromValue(detail["PRECIO U$S:"]);
+          const rangeEPA = numFromValue(detail["Autonomía Ciclo EPA(KM mas realista)"]);
+          const rangeWLTP = numFromValue(detail["Autonomía Ciclo WLTP(KM)"]);
+          const adas =
+            String(detail["ADAS"] ?? "")
+              .trim()
+              .toUpperCase() === "SI";
+
+          let rawBodyType = null;
+          if (idxTipo !== -1) {
+            rawBodyType = data[idxTipo][col];
+          }
+          const bodyTypeNorm = normalizeBodyType(rawBodyType);
+          const bodyLabel = bodyTypeLabel(bodyTypeNorm);
+
+          const score = numFromValue(
+            idxPuntaje !== -1 ? data[idxPuntaje][col] : null
+          );
+
+          const imageUrl = cleanValue(
+            idxImagen !== -1 ? data[idxImagen][col] : null
+          );
+
+          let priceWithoutVAT = null;
+          let patenteUSD = null;
+          let patenteContadoUSD = null;
+          if (price != null && Number.isFinite(price)) {
+            priceWithoutVAT = price / (1 + VAT_RATE);
+            patenteUSD = priceWithoutVAT * PATENTE_RATE;
+            patenteContadoUSD = patenteUSD * (1 - PATENTE_DISCOUNT_RATE);
+          }
+
+          parsedVehicles.push({
+            name: nameStr,
+            price,
+            rangeEPA,
+            rangeWLTP,
+            adas,
+            bodyTypeNorm,
+            bodyLabel,
+            raw: detail,
+            score,
+            imageUrl,
+            priceWithoutVAT,
+            patenteUSD,
+            patenteContadoUSD
+          });
+        }
+
+        vehicles = parsedVehicles;
+        excelLoaded = true;
+        setExcelStatus();
+      } catch (err) {
+        console.error("Error cargando Excel:", err);
+        excelError = err;
+        setExcelStatus();
+        showError(
+          "No se pudo leer la planilla comparativaAutos.xlsx. " +
+            "Verificá que esté en la misma carpeta que este HTML y que se sirva por HTTP (no file://)."
+        );
+      }
+    }
+
+    async function loadDolarIfNeeded() {
+      if (dolarRate !== null || dolarError) return;
+      try {
+        const res = await fetch(DOLAR_FILE_NAME);
+        if (!res.ok) throw new Error("No se pudo encontrar " + DOLAR_FILE_NAME);
+        const text = await res.text();
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) throw new Error("Contenido de dolar.csv inesperado");
+        const valueStr = lines[1].trim().replace(",", ".");
+        const value = Number(valueStr);
+        if (!Number.isFinite(value)) throw new Error("Valor de cotización inválido");
+        dolarRate = value;
+      } catch (err) {
+        console.error("Error cargando dolar.csv:", err);
+        dolarError = err;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadExcelIfNeeded();
+      loadDolarIfNeeded();
+    });
+
+    function formatUsd(num) {
+      if (num == null || !Number.isFinite(num)) return "–";
+      return (
+        "US$ " +
+        num.toLocaleString("es-UY", {
+          maximumFractionDigits: 0
+        })
+      );
+    }
+
+    function formatKm(num) {
+      if (num == null || !Number.isFinite(num)) return "–";
+      return (
+        num.toLocaleString("es-UY", {
+          maximumFractionDigits: 0
+        }) + " km"
+      );
+    }
+
+    function formatUyu(num) {
+      if (num == null || !Number.isFinite(num)) return "–";
+      return (
+        "$ " +
+        num.toLocaleString("es-UY", {
+          maximumFractionDigits: 0
+        })
+      );
+    }
+
+    function computePatenteUyu(vehicle) {
+      if (!vehicle || vehicle.patenteUSD == null || !Number.isFinite(vehicle.patenteUSD)) return null;
+      if (dolarRate == null || !Number.isFinite(dolarRate)) return null;
+      return vehicle.patenteUSD * dolarRate;
+    }
+
+    function computePatenteContadoUyu(vehicle) {
+      if (!vehicle || vehicle.patenteContadoUSD == null || !Number.isFinite(vehicle.patenteContadoUSD)) return null;
+      if (dolarRate == null || !Number.isFinite(dolarRate)) return null;
+      return vehicle.patenteContadoUSD * dolarRate;
+    }
+
+    function handleRecommendClick() {
+      showError("");
+      const budgetInput = document.getElementById("budget");
+      const rangeInput = document.getElementById("range");
+      const typeSelect = document.getElementById("vehicleType");
+      const adasSelect = document.getElementById("adas");
+
+      const budget = Number(budgetInput.value);
+      const rangeMin = Number(rangeInput.value);
+      const vehicleType = typeSelect.value;
+      const adasPref = adasSelect.value;
+
+      if (!Number.isFinite(budget) || budget <= 0) {
+        showError("Ingresá un presupuesto máximo válido en USD.");
+        return;
+      }
+      if (!Number.isFinite(rangeMin) || rangeMin < 0) {
+        showError("Ingresá una autonomía mínima válida en kilómetros.");
+        return;
+      }
+
+      Promise.all([loadExcelIfNeeded(), loadDolarIfNeeded()]).then(() => {
+        if (!excelLoaded || !vehicles.length) {
+          showError(
+            "No se pudo cargar la lista de vehículos desde comparativaAutos.xlsx."
+          );
+          renderResults([], {
+            budget,
+            rangeMin,
+            vehicleType,
+            adasPref
+          });
+          return;
+        }
+
+        let filtered = vehicles.filter((v) => {
+          if (v.price == null) return false;
+          if (v.price > budget) return false;
+
+          const rangeSource = v.rangeWLTP ?? v.rangeEPA;
+          if (rangeSource == null) return false;
+          if (rangeSource < rangeMin) return false;
+
+          if (adasPref === "si" && !v.adas) return false;
+          if (adasPref === "no_adas" && v.adas) return false;
+          return true;
+        });
+
+        if (vehicleType !== "cualquiera") {
+          filtered = filtered.filter((v) => {
+            const t = v.bodyTypeNorm;
+            if (!t) return false;
+            if (vehicleType === "auto") {
+              return t === "auto" || t === "sedan" || t === "hatch";
+            }
+            if (vehicleType === "suv") {
+              return t === "suv";
+            }
+            if (vehicleType === "hatch") {
+              return t === "hatch";
+            }
+            return true;
+          });
+        }
+
+        filtered.sort((a, b) => {
+          const sa = a.score ?? 0;
+          const sb = b.score ?? 0;
+
+          if (sa !== sb) return sb - sa;
+
+          const pa = a.price ?? Infinity;
+          const pb = b.price ?? Infinity;
+          return pa - pb;
+        });
+
+        renderResults(filtered, {
+          budget,
+          rangeMin,
+          vehicleType,
+          adasPref
+        });
+      });
+    }
+
+    function hasYes(d, key) {
+      const val = d[key];
+      return typeof val === "string" && val.trim().toUpperCase() === "SI";
+    }
+
+    function getAdasFeatureLabels(vehicle) {
+      const d = (vehicle && vehicle.raw) ? vehicle.raw : {};
+      const adasFeaturesMap = [
+        ["Frenado de Emergencia", "Frenado autónomo de emergencia"],
+        ["Advertencia de colisión Frontal", "Alerta de colisión frontal"],
+        ["Advertencia de colisión Trasera", "Alerta de colisión trasera"],
+        ["Advertencia de salida de carril", "Alerta de salida de carril"],
+        ["Asistente mantenimiento en carril", "Asistente de mantenimiento de carril"],
+        ["Velocidad crucero adaptativo", "Control de crucero adaptativo"],
+        ["Monitoreo presión de neumáticos", "Monitoreo de presión de neumáticos"],
+        ["Sensor estacionamiento delantero", "Sensores de estacionamiento delanteros"],
+        ["Sensor estacionamiento trasero", "Sensores de estacionamiento traseros"],
+        ["Asistencia en carretera", "Asistencia en carretera"],
+        ["Conducción con fatiga", "Detector de fatiga"],
+        ["Camara 360", "Cámara 360°"]
+      ];
+      const out = [];
+      for (const [key, label] of adasFeaturesMap) {
+        if (hasYes(d, key)) out.push(label);
+      }
+      return out;
+    }
+
+    function getExtrasFeatureLabels(vehicle) {
+      const d = (vehicle && vehicle.raw) ? vehicle.raw : {};
+      const extrasMap = [
+        ["Techo Solar", "Techo solar"],
+        ["Butacas calefaccionadas", "Butacas calefaccionadas"],
+        ["Butacas con masajes", "Butacas con masajes"],
+        ["Apple CarPlay / Android Auto", "Apple CarPlay / Android Auto"],
+        ["Camara 360", "Cámara 360°"],
+      ];
+      const out = [];
+      for (const [key, label] of extrasMap) {
+        if (hasYes(d, key)) out.push(label);
+      }
+      const rodado = cleanValue(d["Rodado/Cubiertas/Llantas"]);
+      if (rodado) out.push('Rodado ' + rodado);
+      return Array.from(new Set(out));
+    }
+
+    function buildEquipmentSummary(vehicle) {
+      const d = vehicle.raw || {};
+      const pieces = [];
+
+      const rangeMain = vehicle.rangeWLTP ?? vehicle.rangeEPA;
+      const rangeLabel =
+        vehicle.rangeWLTP != null
+          ? "WLTP"
+          : vehicle.rangeEPA != null
+          ? "EPA"
+          : null;
+
+      const bt = cleanValue(d["Bateria en KW"]);
+      const chem = cleanValue(d["Quimica bateria"]);
+
+      let first = `Es un ${vehicle.bodyLabel || "vehículo eléctrico"}`;
+      if (bt) first += ` con batería de ${bt} kWh`;
+      if (chem) first += ` (${chem})`;
+      if (rangeMain != null) {
+        const rtxt = formatKm(rangeMain);
+        if (rangeLabel) {
+          first += ` y una autonomía estimada de ${rtxt} (${rangeLabel}).`;
+        } else {
+          first += ` con ${rtxt} de autonomía aproximada.`;
+        }
+      } else {
+        first += `.`;
+      }
+      pieces.push(first);
+
+      const power = cleanValue(d["Potencia máxima(cv)"]);
+      const torque = cleanValue(d["Torque(Nm)"]);
+      const connector = cleanValue(d["Conector"]);
+      const perfParts = [];
+      if (power) perfParts.push(`${power} cv de potencia`);
+      if (torque) perfParts.push(`${torque} Nm de torque`);
+      if (perfParts.length || connector) {
+        let txt = "Ofrece";
+        if (perfParts.length) {
+          txt += " " + perfParts.join(" y ");
+        }
+        if (connector) {
+          txt += (perfParts.length ? ", " : " ") + `con conector de carga ${connector}`;
+        }
+        txt += ".";
+        pieces.push(txt);
+      }
+
+      const airbags = cleanValue(d["Airbags"]);
+      const crash = cleanValue(d["CRASH TEST"]);
+      const euro = cleanValue(d["Euro NCAP"]);
+      const latin = cleanValue(d["Latin NCAP"] || d["China NCAP"]);
+      const safetyParts = [];
+      if (airbags) safetyParts.push(`${airbags} airbags`);
+      if (crash) safetyParts.push(`evaluación de crash test ${crash}`);
+      if (euro) safetyParts.push(`referencias Euro NCAP ${euro}`);
+      if (latin) safetyParts.push(`datos de seguridad adicionales (${latin})`);
+      if (safetyParts.length) {
+        pieces.push("En seguridad cuenta con " + safetyParts.join(", ") + ".");
+      }
+
+      const adasFeaturesMap = [
+        ["Frenado de Emergencia", "frenado autónomo de emergencia"],
+        ["Advertencia de colisión Frontal", "alerta de colisión frontal"],
+        ["Advertencia de colisión Trasera", "alerta de colisión trasera"],
+        ["Advertencia de salida de carril", "alerta de cambio de carril"],
+        ["Asistente mantenimiento en carril", "asistente de mantenimiento de carril"],
+        ["Velocidad crucero adaptativo", "control de crucero adaptativo"],
+        ["Monitoreo presión de neumáticos", "monitoreo de presión de neumáticos"],
+        ["Sensor estacionamiento delantero", "sensores de estacionamiento delanteros"],
+        ["Sensor estacionamiento trasero", "sensores de estacionamiento traseros"],
+        ["Asistencia en carretera", "asistencia en carretera"],
+        ["Conducción con fatiga", "detector de fatiga"],
+        ["Camara 360", "cámara 360°"]
+      ];
+      const adasFeatures = [];
+      for (const [key, label] of adasFeaturesMap) {
+        if (hasYes(d, key)) adasFeatures.push(label);
+      }
+
+      if (vehicle.adas || adasFeatures.length) {
+        let txt = vehicle.adas
+          ? "Incluye paquetes de ADAS"
+          : "Cuenta con equipamiento";
+        if (adasFeatures.length) {
+          const shown = adasFeatures.slice(0, 4);
+          txt += " como " + shown.join(", ");
+          if (adasFeatures.length > 4) txt += " entre otros";
+        }
+        txt += ".";
+        pieces.push(txt);
+      }
+
+      const comfortParts = [];
+      if (hasYes(d, "Techo Solar")) comfortParts.push("techo solar");
+      if (hasYes(d, "Butacas calefaccionadas")) comfortParts.push("butacas calefaccionadas");
+      if (hasYes(d, "Butacas con masajes")) comfortParts.push("butacas con masajes");
+      const rodado = cleanValue(d["Rodado/Cubiertas/Llantas"]);
+      if (rodado) comfortParts.push(`llantas/rodado ${rodado}`);
+
+      const multimediaParts = [];
+      if (hasYes(d, "Apple CarPlay / Android Auto")) {
+        multimediaParts.push("Apple CarPlay y Android Auto");
+      }
+      if (hasYes(d, "Camara 360")) {
+        multimediaParts.push("cámara 360°");
+      }
+
+      if (comfortParts.length || multimediaParts.length) {
+        const all = comfortParts.concat(multimediaParts);
+        let txt = "En confort y tecnología ofrece " + all.join(", ") + ".";
+        pieces.push(txt);
+      }
+
+      return pieces.join(" ");
+    }
+
+    function renderDetailsPanel(vehicle, isRecommended) {
+      const panel = document.getElementById("details-panel");
+      if (!panel) return;
+      if (!vehicle) {
+        panel.innerHTML =
+          '<div class="details-placeholder">Seleccioná un modelo del listado para ver un resumen de su equipamiento y características principales. El primer resultado se marca como candidato recomendado.</div>';
+        return;
+      }
+
+      const rangeMain = vehicle.rangeWLTP ?? vehicle.rangeEPA;
+      const rangeLabel =
+        vehicle.rangeWLTP != null
+          ? "WLTP aprox."
+          : vehicle.rangeEPA != null
+          ? "EPA aprox."
+          : "aprox.";
+
+      const summaryText = buildEquipmentSummary(vehicle);
+      const patenteUyu = computePatenteUyu(vehicle);
+      const patenteContadoUyu = computePatenteContadoUyu(vehicle);
+
+      panel.innerHTML = `
+        ${isRecommended ? '<div class="details-badge">Candidato recomendado</div>' : ''}
+
+        <div class="details-hero">
+          ${vehicle.imageUrl ? `<img class="vehicle-image" src="${vehicle.imageUrl}" alt="${vehicle.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : ''}
+          <div style="min-width:0; flex:1;">
+            <div class="details-title">${vehicle.name}</div>
+            <div class="details-subtitle">${vehicle.bodyLabel || 'Vehículo eléctrico'}</div>
+            <div class="details-price">${formatUsd(vehicle.price)}</div>
+          </div>
+        </div>
+
+        <div class="details-body">
+          ${summaryText}
+        </div>
+
+        ${(() => {
+          const adasFeats = getAdasFeatureLabels(vehicle);
+          const extrasFeats = getExtrasFeatureLabels(vehicle);
+          const title = adasFeats.length ? 'Equipamiento:' : (extrasFeats.length ? 'Extras:' : '');
+          const feats = adasFeats.length ? adasFeats : extrasFeats;
+          if (!feats.length) return '';
+          const items = feats.map(f => `
+            <li class="adas-item">
+              <span class="adas-tick">✓</span>
+              <span>${f}</span>
+            </li>
+          `).join('');
+          return `
+            <div class="adas-box">
+              <div class="adas-box-title"><span class="dot"></span><span>${title}</span></div>
+              <ul class="adas-list">${items}</ul>
+            </div>
+          `;
+        })()}
+
+        <div class="details-note">
+          Autonomía de referencia: <strong>${formatKm(rangeMain)}</strong> (${rangeLabel}).
+        </div>
+        <div class="details-note">
+          Patente estimada (3% del valor sin IVA 22%): 
+          ${vehicle.patenteUSD != null && Number.isFinite(vehicle.patenteUSD)
+            ? `<strong>${formatUsd(vehicle.patenteUSD)}</strong>${patenteUyu != null ? ' ≈ <strong>' + formatUyu(patenteUyu) + '</strong>' : ''}`
+            : '–'}
+        </div>
+        ${
+          vehicle.patenteContadoUSD != null && Number.isFinite(vehicle.patenteContadoUSD)
+            ? `<div class="details-note details-note-contado">
+                Pago contado (-20%): 
+                <strong>${formatUsd(vehicle.patenteContadoUSD)}</strong>${
+                  patenteContadoUyu != null ? ' ≈ <strong>' + formatUyu(patenteContadoUyu) + '</strong>' : ''
+                }
+              </div>`
+            : ''
+        }
+      `;
+    }
+
+    function renderResults(list, opts) {
+      const { budget, rangeMin, vehicleType, adasPref } = opts;
+
+      lastRenderedList = list;
+
+      const resultsListEl = document.getElementById("results-list");
+      const summaryEl = document.getElementById("results-summary");
+      const pillsEl = document.getElementById("results-pills");
+      const emptyStateEl = document.getElementById("empty-state");
+
+      if (!resultsListEl || !summaryEl || !pillsEl) return;
+
+      if (!list.length) {
+        summaryEl.textContent =
+          "No se encontraron vehículos que cumplan todos los criterios. Ajustá el presupuesto, la autonomía o el requisito de ADAS.";
+      } else {
+        summaryEl.textContent =
+          "Mostrando " +
+          list.length +
+          " modelo(s) que encajan con tu perfil. El primero se considera candidato recomendado.";
+      }
+
+      const pills = [];
+      pills.push(
+        '<div class="pill-filter"><span class="chip-label">Presupuesto</span><span>hasta ' +
+          formatUsd(budget) +
+          "</span></div>"
+      );
+      pills.push(
+        '<div class="pill-filter"><span class="chip-label">Autonomía mínima</span><span>' +
+          formatKm(rangeMin) +
+          " WLTP</span></div>"
+      );
+
+      if (vehicleType === "auto") {
+        pills.push(
+          '<div class="pill-filter"><span class="chip-label">Tipo</span><span>Auto / Sedán / Hatch</span></div>'
+        );
+      } else if (vehicleType === "suv") {
+        pills.push(
+          '<div class="pill-filter"><span class="chip-label">Tipo</span><span>SUV / Crossover</span></div>'
+        );
+      } else if (vehicleType === "hatch") {
+        pills.push(
+          '<div class="pill-filter"><span class="chip-label">Tipo</span><span>Solo hatchback</span></div>'
+        );
+      } else {
+        pills.push(
+          '<div class="pill-filter"><span class="chip-label">Tipo</span><span>Cualquiera</span></div>'
+        );
+      }
+
+      if (adasPref === "si") {
+        pills.push(
+          '<div class="pill-filter"><span class="chip-label">ADAS</span><span>Debe tener</span></div>'
+        );
+      } else if (adasPref === "no_adas") {
+        pills.push(
+          '<div class="pill-filter"><span class="chip-label">ADAS</span><span>Prefiero que no tenga</span></div>'
+        );
+      } else {
+        pills.push(
+          '<div class="pill-filter"><span class="chip-label">ADAS</span><span>Indistinto</span></div>'
+        );
+      }
+
+      pillsEl.innerHTML = pills.join("");
+
+      if (!list.length) {
+        resultsListEl.innerHTML =
+          '<div class="empty-state">' +
+          "<strong>No hubo coincidencias exactas.</strong> Intentá bajar un poco la autonomía mínima, subir el presupuesto o relajar el requisito de ADAS para ver opciones cercanas." +
+          "</div>";
+        if (emptyStateEl) emptyStateEl.style.display = "none";
+        renderDetailsPanel(null);
+        return;
+      }
+
+      const cardsHTML = list
+        .map((v, idx) => {
+          const rangeMain = v.rangeWLTP ?? v.rangeEPA;
+          const rangeLabelShort =
+            v.rangeWLTP != null
+              ? "WLTP aprox."
+              : v.rangeEPA != null
+              ? "EPA aprox."
+              : "aprox.";
+
+          const adasChip = v.adas
+            ? '<div class="chip chip-accent"><span class="chip-accent-dot"></span><span>ADAS disponible</span></div>'
+            : '<div class="chip chip-adas-no">Sin ADAS</div>';
+
+          const patenteUyu = computePatenteUyu(v);
+          const patenteContadoUyu = computePatenteContadoUyu(v);
+
+          const patenteChipBase = patenteUyu != null
+            ? `<div class="chip"><span class="chip-label">Patente</span><span>${formatUyu(patenteUyu)}</span></div>`
+            : "";
+
+          const patenteChipContado = patenteContadoUyu != null
+            ? `<div class="chip chip-patente-contado"><span class="chip-label">Contado</span><span>${formatUyu(patenteContadoUyu)}</span></div>`
+            : "";
+
+          const patenteChip = patenteChipBase + patenteChipContado;
+
+          return `
+            <article class="result-card" data-index="${idx}">
+              <div class="result-main">
+                <div class="result-name">${v.name}</div>
+                <div class="result-subtitle">${v.bodyLabel || "Vehículo eléctrico"}</div>
+                <div class="result-price">${formatUsd(v.price)}</div>
+                <div class="result-meta">
+                  <div class="chip">
+                    <span class="chip-label">Autonomía</span>
+                    <span>${formatKm(rangeMain)} · ${rangeLabelShort}</span>
+                  </div>
+                  ${adasChip}
+                  ${patenteChip}
+                </div>
+              </div>
+              <div class="result-side">
+                ${v.imageUrl ? `
+                  <img class="result-thumb" src="${v.imageUrl}" alt="${v.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;result-thumb placeholder&quot;>🚗</div>'">
+                ` : `<div class="result-thumb placeholder">🚗</div>`}
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      resultsListEl.innerHTML = cardsHTML;
+
+      const cards = resultsListEl.querySelectorAll(".result-card");
+      cards.forEach((card) => {
+        card.addEventListener("click", () => {
+          cards.forEach((c) => c.classList.remove("selected"));
+          card.classList.add("selected");
+          const idx = Number(card.getAttribute("data-index"));
+          const vehicle = lastRenderedList[idx];
+          renderDetailsPanel(vehicle, idx === 0);
+
+          if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
+            const panel = document.getElementById('details-panel');
+            if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      if (cards.length > 0) {
+        cards[0].classList.add("selected");
+        renderDetailsPanel(lastRenderedList[0], true);
+      } else {
+        renderDetailsPanel(null);
+      }
+    }
+  </script>
+</body>
+</html>
