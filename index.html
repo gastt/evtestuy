@@ -4,977 +4,684 @@
   <meta charset="UTF-8" />
   <title>Calculá los costos de carga y tu ahorro en EVUruguay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#020617" />
+  <meta name="theme-color" content="#f1f9f5" />
+  <link rel="stylesheet" href="evuy-design.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2900400294044604"
+     crossorigin="anonymous"></script>
   <style>
-    html {
-      background-color: #020617; /* Fondo oscuro para el rebote del scroll */
-      color-scheme: dark;
-    }
-
-    :root {
-      --bg: #0f172a;
-      --card-bg: #111827;
-      --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.12);
-      --text: #e5e7eb;
-      --text-muted: #9ca3af;
-      --border: #1f2933;
-      --error: #ef4444;
-      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
-      --radius-xl: 18px;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      overscroll-behavior-y: contain;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 980px;
-      background: linear-gradient(145deg, #020617 0%, #020617 40%, #0b1120 100%);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      display: grid;
+    /* Page-specific layout */
+    .ev-app {
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-      gap: 24px;
     }
-
     @media (max-width: 800px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
+      .ev-app { grid-template-columns: 1fr; }
     }
 
-    h1 {
-      margin: 0 0 6px;
-      font-size: 1.6rem;
-      letter-spacing: 0.03em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    h1 span.badge {
-      font-size: 0.72rem;
-      padding: 2px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      background: rgba(34, 197, 94, 0.06);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    /* ============================
-       HERO title (color + glow)
-       ============================ */
-    .hero-title {
-      margin: 0 0 4px;
-      font-size: 1.85rem;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      line-height: 1.1;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .hero-title-text {
-      background: linear-gradient(90deg, #22c55e 0%, #4ade80 35%, #86efac 70%, #22c55e 100%);
-      background-size: 220% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: titleShimmer 3.2s ease-in-out infinite;
-    }
-
-    @keyframes titleShimmer {
-      0%   { background-position: 0% 50%; filter: drop-shadow(0 0 0 rgba(34,197,94,0.0)); }
-      45%  { filter: drop-shadow(0 0 10px rgba(34,197,94,0.35)); }
-      100% { background-position: 100% 50%; filter: drop-shadow(0 0 3px rgba(34,197,94,0.22)); }
-    }
-
-    .hero-tagline {
-      margin: 0 0 10px;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      letter-spacing: 0.10em;
-      text-transform: uppercase;
-    }
-
-    /* Mobile: center header title/tagline */
-    @media (max-width: 560px) {
-      header { text-align: center; }
-      .hero-title { justify-content: center; width: 100%; }
-      .pill-row { justify-content: center; }
-      .status { text-align: center; }
-    }
-
-
-    .subtitle {
-      margin: 0;
-      font-size: 0.86rem;
-      color: var(--text-muted);
-    }
-
-    .pill-row {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 0.72rem;
-    }
-
-    .pill {
-      border-radius: 999px;
-      padding: 4px 10px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      color: var(--text-muted);
-    }
-
-    .pill strong {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .card {
-      background: radial-gradient(circle at top left, #111827 0, #020617 60%);
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      padding: 16px 16px 18px;
-    }
-
-    .card + .card {
-      margin-top: 12px;
-    }
-
-    .card-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: #e5e7eb;
-      gap: 8px;
-    }
-
-    .card-title small {
-      color: var(--text-muted);
-      font-weight: 400;
-      font-size: 0.75rem;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.8rem;
-    }
-
-    label {
-      color: var(--text-muted);
-    }
-
-    select,
-    input[type="number"],
-    input[type="text"] {
-      background: #020617;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 7px 12px;
-      color: var(--text);
-      font-size: 0.86rem;
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease,
-        background 0.15s ease;
-      width: 100%;
-      -moz-appearance: none;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    select:focus,
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
-    }
-
-    .field-inline {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 8px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .badge-small {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border: 1px solid rgba(34, 197, 94, 0.45);
-    }
-
-    .results-card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      height: 100%;
-    }
-
-    .result-main {
-      background: radial-gradient(circle at top, #16a34a22 0, #020617 65%);
-      border-radius: var(--radius-xl);
-      padding: 16px 16px 18px;
-      border: 1px solid rgba(34, 197, 94, 0.6);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .result-tag {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .result-cost {
-      font-size: 1.9rem;
-      font-weight: 650;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .result-cost span.currency {
-      font-size: 1rem;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-right: 4px;
-    }
-
-    .result-sub {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-
-    .result-sub strong {
-      color: var(--accent);
-    }
-
-    .chip-row {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      font-size: 0.72rem;
-    }
-
-    .chip {
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .chip strong {
-      color: var(--accent);
-    }
-
-    .note {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .tarifa-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.75rem;
-      margin-top: 6px;
-    }
-
-    .tarifa-table th,
-    .tarifa-table td {
-      padding: 6px 6px;
-      border-bottom: 1px dashed rgba(51, 65, 85, 0.9);
-      text-align: left;
-    }
-
-    .tarifa-table th {
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .tarifa-table td strong {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .tarifa-pill {
-      font-size: 0.66rem;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .error {
-      margin-top: 6px;
-      font-size: 0.76rem;
-      color: var(--error);
-    }
-
-
-    /* Share PDF button */
-    .share-row{
-      margin-top: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .share-btn{
-      border-radius: 999px;
-      padding: 9px 14px;
-      border: 1px solid rgba(34, 197, 94, 0.65);
-      background: rgba(34, 197, 94, 0.10);
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 650;
-      letter-spacing: 0.02em;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-    .share-btn:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.35);
-      background: rgba(34, 197, 94, 0.14);
-    }
-    .share-btn:active{ transform: translateY(0); box-shadow: none; }
-    .share-note{ font-size: 0.72rem; color: var(--text-muted); }
-    @media (max-width:560px){
-      .share-row{ justify-content: center; }
-      .share-btn{ width: 100%; max-width: 280px; }
-    }
-
-
-    .footer {
-      margin-top: 12px;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-align: right;
-    }
-
-    .status {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: 8px;
-    }
-
-    .status strong {
-      color: var(--accent);
-    }
-
-    /* Collapsibles */
-    .collapsible .card-title {
-      cursor: pointer;
-    }
-
-    .collapse-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(15, 23, 42, 0.7);
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .collapse-btn-icon {
-      display: inline-block;
-      transition: transform 0.18s ease;
-      font-size: 0.7rem;
-    }
-
-    .collapsible-body {
-      margin-top: 8px;
-    }
-
-    .collapsible[data-open="false"] .collapsible-body {
-      display: none;
-    }
-
-    .collapsible[data-open="false"] .collapse-btn-icon {
-      transform: rotate(-90deg);
-    }
-
-    /* Comparación con combustión */
-    .comparison-card {
-      grid-column: 1 / -1;
-      background: radial-gradient(circle at top, #1d4ed822 0, #020617 70%);
-      border-radius: var(--radius-xl);
-      padding: 16px 16px 18px;
-      border: 1px solid rgba(59, 130, 246, 0.7);
-      margin-top: 8px;
-    }
-
-    .comparison-card .card-title span {
-      font-size: 0.9rem;
-    }
-
-    .comp-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-top: 4px;
-    }
-
-    .comp-col {
-      flex: 1 1 220px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .comp-stat {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-
-    .comp-stat strong {
-      color: var(--text);
-    }
-
-    .comp-highlight strong {
-      color: var(--accent);
-    }
-
-    .comp-note {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: 8px;
-    }
-
-    .comp-bars {
-      margin-top: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 0.75rem;
-    }
-
-    .comp-bar-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .comp-bar-label {
-      width: 88px;
-      color: var(--text-muted);
-      text-align: right;
-    }
-
-    .comp-bar-track {
-      flex: 1;
-      height: 10px;
-      border-radius: 999px;
-      background: #0f172a;
-      overflow: hidden;
-    }
-
-    .comp-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      width: 0%;
-      transition: width 0.2s ease-out;
-    }
-
-    .comp-bar-fill-ev {
-      background: #22c55e;
-    }
-
-    .comp-bar-fill-ice {
-      background: #ef4444;
-    }
-
-    /* Ahorro en el tiempo */
-    .savings-card {
-      grid-column: 1 / -1;
-      background: radial-gradient(circle at top, #16a34a33 0, #020617 70%);
-      border-radius: var(--radius-xl);
-      padding: 16px 16px 18px;
-      border: 1px solid rgba(34, 197, 94, 0.7);
-      margin-top: 8px;
-    }
-
-    .savings-card .card-title span {
-      font-size: 0.9rem;
-    }
-
-    .savings-highlight {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #fbbf24;
-      background: rgba(251, 191, 36, 0.08);
-      border-radius: 999px;
-      padding: 8px 14px;
-      text-align: center;
-      border: 1px solid rgba(251, 191, 36, 0.4);
-    }
-
-    .savings-subnote {
-      margin-top: 4px;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    /* Cargadores públicos / privados */
-    .chargers-card {
-      grid-column: 1 / -1;
-      background: radial-gradient(circle at top, #22c55e22 0, #020617 70%);
-      border-radius: var(--radius-xl);
-      padding: 16px 16px 18px;
-      border: 1px solid rgba(34, 197, 94, 0.7);
-      margin-top: 8px;
-    }
-
-    .chargers-card .card-title span {
-      font-size: 0.9rem;
-    }
-
-    .chargers-bars {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 0.75rem;
-    }
-
-    .charger-bar-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .charger-bar-label {
-      width: 120px;
-      color: var(--text-muted);
-      text-align: right;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .charger-bar-track {
-      flex: 1;
-      height: 10px;
-      border-radius: 999px;
-      background: #0f172a;
-      overflow: hidden;
-    }
-
-    .charger-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      width: 0%;
-      transition: width 0.2s ease-out;
-    }
-  
-    /* Pie de página global */
-    .app-footer {
-      grid-column: 1 / -1;
-      margin-top: 18px;
-      font-size: 0.7rem;
-      color: #9ca3af;
-      text-align: center;
-    }
-    .app-footer-separator {
-      height: 1px;
-      width: 100%;
-      background: radial-gradient(circle, rgba(148, 163, 184, 0.35), transparent);
-      margin-bottom: 10px;
-      opacity: 0.8;
-    }
-    .app-footer a {
-      color: #22c55e;
-      text-decoration: none;
-    }
-    .app-footer a:hover {
-      text-decoration: underline;
-    }
-
-
-    /* Callout destacado para secciones */
-    .section-callout {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(34, 197, 94, 0.65);
-      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), rgba(2, 6, 23, 0.85));
-      color: var(--text);
-      font-size: 0.86rem;
-      font-weight: 650;
-      letter-spacing: 0.01em;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-      margin-top: 14px;
-      margin-bottom: 10px;
-      width: fit-content;
-      max-width: 100%;
-    }
-
-    .section-callout .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
-      flex: 0 0 auto;
-    }
-
-    .section-callout .text {
-      line-height: 1.2;
-    }
-
-    .section-callout .hint {
-      display: block;
-      margin-top: 4px;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-left: 6px;
-      font-size: 0.82em;
-    }
-
-
-    /* ============================
-       Mejor UX en móviles
-       - 1 campo por línea (selects/inputs)
-       ============================ */
-    @media (max-width: 560px) {
-      .grid-2 {
-        grid-template-columns: 1fr !important;
-        gap: 10px;
-      }
-
-      select,
-      input[type="number"],
-      input[type="text"] {
-        padding: 10px 12px;
-        font-size: 0.92rem;
-      }
-
-      .field-inline {
-        align-items: flex-start;
-      }
-
-      .section-callout {
-        width: 100%;
-        border-radius: 16px;
-        padding: 10px 12px;
-      }
-    }
-
-
-    /* ============================
-       Mobile: ocultar columnas de ahorro para simplificar
-       ============================ */
-    @media (max-width: 560px) {
-      /* Tablas de ahorro en el tiempo */
-      .savings-card table th:nth-child(5),
-      .savings-card table td:nth-child(5) {
-        display: none;
-      }
-
-      /* Tabla de comparación de cargadores */
-      .chargers-card table th:nth-child(5),
-      .chargers-card table td:nth-child(5) {
-        display: none;
-      }
-    }
-
-
-    /* ============================
-       Share Card (Story)
-       ============================ */
+    /* Share card (offscreen for html2canvas capture) */
     .share-card-wrap {
-      position: fixed;
-      left: -10000px;
-      top: 0;
-      width: 1080px;
-      height: auto; /* Auto height: se ajusta al contenido */
-      max-height: none;
-
+      position: fixed; left: -10000px; top: 0;
+      width: 1080px; height: auto; max-height: none;
       padding: 56px;
-      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
-      color: var(--text);
+      background: linear-gradient(135deg, #ecfdf5, #f0fdfa);
+      color: var(--color-text);
+      display: flex; flex-direction: column; gap: 18px;
+      border: 1px solid rgba(45, 212, 168, 0.15);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.08);
+      overflow: hidden; z-index: 9999; pointer-events: none;
+      font-family: var(--font-display);
+    }
+
+    .share-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .share-brand { display: flex; flex-direction: column; gap: 6px; }
+    .share-title {
+      font-size: 64px; font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, var(--ev-green), var(--ev-teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .share-subtitle { font-size: 26px; color: rgba(30,41,59,0.5); text-transform: uppercase; letter-spacing: 0.12em; }
+    .share-badge {
+      font-size: 20px; padding: 10px 16px; border-radius: 999px;
+      border: 1px solid rgba(45,212,168,0.3); background: rgba(45,212,168,0.06);
+      color: var(--ev-green); white-space: nowrap; height: fit-content;
+    }
+    .share-card-main { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+    .share-hero {
+      background: linear-gradient(135deg, rgba(45,212,168,0.06), rgba(22,160,122,0.04));
+      border: 1px solid rgba(45,212,168,0.2); border-radius: 24px; padding: 26px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .share-hero-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .share-vehicle { font-size: 28px; color: rgba(30,41,59,0.85); font-weight: 800; }
+    .share-cost { font-size: 78px; font-weight: 900; line-height: 1; color: var(--ev-forest); }
+    .share-cost small { font-size: 32px; color: rgba(30,41,59,0.5); font-weight: 700; margin-right: 8px; }
+    .share-meta { font-size: 22px; color: rgba(30,41,59,0.55); line-height: 1.25; }
+    .share-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .share-highlight {
+      border-radius: 22px; padding: 20px 22px;
+      background: linear-gradient(135deg, rgba(45,212,168,0.08), rgba(22,160,122,0.06));
+      border: 1px solid rgba(45,212,168,0.2); color: rgba(30,41,59,0.85);
+      font-size: 26px; line-height: 1.25;
+    }
+    .share-highlight strong { color: var(--ev-green); font-weight: 900; }
+    .share-footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      font-size: 20px; color: rgba(30,41,59,0.4);
+      border-top: 1px solid rgba(45,212,168,0.1); padding-top: 14px;
+    }
+    .share-footer .link { color: var(--ev-green); font-weight: 800; letter-spacing: 0.06em; }
+
+    /* Comparison section specific overrides */
+    .comparison-card .ev-card-title span { color: #1d4ed8; }
+
+    /* Savings highlight override */
+    .savings-highlight {
+      margin-top: 12px; font-size: 0.88rem; font-weight: 600;
+      color: var(--ev-green-deep);
+      background: linear-gradient(135deg, var(--ev-mint), rgba(45, 212, 168, 0.08));
+      border-radius: var(--radius-md); padding: 10px 16px; text-align: center;
+      border: 1px solid rgba(45, 212, 168, 0.2);
+    }
+    .savings-highlight strong { color: var(--ev-forest); font-weight: 700; }
+    .savings-subnote { margin-top: 6px; font-size: 0.72rem; color: var(--color-text-tertiary); text-align: center; }
+
+    /* Comp bars */
+    .comp-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 6px; }
+    .comp-col { flex: 1 1 220px; display: flex; flex-direction: column; gap: 10px; }
+    .comp-stat {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 0.8rem; color: var(--color-text-secondary); padding: 3px 0;
+    }
+    .comp-stat strong { color: var(--color-text); font-weight: 600; }
+    .comp-highlight strong { color: var(--color-accent); }
+    .comp-note { font-size: 0.74rem; color: var(--color-text-tertiary); margin-top: 8px; }
+
+    .comp-bars { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; font-size: 0.78rem; }
+    .comp-bar-row { display: flex; align-items: center; gap: 10px; }
+    .comp-bar-label { width: 88px; color: var(--color-text-secondary); text-align: right; font-weight: 500; }
+    .comp-bar-track { flex: 1; height: 14px; border-radius: var(--radius-pill); background: var(--ev-mint); overflow: hidden; }
+    .comp-bar-fill { height: 100%; border-radius: var(--radius-pill); width: 0%; transition: width 0.3s ease-out; }
+    .comp-bar-fill-ev { background: linear-gradient(90deg, var(--ev-green), var(--ev-teal)); }
+    .comp-bar-fill-ice { background: linear-gradient(90deg, #e63946, #f87171); }
+
+    /* Red panel override */
+    #panelComparadorRedes { background: linear-gradient(135deg, #fef2f2 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.12) !important; }
+    #panelComparadorRedes .ev-card-title span { color: #b91c1c !important; }
+    #panelComparadorRedes .ev-collapse-btn { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.06) !important; color: #e63946 !important; }
+    #panelComparadorRedes a.ev-link { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.04) !important; color: #b91c1c !important; }
+
+    /* Amber panel override */
+    #panelCarBuy { background: linear-gradient(135deg, #fefce8 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.12) !important; }
+    #panelCarBuy .ev-card-title span { color: #a16207 !important; }
+    #panelCarBuy .ev-collapse-btn { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.06) !important; color: #ca8a04 !important; }
+    #panelCarBuy a.ev-link { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.04) !important; color: #a16207 !important; }
+
+    /* Green panel override — Simulador Instalación */
+    #panelInstalacion { background: linear-gradient(135deg, #ecfdf5 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.15) !important; }
+    #panelInstalacion .ev-card-title span { color: #0f7b5f !important; }
+    #panelInstalacion .ev-collapse-btn { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.08) !important; color: #16a07a !important; }
+    #panelInstalacion a.ev-link { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.06) !important; color: #0f7b5f !important; }
+
+    /* Dark mode: page-specific overrides */
+    [data-theme="dark"] #panelComparadorRedes { background: linear-gradient(135deg, rgba(230, 57, 70, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.15) !important; }
+    [data-theme="dark"] #panelComparadorRedes .ev-card-title span { color: #fca5a5 !important; }
+    [data-theme="dark"] #panelComparadorRedes .ev-collapse-btn { color: #fca5a5 !important; }
+    [data-theme="dark"] #panelComparadorRedes a.ev-link { color: #fca5a5 !important; }
+
+    [data-theme="dark"] #panelCarBuy { background: linear-gradient(135deg, rgba(202, 138, 4, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.15) !important; }
+    [data-theme="dark"] #panelCarBuy .ev-card-title span { color: #fde68a !important; }
+    [data-theme="dark"] #panelCarBuy .ev-collapse-btn { color: #fde68a !important; }
+    [data-theme="dark"] #panelCarBuy a.ev-link { color: #fde68a !important; }
+
+    /* Dark mode: Simulador Instalación panel */
+    [data-theme="dark"] #panelInstalacion { background: linear-gradient(135deg, rgba(45, 212, 168, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.18) !important; }
+    [data-theme="dark"] #panelInstalacion .ev-card-title span { color: #a7f3d0 !important; }
+    [data-theme="dark"] #panelInstalacion .ev-collapse-btn { color: #a7f3d0 !important; }
+    [data-theme="dark"] #panelInstalacion a.ev-link { color: #a7f3d0 !important; }
+
+    /* Dark mode: savings highlight */
+    [data-theme="dark"] .savings-highlight { background: rgba(45, 212, 168, 0.06); border-color: rgba(45, 212, 168, 0.15); color: #a7f3d0; }
+    [data-theme="dark"] .savings-highlight strong { color: var(--ev-teal); }
+    [data-theme="dark"] .comparison-card .ev-card-title span { color: #93c5fd !important; }
+
+    /* ── Floating bubble ── */
+    .float-bubble {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 9999;
       display: flex;
       flex-direction: column;
-      gap: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      border-radius: 28px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+      align-items: flex-start;
+      gap: 5px;
+      text-decoration: none !important;
+      animation: fbIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    /* Badge "Nuevo" */
+    .fb-badge {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      box-shadow: 0 2px 10px rgba(220,38,38,0.4);
+      pointer-events: none;
+      white-space: nowrap;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease;
       overflow: hidden;
-      z-index: 9999;
+      max-height: 30px;
+    }
+    .float-bubble.collapsed .fb-badge {
+      opacity: 0;
+      transform: translateY(-6px);
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    /* Pill / circle container */
+    .fb-pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--color-surface);
+      border: 1.5px solid rgba(220,38,38,0.4);
+      border-radius: var(--radius-pill);
+      padding: 8px 18px 8px 8px;
+      box-shadow: 0 4px 24px rgba(220,38,38,0.18), 0 1px 5px rgba(0,0,0,0.07);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition:
+        padding 0.4s cubic-bezier(0.4,0,0.2,1),
+        border-radius 0.4s cubic-bezier(0.4,0,0.2,1),
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+      cursor: pointer;
+    }
+    .float-bubble:hover .fb-pill {
+      border-color: rgba(220,38,38,0.7);
+      box-shadow: 0 8px 32px rgba(220,38,38,0.28), 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .float-bubble.collapsed .fb-pill {
+      padding: 10px;
+      border-radius: 50%;
+    }
+
+    /* Pulse ring */
+    .fb-pulse {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 2px solid rgba(220,38,38,0.5);
+      animation: fbPulse 2.6s ease-out infinite;
       pointer-events: none;
     }
 
-    .share-card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .share-brand { display: flex; flex-direction: column; gap: 6px; }
-
-    .share-title {
-      font-size: 64px;
-      font-weight: 900;
-      letter-spacing: 0.02em;
-      line-height: 1;
-      background: linear-gradient(90deg,#22c55e,#4ade80,#86efac);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 10px rgba(34,197,94,0.35));
-    }
-
-    .share-subtitle {
-      font-size: 26px;
-      color: rgba(229,231,235,0.75);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-
-    .share-badge {
-      font-size: 20px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(34,197,94,0.65);
-      background: rgba(34,197,94,0.10);
-      color: #a7f3d0;
-      white-space: nowrap;
-      height: fit-content;
-    }
-
-    .share-card-main { flex: 1; display: flex; flex-direction: column; gap: 16px; }
-
-    .share-hero {
-      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.20) 0, rgba(2, 6, 23, 0.82) 70%);
-      border: 1px solid rgba(34, 197, 94, 0.65);
-      border-radius: 24px;
-      padding: 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .share-hero-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-
-    .share-vehicle { font-size: 28px; color: rgba(229,231,235,0.9); font-weight: 800; }
-
-    .share-cost { font-size: 78px; font-weight: 900; line-height: 1; color: #e5e7eb; }
-    .share-cost small { font-size: 32px; color: rgba(229,231,235,0.65); font-weight: 700; margin-right: 8px; }
-
-    .share-meta { font-size: 22px; color: rgba(229,231,235,0.65); line-height: 1.25; }
-
-    .share-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-
-    .share-highlight {
-      border-radius: 22px;
-      padding: 20px 22px;
-      background: radial-gradient(circle at top, rgba(245, 158, 11, 0.20) 0, rgba(2, 6, 23, 0.80) 70%);
-      border: 1px solid rgba(245, 158, 11, 0.7);
-      color: rgba(229,231,235,0.88);
-      font-size: 26px;
-      line-height: 1.25;
-      box-shadow: 0 16px 45px rgba(0,0,0,0.35);
-    }
-
-    .share-highlight strong { color: #fbbf24; font-weight: 900; }
-
-    .share-footer {
+    /* Icon circle */
+    .fb-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #dc2626, #ef4444);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 20px;
-      color: rgba(229,231,235,0.55);
-      border-top: 1px solid rgba(148, 163, 184, 0.18);
-      padding-top: 14px;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(220,38,38,0.35);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .float-bubble:hover .fb-icon {
+      transform: scale(1.1) rotate(-8deg);
+    }
+    .fb-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
     }
 
-    .share-footer .link { color: rgba(167, 243, 208, 0.85); font-weight: 800; letter-spacing: 0.06em; }
+    /* Text block */
+    .fb-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-left: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 160px;
+      opacity: 1;
+      transition:
+        max-width 0.4s cubic-bezier(0.4,0,0.2,1),
+        opacity 0.3s ease,
+        margin 0.4s ease;
+    }
+    .float-bubble.collapsed .fb-text {
+      max-width: 0;
+      opacity: 0;
+      margin-left: 0;
+    }
+    .fb-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1.2;
+      text-decoration: none;
+    }
+    .fb-sublabel {
+      font-size: 0.63rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      line-height: 1.2;
+    }
 
+    /* Arrow */
+    .fb-arrow {
+      margin-left: 8px;
+      font-size: 0.78rem;
+      color: #dc2626;
+      font-weight: 700;
+      flex-shrink: 0;
+      opacity: 1;
+      max-width: 20px;
+      transition:
+        max-width 0.4s cubic-bezier(0.4,0,0.2,1),
+        opacity 0.3s ease,
+        margin 0.4s ease;
+    }
+    .float-bubble.collapsed .fb-arrow {
+      max-width: 0;
+      opacity: 0;
+      margin-left: 0;
+    }
 
-/* --- Override SOLO para el último menú (Comparador de redes) --- */
-#panelComparadorRedes {
-  background: radial-gradient(circle at top, rgba(239, 68, 68, 0.22) 0, #020617 70%) !important;
-  border: 1px solid rgba(239, 68, 68, 0.7) !important;
-}
+    /* Keyframes */
+    @keyframes fbIn {
+      0%   { opacity: 0; transform: translateX(-24px) scale(0.85); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes fbPulse {
+      0%   { transform: scale(1);    opacity: 0.6; }
+      80%  { transform: scale(1.22); opacity: 0; }
+      100% { transform: scale(1.22); opacity: 0; }
+    }
 
-#panelComparadorRedes .collapse-btn {
-  border-color: rgba(239, 68, 68, 0.45) !important;
-  background: rgba(239, 68, 68, 0.12) !important;
-  color: #ef4444 !important;
-}
+    /* Dark mode tweaks */
+    [data-theme="dark"] .fb-pill {
+      border-color: rgba(220,38,38,0.25);
+      box-shadow: 0 4px 24px rgba(220,38,38,0.1), 0 1px 5px rgba(0,0,0,0.4);
+    }
 
-#panelComparadorRedes a {
-  border: 1px solid rgba(239, 68, 68, 0.65) !important;
-  background: rgba(239, 68, 68, 0.10) !important;
-  color: #fca5a5 !important;
-}
+    /* ── CarBuy bubble (amber variant) ── */
+    .float-bubble-carbuy {
+      top: 88px;
+      left: 18px;
+    }
+    .float-bubble-carbuy .fb-badge {
+      background: linear-gradient(135deg, #ca8a04, #f59e0b);
+      box-shadow: 0 2px 10px rgba(202,138,4,0.4);
+    }
+    .float-bubble-carbuy .fb-pill {
+      border-color: rgba(202,138,4,0.4);
+      box-shadow: 0 4px 24px rgba(202,138,4,0.18), 0 1px 5px rgba(0,0,0,0.07);
+    }
+    .float-bubble-carbuy:hover .fb-pill {
+      border-color: rgba(202,138,4,0.7);
+      box-shadow: 0 8px 32px rgba(202,138,4,0.28), 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .float-bubble-carbuy .fb-pulse {
+      border-color: rgba(202,138,4,0.5);
+    }
+    .float-bubble-carbuy .fb-icon {
+      background: linear-gradient(135deg, #ca8a04, #f59e0b);
+      box-shadow: 0 2px 8px rgba(202,138,4,0.35);
+    }
+    .float-bubble-carbuy .fb-arrow {
+      color: #ca8a04;
+    }
+    [data-theme="dark"] .float-bubble-carbuy .fb-pill {
+      border-color: rgba(202,138,4,0.25);
+      box-shadow: 0 4px 24px rgba(202,138,4,0.1), 0 1px 5px rgba(0,0,0,0.4);
+    }
 
+    @keyframes fbInUp {
+      0%   { opacity: 0; transform: translateX(-24px) scale(0.85); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    .float-bubble-carbuy {
+      animation-name: fbInUp;
+      animation-delay: 0.15s;
+    }
 
+    /* ── Instalación bubble (green variant) ── */
+    .float-bubble-instalacion {
+      top: 158px;
+      left: 18px;
+      animation-name: fbInUp;
+      animation-delay: 0.3s;
+    }
+    .float-bubble-instalacion .fb-badge {
+      background: linear-gradient(135deg, #16a07a, #2dd4a8);
+      box-shadow: 0 2px 10px rgba(45,212,168,0.4);
+    }
+    .float-bubble-instalacion .fb-pill {
+      border-color: rgba(45,212,168,0.4);
+      box-shadow: 0 4px 24px rgba(45,212,168,0.18), 0 1px 5px rgba(0,0,0,0.07);
+    }
+    .float-bubble-instalacion:hover .fb-pill {
+      border-color: rgba(45,212,168,0.7);
+      box-shadow: 0 8px 32px rgba(45,212,168,0.28), 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .float-bubble-instalacion .fb-pulse {
+      border-color: rgba(45,212,168,0.5);
+    }
+    .float-bubble-instalacion .fb-icon {
+      background: linear-gradient(135deg, #16a07a, #2dd4a8);
+      box-shadow: 0 2px 8px rgba(45,212,168,0.35);
+    }
+    .float-bubble-instalacion .fb-arrow {
+      color: #16a07a;
+    }
+    [data-theme="dark"] .float-bubble-instalacion .fb-pill {
+      border-color: rgba(45,212,168,0.25);
+      box-shadow: 0 4px 24px rgba(45,212,168,0.1), 0 1px 5px rgba(0,0,0,0.4);
+    }
 
-/* --- Override para el menú nuevo (Recomendador de compra) --- */
-#panelCarBuy {
-  background: radial-gradient(circle at top, rgba(251, 191, 36, 0.22) 0, #020617 70%) !important;
-  border: 1px solid rgba(251, 191, 36, 0.7) !important;
-}
+    @media (max-width: 560px) {
+      .float-bubble { top: 12px; left: 12px; }
+      .float-bubble-carbuy { top: 78px; left: 12px; }
+      .float-bubble-instalacion { top: 144px; left: 12px; }
+      .fb-icon { width: 30px; height: 30px; }
+      .fb-icon svg { width: 15px; height: 15px; }
+    }
 
-#panelCarBuy .collapse-btn {
-  border-color: rgba(251, 191, 36, 0.45) !important;
-  background: rgba(251, 191, 36, 0.12) !important;
-  color: #fbbf24 !important;
-}
-
-#panelCarBuy a {
-  border: 1px solid rgba(251, 191, 36, 0.65) !important;
-  background: rgba(251, 191, 36, 0.10) !important;
-  color: #fde68a !important;
-}
-
-</style>
+    /* ── AdSense banners ── */
+    .ad-banner-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .ad-banner-wrap.ad-top {
+      padding: 10px 0 4px;
+    }
+    .ad-banner-wrap.ad-bottom {
+      padding: 4px 0 10px;
+    }
+    .ad-label {
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-tertiary);
+      align-self: center;
+    }
+    .ad-slot {
+      width: 100%;
+      max-width: 728px;
+      min-height: 90px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--color-surface);
+      border: 1px dashed rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Simulación visual del banner */
+    .ad-slot-mock {
+      width: 100%;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: linear-gradient(135deg, rgba(45,212,168,0.04), rgba(22,160,122,0.03));
+      color: var(--color-text-tertiary);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+    .ad-slot-mock .ad-mock-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(45,212,168,0.15), rgba(22,160,122,0.1));
+      border: 1px solid rgba(45,212,168,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .ad-slot-mock .ad-mock-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+      font-size: 0.65rem;
+      color: var(--color-text-tertiary);
+    }
+    [data-theme="dark"] .ad-slot {
+      border-color: rgba(255,255,255,0.07);
+    }
+    @media (max-width: 560px) {
+      .ad-slot { min-height: 60px; }
+      .ad-slot-mock { height: 60px; }
+    }
+    @media (max-width: 560px) {
+      .savings-card .ev-table th:nth-child(5),
+      .savings-card .ev-table td:nth-child(5),
+      .chargers-card .ev-table th:nth-child(5),
+      .chargers-card .ev-table td:nth-child(5) { display: none; }
+      .ev-share-row .ev-btn-ghost { width: 100%; max-width: 280px; }
+      header { text-align: center; }
+      .ev-brand { justify-content: center; }
+      .ev-pill-row { justify-content: center; }
+      .status { text-align: center; }
+    }
+  </style>
 </head>
 <body>
-  <div class="app">
+  <!-- Floating bubble: Comparador de redes -->
+  <a class="float-bubble collapsed" id="floatBubble" href="/carga.html" title="Comparador de redes de carga"
+     onclick="return handleBubbleClick(event, 'floatBubble')">
+    <span class="fb-badge">⚡ Comparador</span>
+    <span class="fb-pill">
+      <span class="fb-pulse"></span>
+      <span class="fb-icon">
+        <!-- Calculator SVG -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v4h10V4H7zm0 6v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2zm-8 4v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v6h2v-6h-2zm-8 4v2h2v-2H7zm4 0v2h2v-2h-2z"/>
+        </svg>
+      </span>
+      <span class="fb-text">
+        <span class="fb-label">Comparador de redes</span>
+        <span class="fb-sublabel">Compará costos de carga</span>
+      </span>
+      <span class="fb-arrow">→</span>
+    </span>
+  </a>
+
+  <!-- Floating bubble: CarBuy recomendador -->
+  <a class="float-bubble float-bubble-carbuy collapsed" id="floatBubbleCarbuy" href="/carbuy/recomendador.html" title="¿Qué vehículo EV puedo comprar?"
+     onclick="return handleBubbleClick(event, 'floatBubbleCarbuy')">
+    <span class="fb-badge">🚗 Recomendador</span>
+    <span class="fb-pill">
+      <span class="fb-pulse"></span>
+      <span class="fb-icon">
+        <!-- Car SVG -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 11l1.5-4.5h11L19 11M17.5 16a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m-8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0M3 11.5l1-3.5A2 2 0 0 1 5.9 6.5h12.2A2 2 0 0 1 20 8l1 3.5V17a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H6v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5.5z"/>
+        </svg>
+      </span>
+      <span class="fb-text">
+        <span class="fb-label">¿Qué EV puedo comprar?</span>
+        <span class="fb-sublabel">Recomendador de vehículos</span>
+      </span>
+      <span class="fb-arrow">→</span>
+    </span>
+  </a>
+
+  <!-- Floating bubble: Simulador de instalación -->
+  <a class="float-bubble float-bubble-instalacion collapsed" id="floatBubbleInstalacion" href="/instalacion/" title="Simulador de instalación EV"
+     onclick="return handleBubbleClick(event, 'floatBubbleInstalacion')">
+    <span class="fb-badge">🔧 Instalación</span>
+    <span class="fb-pill">
+      <span class="fb-pulse"></span>
+      <span class="fb-icon">
+        <!-- Wrench/plug SVG -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </span>
+      <span class="fb-text">
+        <span class="fb-label">Simulador de instalación</span>
+        <span class="fb-sublabel">Dimensioná tu carga en casa</span>
+      </span>
+      <span class="fb-arrow">→</span>
+    </span>
+  </a>
+
+  <script>
+    (function() {
+      var expandedBubble = null;
+      var autoCollapseTimer = null;
+
+      window.handleBubbleClick = function(e, id) {
+        var bubble = document.getElementById(id);
+        var isCollapsed = bubble.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          // Expand this bubble
+          e.preventDefault();
+          // Collapse any other expanded bubble
+          if (expandedBubble && expandedBubble !== bubble) {
+            expandedBubble.classList.add('collapsed');
+          }
+          bubble.classList.remove('collapsed');
+          expandedBubble = bubble;
+          // Auto-collapse after 4 seconds if user doesn't click again
+          clearTimeout(autoCollapseTimer);
+          autoCollapseTimer = setTimeout(function() {
+            bubble.classList.add('collapsed');
+            expandedBubble = null;
+          }, 4000);
+          return false;
+        } else {
+          // Already expanded → navigate normally
+          clearTimeout(autoCollapseTimer);
+          return true;
+        }
+      };
+
+      // Collapse on outside click
+      document.addEventListener('click', function(e) {
+        if (expandedBubble && !expandedBubble.contains(e.target)) {
+          expandedBubble.classList.add('collapsed');
+          expandedBubble = null;
+          clearTimeout(autoCollapseTimer);
+        }
+      });
+    })();
+  </script>
+
+  <!-- Theme toggle -->
+  <button class="ev-theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro">
+    <span class="icon-light">💡</span>
+    <span class="icon-dark">🌙</span>
+  </button>
+
+  <div class="ad-banner-wrap ad-top">
+    <span class="ad-label">Publicidad</span>
+    <div class="ad-slot">
+      </div>
+    </div>
+  </div>
+
+  <div class="ev-shell">
+  <div class="ev-app">
     <!-- Panel Izquierdo -->
     <div>
       <header>
-        <h1 class="hero-title" aria-label="Calculadora de carga EV">
-          <span class="hero-title-text">Calculadora de carga EV</span>
-        </h1>
-        <p class="hero-tagline">Calcula tu ahorro</p>
-        <p class="subtitle">
+        <a href="/" class="ev-brand" style="text-decoration:none;">
+          <div class="ev-brand-logo">EV</div>
+          <div class="ev-brand-text">EV<span>Uruguay</span></div>
+        </a>
+        <h1 class="ev-heading ev-heading-xl" style="margin-top:8px;">Calculadora de carga EV</h1>
+        <p class="ev-overline" style="margin-top:4px;">Calcula tu ahorro</p>
+        <p class="ev-subtitle" style="margin-top:6px;">
           Estimá el costo de la carga eléctrica y comparalo con tu auto a combustión.
         </p>
-        <div class="pill-row">
-          <div class="pill">Podés elegir carga parcial (ej: <strong>20% → 80%</strong>)</div>
-          <div class="pill">Opción para <strong>incluir IVA 22%</strong></div>
+        <div class="ev-chip-row ev-pill-row" style="margin-top:12px;">
+          <div class="ev-pill">Podés elegir carga parcial (ej: <strong>20% → 80%</strong>)</div>
+          <div class="ev-pill">Opción para <strong>incluir IVA 22%</strong></div>
         </div>
         <div class="status" id="dataStatus"></div>
       </header>
 
-      
       <!-- Callout: selección de vehículo -->
-      <div class="section-callout" aria-label="Guía de selección de vehículo">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="text">Elegí marca y modelo de tu vehículo eléctrico<span class="hint">Podés usar “Vehículo personalizado” si no está en la lista</span></span>
+      <div class="ev-callout">
+        <span class="ev-callout-dot"></span>
+        <span class="ev-callout-text">Elegí marca y modelo de tu vehículo eléctrico<span class="ev-callout-hint">Podés usar "Vehículo personalizado" si no está en la lista</span></span>
       </div>
 
-<!-- 1) Vehículo -->
-      <div class="card" style="margin-top:16px;">
-        <div class="card-title">
-          <span>Vehículo</span>
-</div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="brandSelect">Marca</label>
-            <select id="brandSelect" disabled>
-              <option value="">Cargando marcas…</option>
-            </select>
+      <!-- 1) Vehículo -->
+      <div class="ev-card" style="margin-top:8px;">
+        <div class="ev-card-title"><span>Vehículo</span></div>
+        <div class="ev-grid-2">
+          <div class="ev-field">
+            <label class="ev-label" for="brandSelect">Marca</label>
+            <select class="ev-select" id="brandSelect" disabled><option value="">Cargando marcas…</option></select>
           </div>
-          <div class="field">
-            <label for="modelSelect">Modelo</label>
-            <select id="modelSelect" disabled>
-              <option value="">Seleccioná una marca</option>
-            </select>
+          <div class="ev-field">
+            <label class="ev-label" for="modelSelect">Modelo</label>
+            <select class="ev-select" id="modelSelect" disabled><option value="">Seleccioná una marca</option></select>
           </div>
         </div>
-        <div class="grid-2" style="margin-top:10px;">
-          <div class="field">
-            <label>Capacidad de batería (kWh)</label>
-            <input id="batteryKwh" type="text" readonly />
+        <div class="ev-grid-2" style="margin-top:10px;">
+          <div class="ev-field">
+            <label class="ev-label">Capacidad de batería (kWh)</label>
+            <input class="ev-input" id="batteryKwh" type="text" readonly />
           </div>
-          <div class="field">
-            <label>Autonomía WLTP (km)</label>
-            <input id="wltpRangeKm" type="text" readonly placeholder="—" />
+          <div class="ev-field">
+            <label class="ev-label">Autonomía WLTP (km)</label>
+            <input class="ev-input" id="wltpRangeKm" type="text" readonly placeholder="—" />
           </div>
         </div>
 
         <!-- Vehículo personalizado -->
         <div class="collapsible" id="panelCustomEv" data-open="false" style="margin-top:12px;">
-          <div class="card-title" style="margin-bottom:0;">
-            <span style="font-size:0.8rem;">Vehículo personalizado (si tu modelo no está en la lista)</span>
-            <button class="collapse-btn" type="button" data-target="panelCustomEv">
+          <div class="ev-card-title card-title" style="margin-bottom:0;cursor:pointer;">
+            <span style="font-size:0.8rem;">Vehículo personalizado</span>
+            <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelCustomEv">
               <span class="collapse-btn-label">Mostrar</span>
-              <span class="collapse-btn-icon">▼</span>
+              <span class="ev-collapse-icon collapse-btn-icon">▼</span>
             </button>
           </div>
           <div class="collapsible-body">
-            <div class="grid-2">
-              <div class="field">
-                <label for="customBatteryKwh">Capacidad batería (kWh)</label>
-                <input
-                  id="customBatteryKwh"
-                  type="number"
-                  min="1"
-                  step="0.1"
-                  placeholder="Ej: 64.8"
-                />
+            <div class="ev-grid-2">
+              <div class="ev-field">
+                <label class="ev-label" for="customBatteryKwh">Capacidad batería (kWh)</label>
+                <input class="ev-input" id="customBatteryKwh" type="number" min="1" step="0.1" placeholder="Ej: 64.8" />
               </div>
-              <div class="field">
-                <label for="customWltpKm">Autonomía WLTP (km)</label>
-                <input
-                  id="customWltpKm"
-                  type="number"
-                  min="1"
-                  step="1"
-                  placeholder="Ej: 420"
-                />
+              <div class="ev-field">
+                <label class="ev-label" for="customWltpKm">Autonomía WLTP (km)</label>
+                <input class="ev-input" id="customWltpKm" type="number" min="1" step="1" placeholder="Ej: 420" />
               </div>
             </div>
-            <p class="note" style="margin-top:8px;">
+            <p class="ev-note" style="margin-top:8px;">
               Si completás estos valores se usarán para el cálculo de energía, kilómetros equivalentes y comparaciones,
               aunque tu vehículo no esté en la lista.
             </p>
@@ -982,426 +689,297 @@
         </div>
       </div>
 
-      
       <!-- Callout: selección de tarifa UTE -->
-      <div class="section-callout" aria-label="Guía de selección de tarifa UTE">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="text">
+      <div class="ev-callout">
+        <span class="ev-callout-dot"></span>
+        <span class="ev-callout-text">
           Elegí la tarifa de UTE que más se adapte a ti.
-          <span class="hint">En Triple Horario desde 00:00 a 7:00 es el horario más económico para cargar</span>
+          <span class="ev-callout-hint">En Triple Horario desde 00:00 a 7:00 es el horario más económico para cargar</span>
         </span>
       </div>
 
-<!-- 2) Tarifa UTE -->
-      <div class="card">
-        <div class="card-title">
-          <span>Tarifa UTE</span>
-        </div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="tarifaTipo">Tipo de tarifa</label>
-            <select id="tarifaTipo" disabled>
-              <option value="">Cargando tarifas…</option>
-            </select>
+      <!-- 2) Tarifa UTE -->
+      <div class="ev-card">
+        <div class="ev-card-title"><span>Tarifa UTE</span></div>
+        <div class="ev-grid-2">
+          <div class="ev-field">
+            <label class="ev-label" for="tarifaTipo">Tipo de tarifa</label>
+            <select class="ev-select" id="tarifaTipo" disabled><option value="">Cargando tarifas…</option></select>
           </div>
-          <div class="field">
-            <label for="franjaSelect">Franja horaria</label>
-            <select id="franjaSelect" disabled></select>
+          <div class="ev-field">
+            <label class="ev-label" for="franjaSelect">Franja horaria</label>
+            <select class="ev-select" id="franjaSelect" disabled></select>
           </div>
         </div>
-        <div class="field-inline">
+        <div class="ev-checkbox-row">
           <input type="checkbox" id="includeIva" checked />
           <label for="includeIva">Incluir IVA 22% en el costo de energía</label>
         </div>
 
-        <!-- Valores de referencia (desplegable) -->
+        <!-- Valores de referencia -->
         <div class="collapsible" id="panelPliego" data-open="false" style="margin-top:12px;">
-          <div class="card-title" style="margin-bottom:0;">
-            <span>Valores de referencia según pliego tarifario de UTE a enero de 2026</span>
-            <button class="collapse-btn" type="button" data-target="panelPliego">
+          <div class="ev-card-title card-title" style="margin-bottom:0;cursor:pointer;">
+            <span style="font-size:0.78rem;">Valores de referencia según pliego tarifario de UTE a enero de 2026</span>
+            <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelPliego">
               <span class="collapse-btn-label">Mostrar</span>
-              <span class="collapse-btn-icon">▼</span>
+              <span class="ev-collapse-icon collapse-btn-icon">▼</span>
             </button>
           </div>
           <div class="collapsible-body">
-            <table class="tarifa-table">
-              <thead>
-                <tr>
-                  <th>Tarifa</th>
-                  <th>Franja</th>
-                  <th>$/kWh (sin IVA)</th>
-                </tr>
-              </thead>
-              <tbody id="tarifaTableBody">
-                <tr>
-                  <td colspan="3">Cargando tarifas…</td>
-                </tr>
-              </tbody>
+            <table class="ev-table tarifa-table">
+              <thead><tr><th>Tarifa</th><th>Franja</th><th>$/kWh (sin IVA)</th></tr></thead>
+              <tbody id="tarifaTableBody"><tr><td colspan="3">Cargando tarifas…</td></tr></tbody>
             </table>
-
-            <p class="note">
+            <p class="ev-note" style="margin-top:6px;">
               Los valores muestran solo el <strong>cargo por energía</strong>. No se incluyen cargos fijos ni potencia contratada.
             </p>
           </div>
         </div>
-
-
       </div>
 
-      <!-- 3) Estado de carga (SOC) - 3er panel y desplegable oculto -->
-      <div class="card collapsible" id="panelSoc" data-open="false">
-        <div class="card-title">
+      <!-- 3) Estado de carga (SOC) -->
+      <div class="ev-card collapsible" id="panelSoc" data-open="false">
+        <div class="ev-card-title card-title" style="cursor:pointer;">
           <span>Estado de carga</span>
           <small>Calcula solo el tramo que realmente cargás</small>
-          <button class="collapse-btn" type="button" data-target="panelSoc">
+          <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelSoc">
             <span class="collapse-btn-label">Mostrar</span>
-            <span class="collapse-btn-icon">▼</span>
+            <span class="ev-collapse-icon collapse-btn-icon">▼</span>
           </button>
         </div>
         <div class="collapsible-body">
-          <div class="grid-2">
-            <div class="field">
-              <label for="socStart">SOC inicial (%)</label>
-              <input
-                id="socStart"
-                type="number"
-                min="0"
-                max="100"
-                step="1"
-                value="0"
-              />
+          <div class="ev-grid-2">
+            <div class="ev-field">
+              <label class="ev-label" for="socStart">SOC inicial (%)</label>
+              <input class="ev-input" id="socStart" type="number" min="0" max="100" step="1" value="0" />
             </div>
-            <div class="field">
-              <label for="socEnd">SOC final (%)</label>
-              <input
-                id="socEnd"
-                type="number"
-                min="0"
-                max="100"
-                step="1"
-                value="100"
-              />
+            <div class="ev-field">
+              <label class="ev-label" for="socEnd">SOC final (%)</label>
+              <input class="ev-input" id="socEnd" type="number" min="0" max="100" step="1" value="100" />
             </div>
           </div>
-          <div class="error" id="socError" style="display:none;"></div>
+          <div class="ev-error" id="socError" style="display:none;"></div>
         </div>
       </div>
     </div>
 
     <!-- Panel Derecho: Resultados -->
-    <div class="results-card">
-      <div class="result-main">
-        <div class="result-tag">Costo estimado de la carga</div>
-        <div class="result-cost" id="resultCost">
-          <span class="currency">$U</span>0,00
+    <div style="display:flex;flex-direction:column;gap:12px;height:100%;">
+      <div class="ev-result-hero">
+        <div class="ev-result-tag">Costo estimado de la carga</div>
+        <div class="ev-result-cost" id="resultCost">
+          <span class="ev-currency">$U</span>0,00
         </div>
-        <div class="result-sub" id="resultSub">
-          Esperando datos y selección de vehículo…
+        <div class="ev-result-sub" id="resultSub">Esperando datos y selección de vehículo…</div>
+        <div class="ev-chip-row" id="chipRow"></div>
+        <div class="ev-share-row">
+          <button class="ev-btn ev-btn-ghost" id="shareImgBtn" type="button" title="Generar imagen para stories">Compartir (Imagen)</button>
+          <span class="ev-share-note" id="sharePdfNote" aria-live="polite"></span>
         </div>
-        <div class="chip-row" id="chipRow"></div>
-
-      <div class="share-row">
-	<button class="share-btn" id="shareImgBtn" type="button" title="Generar imagen para stories">
-          Compartir (Imagen)
-        </button>
-        <span class="share-note" id="sharePdfNote" aria-live="polite"></span>
       </div>
-
-      </div>
-
-      
-
-      <div class="footer"></div>
+      <div style="flex:1;"></div>
     </div>
 
-    <!-- Comparación con combustión (desplegable) -->
-    <div class="comparison-card collapsible" id="panelComparacion" data-open="false">
-      <div class="card-title">
+    <!-- Comparación con combustión -->
+    <div class="ev-section-card ev-section-card--blue comparison-card collapsible" id="panelComparacion" data-open="false">
+      <div class="ev-card-title card-title" style="cursor:pointer;">
         <span>Comparación con tu vehículo a combustión</span>
-        <button class="collapse-btn" type="button" data-target="panelComparacion">
+        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelComparacion">
           <span class="collapse-btn-label">Mostrar</span>
-          <span class="collapse-btn-icon">▼</span>
+          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
         </button>
       </div>
       <div class="collapsible-body">
         <div class="comp-row">
           <div class="comp-col">
-            <div class="field">
-              <label for="fuelSelect">Combustible actual</label>
-              <select id="fuelSelect" disabled>
-                <option value="">Cargando precios…</option>
-              </select>
+            <div class="ev-field">
+              <label class="ev-label" for="fuelSelect">Combustible actual</label>
+              <select class="ev-select" id="fuelSelect" disabled><option value="">Cargando precios…</option></select>
             </div>
-            <div class="field">
-              <label for="iceConsumo">Consumo de tu auto (km/l)</label>
-              <input
-                id="iceConsumo"
-                type="number"
-                min="1"
-                step="0.1"
-                placeholder="Ej: 12"
-              />
+            <div class="ev-field">
+              <label class="ev-label" for="iceConsumo">Consumo de tu auto (km/l)</label>
+              <input class="ev-input" id="iceConsumo" type="number" min="1" step="0.1" placeholder="Ej: 12" />
             </div>
           </div>
           <div class="comp-col">
-            <div class="comp-stat">
-              <span>Km equivalentes con esta carga</span>
-              <strong id="compKm">—</strong>
-            </div>
-            <div class="comp-stat">
-              <span>Costo en tu EV</span>
-              <strong id="compEvCost">—</strong>
-            </div>
-            <div class="comp-stat">
-              <span>Costo en combustión</span>
-              <strong id="compIceCost">—</strong>
-            </div>
-            <div class="comp-stat comp-highlight">
-              <span>Ahorro aproximado</span>
-              <strong id="compSavings">—</strong>
-            </div>
-
+            <div class="comp-stat"><span>Km equivalentes con esta carga</span><strong id="compKm">—</strong></div>
+            <div class="comp-stat"><span>Costo en tu EV</span><strong id="compEvCost">—</strong></div>
+            <div class="comp-stat"><span>Costo en combustión</span><strong id="compIceCost">—</strong></div>
+            <div class="comp-stat comp-highlight"><span>Ahorro aproximado</span><strong id="compSavings">—</strong></div>
             <div class="comp-bars">
               <div class="comp-bar-row">
                 <span class="comp-bar-label">EV</span>
-                <div class="comp-bar-track">
-                  <div id="barEv" class="comp-bar-fill comp-bar-fill-ev"></div>
-                </div>
+                <div class="comp-bar-track"><div id="barEv" class="comp-bar-fill comp-bar-fill-ev"></div></div>
               </div>
               <div class="comp-bar-row">
                 <span class="comp-bar-label">Combustión</span>
-                <div class="comp-bar-track">
-                  <div id="barIce" class="comp-bar-fill comp-bar-fill-ice"></div>
-                </div>
+                <div class="comp-bar-track"><div id="barIce" class="comp-bar-fill comp-bar-fill-ice"></div></div>
               </div>
             </div>
           </div>
         </div>
-        
         <p class="savings-highlight" id="iceSummaryHighlight" style="margin-top:14px;">
           Con tu <strong id="iceSummaryCar">—</strong> te ahorrás <strong id="iceSummarySavings">—</strong> para recorrer <strong id="iceSummaryKm">—</strong> comparado con tu vehículo a combustión.
         </p>
-
-<p class="comp-note">
-          En tu vehículo actual gastarías aproximadamente <strong id="compSentenceIce">—</strong> para recorrer lo mismo que con esta carga.
-        </p>
+        <p class="comp-note">En tu vehículo actual gastarías aproximadamente <strong id="compSentenceIce">—</strong> para recorrer lo mismo que con esta carga.</p>
       </div>
     </div>
 
-    <!-- Ahorro en el tiempo (desplegable) -->
-    <div class="savings-card collapsible" id="panelAhorro" data-open="false">
-      <div class="card-title">
+    <!-- Ahorro en el tiempo -->
+    <div class="ev-section-card savings-card collapsible" id="panelAhorro" data-open="false">
+      <div class="ev-card-title card-title" style="cursor:pointer;">
         <span>Ahorro estimado en el tiempo</span>
-        <button class="collapse-btn" type="button" data-target="panelAhorro">
+        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelAhorro">
           <span class="collapse-btn-label">Mostrar</span>
-          <span class="collapse-btn-icon">▼</span>
+          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
         </button>
       </div>
       <div class="collapsible-body">
         <div class="comp-row">
           <div class="comp-col">
-            <div class="field">
-              <label for="monthlyKm">Km que recorrés por mes con tu auto actual</label>
-              <input
-                id="monthlyKm"
-                type="number"
-                min="1"
-                step="10"
-                placeholder="Ej: 1000"
-              />
+            <div class="ev-field">
+              <label class="ev-label" for="monthlyKm">Km que recorrés por mes con tu auto actual</label>
+              <input class="ev-input" id="monthlyKm" type="number" min="1" step="10" placeholder="Ej: 1000" />
             </div>
-            <p class="note">
+            <p class="ev-note">
               Usamos el mismo <strong>tipo de combustible</strong> y <strong>consumo (km/l)</strong> del panel de comparación,
               junto con la <strong>autonomía WLTP</strong> del EV y la tarifa de UTE seleccionada.
             </p>
           </div>
           <div class="comp-col">
-            <table class="tarifa-table">
-              <thead>
-                <tr>
-                  <th>Plazo</th>
-                  <th>Costo EV ($U)</th>
-                  <th>Costo combustión ($U)</th>
-                  <th>Ahorro ($U)</th>
-                  <th>Ahorro (USD)</th>
-                </tr>
-              </thead>
-              <tbody id="savingsTableBody">
-                <tr>
-                  <td colspan="5">Ingresá tus km mensuales para ver el ahorro estimado.</td>
-                </tr>
-              </tbody>
+            <table class="ev-table tarifa-table">
+              <thead><tr><th>Plazo</th><th>Costo EV ($U)</th><th>Costo combustión ($U)</th><th>Ahorro ($U)</th><th>Ahorro (USD)</th></tr></thead>
+              <tbody id="savingsTableBody"><tr><td colspan="5">Ingresá tus km mensuales para ver el ahorro estimado.</td></tr></tbody>
             </table>
-
             <div id="savingsHighlightContainer">
-              <p class="savings-highlight" id="savingsHighlight">
-                Tu ahorro en 5 años será de un total de <strong>—</strong>.
-              </p>
-              <p class="savings-subnote">
-                Y no estamos teniendo en cuenta el ahorro por mantenimiento, patente y otras bonificaciones.
-              </p>
+              <p class="savings-highlight" id="savingsHighlight">Tu ahorro en 5 años será de un total de <strong>—</strong>.</p>
+              <p class="savings-subnote">Y no estamos teniendo en cuenta el ahorro por mantenimiento, patente y otras bonificaciones.</p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Comparación con cargadores públicos/privados -->
-    <div class="chargers-card collapsible" id="panelCargadores" data-open="false">
-      <div class="card-title">
+    <!-- Cargadores -->
+    <div class="ev-section-card chargers-card collapsible" id="panelCargadores" data-open="false">
+      <div class="ev-card-title card-title" style="cursor:pointer;">
         <span>Comparación con cargadores públicos y privados</span>
-        <button class="collapse-btn" type="button" data-target="panelCargadores">
+        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelCargadores">
           <span class="collapse-btn-label">Mostrar</span>
-          <span class="collapse-btn-icon">▼</span>
+          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
         </button>
       </div>
       <div class="collapsible-body">
-        <p class="note">
-          Se calcula el costo total de la misma carga considerando la <strong>bajada de bandera</strong> y el
-          <strong>precio por kWh</strong> de cada operador, incluyendo la opción de <strong>cargar en casa (UTE)</strong>.
-        </p>
-        <table class="tarifa-table">
-          <thead>
-            <tr>
-              <th>Opción</th>
-              <th>Bajada ($U)</th>
-              <th>$/kWh</th>
-              <th>Costo total ($U)</th>
-              <th>Costo total (USD)</th>
-            </tr>
-          </thead>
-          <tbody id="chargersTableBody">
-            <tr>
-              <td colspan="5">Calculá primero una carga para ver la comparación.</td>
-            </tr>
-          </tbody>
+        <p class="ev-note">Se calcula el costo total de la misma carga considerando la <strong>bajada de bandera</strong> y el <strong>precio por kWh</strong> de cada operador, incluyendo la opción de <strong>cargar en casa (UTE)</strong>.</p>
+        <table class="ev-table tarifa-table">
+          <thead><tr><th>Opción</th><th>Bajada ($U)</th><th>$/kWh</th><th>Costo total ($U)</th><th>Costo total (USD)</th></tr></thead>
+          <tbody id="chargersTableBody"><tr><td colspan="5">Calculá primero una carga para ver la comparación.</td></tr></tbody>
         </table>
-
-        <div class="chargers-bars" id="chargersBars">
-          <!-- Barras dinámicas -->
-        </div>
-
+        <div class="ev-bars" id="chargersBars"></div>
         <p class="savings-highlight" id="bestChargerSummary" style="margin-top:14px;">
           El método de carga que más te conviene es <strong id="bestChargerMethod">—</strong>,
           con un costo de <strong id="bestChargerCost">—</strong> por carga para recorrer <strong id="bestChargerKm">—</strong>.
         </p>
-
       </div>
     </div>
-  
-    <!-- Compará el costo de carga en diferentes redes -->
-    <div class="chargers-card collapsible" id="panelComparadorRedes" data-open="false">
-      <div class="card-title">
+
+    <!-- Comparador de redes -->
+    <div class="ev-section-card chargers-card collapsible" id="panelComparadorRedes" data-open="false">
+      <div class="ev-card-title card-title" style="cursor:pointer;">
         <span>Compará el costo de tu carga en las diferentes redes de carga de Uruguay</span>
-        <button class="collapse-btn" type="button" data-target="panelComparadorRedes">
+        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelComparadorRedes">
           <span class="collapse-btn-label">Mostrar</span>
-          <span class="collapse-btn-icon">▼</span>
+          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
         </button>
       </div>
-
       <div class="collapsible-body">
-        <p class="note">
-          Accedé a la herramienta donde podés comparar cuánto cuesta la misma carga
-          en cada red pública y privada del país.
-        </p>
-
-        <a href="/carga.html" 
-           style="
-             display:inline-block;
-             margin-top:12px;
-             padding:10px 16px;
-             border-radius:999px;
-             border:1px solid rgba(34, 197, 94, 0.65);
-             color:#e5e7eb;
-             background:rgba(34, 197, 94, 0.10);
-             text-decoration:none;
-             font-weight:600;
-             transition:0.15s;">
-          Ir al comparador de redes →
-        </a>
+        <p class="ev-note">Accedé a la herramienta donde podés comparar cuánto cuesta la misma carga en cada red pública y privada del país.</p>
+        <a class="ev-link" href="/carga.html">Ir al comparador de redes →</a>
       </div>
     </div>
 
-    
-  
-    <!-- Qué vehículo puedo comprar (BETA) -->
-    <div class="chargers-card collapsible" id="panelCarBuy" data-open="false">
-      <div class="card-title">
-        <span>Qué vehículo puedo comprar? <span style="opacity:.75">(BETA)</span></span>
-        <button class="collapse-btn" type="button" data-target="panelCarBuy">
+    <!-- Recomendador -->
+    <div class="ev-section-card chargers-card collapsible" id="panelCarBuy" data-open="false">
+      <div class="ev-card-title card-title" style="cursor:pointer;">
+        <span>Qué vehículo puedo comprar? <span style="opacity:.6">(BETA)</span></span>
+        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelCarBuy">
           <span class="collapse-btn-label">Mostrar</span>
-          <span class="collapse-btn-icon">▼</span>
+          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
         </button>
       </div>
-
       <div class="collapsible-body">
-        <p class="note">
-          Probá la herramienta beta para ayudarte a elegir un vehículo eléctrico según tus preferencias y presupuesto.
-        </p>
-
-        <a href="/carbuy/recomendador.html"
-           style="
-             display:inline-block;
-             margin-top:12px;
-             padding:10px 16px;
-             border-radius:999px;
-             text-decoration:none;
-             font-weight:600;
-             transition:0.15s;">
-          Ir a "Qué vehículo puedo comprar?" →
-        </a>
+        <p class="ev-note">Probá la herramienta beta para ayudarte a elegir un vehículo eléctrico según tus preferencias y presupuesto.</p>
+        <a class="ev-link" href="/carbuy/recomendador.html">Ir a "Qué vehículo puedo comprar?" →</a>
       </div>
     </div>
 
-<!-- Pie de página -->
-    <div class="app-footer">
-      <div class="app-footer-separator"></div>
+    <!-- Simulador de Instalación -->
+    <div class="ev-section-card chargers-card collapsible" id="panelInstalacion" data-open="false">
+      <div class="ev-card-title card-title" style="cursor:pointer;">
+        <span>⚡ Simulador de Instalación EV para el hogar</span>
+        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelInstalacion">
+          <span class="collapse-btn-label">Mostrar</span>
+          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
+        </button>
+      </div>
+      <div class="collapsible-body">
+        <p class="ev-note">Dimensioná el cableado, protecciones, tablero y materiales necesarios para instalar un punto de carga en tu hogar, según la normativa de UTE (Cap. XXX). Incluye lista de materiales con links a MercadoLibre y diagrama animado de la instalación.</p>
+        <a class="ev-link" href="/instalacion/">Ir al simulador de instalación →</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="ev-footer">
+      <div class="ev-footer-line"></div>
       <p>
         Los valores mostrados son estimaciones de carácter informativo, calculadas a partir de datos públicos
         y referencias disponibles en internet. Los costos pueden variar según condiciones reales de uso,
-        instalaciones, contratos y factores externos. Esta herramienta no constituye asesoramiento técnico 
-        o comercial y no asume responsabilidad por decisiones basadas en estos cálculos. Muchos vehículos del listado no declaran 	su rango en ciclo WLTP (el ciclo más realista), 
-	por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP según corresponda. De igual manera en 	circunstancias reales de uso el rendimiento en carretera puede ser entre un 10% o 20% menor según condiciones de uso y 	factores externos. Para comentarios o sugerencias: 
+        instalaciones, contratos y factores externos. Esta herramienta no constituye asesoramiento técnico
+        o comercial y no asume responsabilidad por decisiones basadas en estos cálculos. Muchos vehículos del listado no declaran su rango en ciclo WLTP (el ciclo más realista),
+        por lo que se han realizado cálculos conviertiendo rangos NEDC/CLTC a WLTP según corresponda. De igual manera en circunstancias reales de uso el rendimiento en carretera puede ser entre un 10% o 20% menor según condiciones de uso y factores externos. Para comentarios o sugerencias:
         <a href="mailto:contacto@evuruguay.com">contacto@evuruguay.com</a>.
       </p>
     </div>
 
-</div>
+  </div>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-    <!-- Share Card (Story) -->
-    <div class="share-card-wrap" id="shareCard" aria-hidden="true">
-      <div class="share-card-top">
-        <div class="share-brand">
-          <div class="share-title">EVUruguay</div>
-          <div class="share-subtitle">Calculá tu ahorro</div>
-        </div>
-        <div class="share-badge" id="shareBadge">Resumen</div>
-      </div>
-
-      <div class="share-card-main">
-        <div class="share-hero">
-          <div class="share-hero-row">
-            <div class="share-vehicle" id="shareVehicle">—</div>
-            <div class="share-meta" id="shareTarifa">—</div>
-          </div>
-          <div class="share-cost" id="shareCost"><small>$U</small>0,00</div>
-          <div class="share-meta" id="shareMetaLine">—</div>
-        </div>
-
-        <div class="share-grid">
-          <div class="share-highlight" id="shareHighlight1">—</div>
-          <div class="share-highlight" id="shareHighlight2">—</div>
-          <div class="share-highlight" id="shareHighlight3">—</div>
-        </div>
-      </div>
-
-      <div class="share-footer">
-        <div>Estimativo • Puede variar</div>
-        <div class="link">evuruguay.com</div>
+  <div class="ad-banner-wrap ad-bottom">
+    <div class="ad-slot">
       </div>
     </div>
+    <span class="ad-label">Publicidad</span>
+  </div>
+
+  <!-- Share Card (Story) -->
+  <div class="share-card-wrap" id="shareCard" aria-hidden="true">
+    <div class="share-card-top">
+      <div class="share-brand">
+        <div class="share-title">EVUruguay</div>
+        <div class="share-subtitle">Calculá tu ahorro</div>
+      </div>
+      <div class="share-badge" id="shareBadge">Resumen</div>
+    </div>
+    <div class="share-card-main">
+      <div class="share-hero">
+        <div class="share-hero-row">
+          <div class="share-vehicle" id="shareVehicle">—</div>
+          <div class="share-meta" id="shareTarifa">—</div>
+        </div>
+        <div class="share-cost" id="shareCost"><small>$U</small>0,00</div>
+        <div class="share-meta" id="shareMetaLine">—</div>
+      </div>
+      <div class="share-grid">
+        <div class="share-highlight" id="shareHighlight1">—</div>
+        <div class="share-highlight" id="shareHighlight2">—</div>
+        <div class="share-highlight" id="shareHighlight3">—</div>
+      </div>
+    </div>
+    <div class="share-footer">
+      <div>Estimativo • Puede variar</div>
+      <div class="link">evuruguay.com</div>
+    </div>
+  </div>
 
   <script>
     // ============================
@@ -2326,7 +1904,7 @@
 
       resultados.forEach((r, index) => {
         const isCheapest = index === 0;
-        const color = isCheapest ? "#22c55e" : "#ef4444";
+        const color = isCheapest ? "#16a07a" : "#e63946";
 
         // Tabla
         const tr = document.createElement("tr");
@@ -2342,9 +1920,9 @@
         td4.textContent = "$U " + formatCurrency(r.costoTotal);
 
         if (isCheapest) {
-          td4.style.color = "#22c55e";
+          td4.style.color = "#16a07a";
         } else {
-          td4.style.color = "#ef4444";
+          td4.style.color = "#e63946";
         }
 
         if (usdRate && usdRate > 0) {
@@ -2366,17 +1944,17 @@
 
         // Barras
         const rowDiv = document.createElement("div");
-        rowDiv.className = "charger-bar-row";
+        rowDiv.className = "ev-bar-row";
 
         const labelDiv = document.createElement("div");
-        labelDiv.className = "charger-bar-label";
+        labelDiv.className = "ev-bar-label";
         labelDiv.textContent = r.empresa;
 
         const trackDiv = document.createElement("div");
-        trackDiv.className = "charger-bar-track";
+        trackDiv.className = "ev-bar-track";
 
         const fillDiv = document.createElement("div");
-        fillDiv.className = "charger-bar-fill";
+        fillDiv.className = "ev-bar-fill";
 
         const pct = (r.costoTotal / maxCost) * 100;
         fillDiv.style.width = pct.toFixed(1) + "%";
@@ -2439,16 +2017,16 @@
         `(${deltaPercent}% de la batería) en <strong>${tarifaSel.franja.label}</strong>.`;
 
       const chip1 = document.createElement("div");
-      chip1.className = "chip";
+      chip1.className = "ev-chip";
       chip1.innerHTML = `<strong>Batería:</strong> ${formatNumber(batteryKwh)} kWh`;
 
       const chip2 = document.createElement("div");
-      chip2.className = "chip";
+      chip2.className = "ev-chip";
       chip2.innerHTML =
         `<strong>Tarifa:</strong> ${tarifaSel.nombre} – ${tarifaSel.franja.label}`;
 
       const chip3 = document.createElement("div");
-      chip3.className = "chip";
+      chip3.className = "ev-chip";
       chip3.innerHTML =
         `<strong>Precio energía:</strong> ${formatNumber(
           tarifaSel.franja.precio * (incluyeIva ? 1.22 : 1)
@@ -2469,7 +2047,7 @@
 
       if (hasCustomBat || hasCustomWltp) {
         const chipCustom = document.createElement("div");
-        chipCustom.className = "chip";
+        chipCustom.className = "ev-chip";
         let desc = "Modo personalizado: ";
         if (hasCustomBat && hasCustomWltp) {
           desc += "batería y WLTP propios";
@@ -2780,9 +2358,28 @@
     });
 </script>
 
-  <!-- Librerías para compartir (captura con estilo del sitio) -->
+  <!-- Librerías para compartir -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- Theme toggle logic -->
+  <script>
+  (function() {
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('ev-theme');
+    if (saved === 'dark') html.setAttribute('data-theme', 'dark');
+
+    toggle.addEventListener('click', () => {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('ev-theme', 'light');
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('ev-theme', 'dark');
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
-
