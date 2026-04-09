@@ -185,7 +185,7 @@
     .ad-banner-wrap.ad-top { padding:10px 0 4px; }
     .ad-banner-wrap.ad-bottom { padding:4px 0 10px; }
     .ad-label { font-size:0.58rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-text-tertiary); }
-    .ad-slot { width:100%; max-width:728px; min-height:90px; border-radius:var(--radius-md); overflow:hidden; background:var(--bg-surface); border:1px dashed rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; }
+    .ad-slot { width:100%; max-width:728px; min-height:90px; border-radius:var(--radius-md); overflow:hidden; background:var(--color-surface); border:1px dashed rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; }
     .ad-slot-mock { width:100%; height:90px; display:flex; align-items:center; justify-content:center; gap:14px; background:linear-gradient(135deg,rgba(45,212,168,0.04),rgba(22,160,122,0.03)); color:var(--color-text-tertiary); font-size:0.72rem; font-weight:500; letter-spacing:0.04em; }
     .ad-slot-mock .ad-mock-icon { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,rgba(45,212,168,0.15),rgba(22,160,122,0.1)); border:1px solid rgba(45,212,168,0.2); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
     .ad-slot-mock .ad-mock-text { display:flex; flex-direction:column; gap:3px; }
@@ -201,7 +201,7 @@
       align-items: center;
       gap: 12px;
       padding: 14px 18px;
-      background: var(--color-surface);
+      background: var(--bg-surface);
       border-top: 1px solid rgba(45,212,168,0.25);
       box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
       backdrop-filter: blur(12px);
@@ -247,7 +247,7 @@
     #pwa-ios-popup ol { margin:0; padding-left:18px; font-size:0.78rem; color:var(--color-text-secondary); line-height:1.6; }
     #pwa-ios-popup ol li { margin-bottom:4px; }
     #pwa-ios-popup .ios-close { display:block; margin-top:14px; width:100%; background:none; border:1px solid rgba(45,212,168,0.3); border-radius:var(--radius-pill); padding:7px; font-size:0.75rem; color:var(--ev-green); font-weight:600; cursor:pointer; }
-  </style>
+</style>
 </head>
 <body>
   <!-- Theme toggle -->
@@ -836,55 +836,5 @@ init();
     </div>
     <span class="ad-label">Publicidad</span>
   </div>
-
-  <!-- PWA Install Banner -->
-  <div id="pwa-banner" role="complementary" aria-label="Instalar aplicación">
-    <div id="pwa-banner-icon"><img src="/icons/icon-192x192.png" alt="EVUruguay" /></div>
-    <div id="pwa-banner-text">
-      <strong>EVUruguay</strong>
-      <span>Instalá la app en tu dispositivo</span>
-    </div>
-    <button id="pwa-banner-install">Instalar</button>
-    <button id="pwa-banner-close" aria-label="Cerrar">✕</button>
-  </div>
-  <div id="pwa-ios-popup" role="dialog" aria-label="Instrucciones de instalación">
-    <h4>Instalá EVUruguay en iOS</h4>
-    <ol>
-      <li>Tocá el botón <strong>Compartir</strong> (□↑) en Safari</li>
-      <li>Desplazate y elegí <strong>"Agregar a pantalla de inicio"</strong></li>
-      <li>Confirmá tocando <strong>"Agregar"</strong></li>
-    </ol>
-    <button class="ios-close" id="pwa-ios-close">Entendido</button>
-  </div>
-  <script>
-  (function() {
-    var DISMISSED_KEY = 'pwa-banner-dismissed';
-    if (localStorage.getItem(DISMISSED_KEY)) return;
-    var banner   = document.getElementById('pwa-banner');
-    var iosPopup = document.getElementById('pwa-ios-popup');
-    var deferredPrompt = null;
-    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-    if (isStandalone) return;
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(function(){});
-    window.addEventListener('beforeinstallprompt', function(e) {
-      e.preventDefault(); deferredPrompt = e; showBanner('android');
-    });
-    if (isIOS) setTimeout(function() { showBanner('ios'); }, 3000);
-    function showBanner(platform) {
-      if (platform === 'ios') document.getElementById('pwa-banner-install').textContent = 'Cómo instalar';
-      setTimeout(function() { banner.classList.add('visible'); }, 100);
-    }
-    document.getElementById('pwa-banner-install').addEventListener('click', function() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(r) { if (r.outcome === 'accepted') dismiss(); deferredPrompt = null; });
-      } else if (isIOS) { iosPopup.classList.add('visible'); }
-    });
-    document.getElementById('pwa-banner-close').addEventListener('click', dismiss);
-    document.getElementById('pwa-ios-close').addEventListener('click', function() { iosPopup.classList.remove('visible'); dismiss(); });
-    function dismiss() { banner.classList.remove('visible'); localStorage.setItem(DISMISSED_KEY, '1'); }
-  })();
-  </script>
 </body>
 </html>
