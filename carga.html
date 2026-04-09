@@ -185,7 +185,7 @@
     .ad-banner-wrap.ad-top { padding:10px 0 4px; }
     .ad-banner-wrap.ad-bottom { padding:4px 0 10px; }
     .ad-label { font-size:0.58rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-text-tertiary); }
-    .ad-slot { width:100%; max-width:728px; min-height:90px; border-radius:var(--radius-md); overflow:hidden; background:var(--color-surface); border:1px dashed rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; }
+    .ad-slot { width:100%; max-width:728px; min-height:90px; border-radius:var(--radius-md); overflow:hidden; background:var(--bg-surface); border:1px dashed rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; }
     .ad-slot-mock { width:100%; height:90px; display:flex; align-items:center; justify-content:center; gap:14px; background:linear-gradient(135deg,rgba(45,212,168,0.04),rgba(22,160,122,0.03)); color:var(--color-text-tertiary); font-size:0.72rem; font-weight:500; letter-spacing:0.04em; }
     .ad-slot-mock .ad-mock-icon { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,rgba(45,212,168,0.15),rgba(22,160,122,0.1)); border:1px solid rgba(45,212,168,0.2); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
     .ad-slot-mock .ad-mock-text { display:flex; flex-direction:column; gap:3px; }
@@ -228,7 +228,7 @@
       position:fixed; bottom:80px; left:50%;
       transform:translateX(-50%) translateY(20px);
       z-index:99999; width:min(340px, calc(100vw - 32px));
-      background:var(--color-surface);
+      background:var(--bg-surface);
       border:1px solid rgba(45,212,168,0.25);
       border-radius:var(--radius-md);
       box-shadow:0 8px 32px rgba(0,0,0,0.18);
@@ -238,7 +238,7 @@
     #pwa-ios-popup.visible { opacity:1; pointer-events:all; transform:translateX(-50%) translateY(0); }
     #pwa-ios-popup::after {
       content:''; position:absolute; bottom:-8px; left:50%;
-      width:16px; height:16px; background:var(--color-surface);
+      width:16px; height:16px; background:var(--bg-surface);
       border-right:1px solid rgba(45,212,168,0.25);
       border-bottom:1px solid rgba(45,212,168,0.25);
       transform:translateX(-50%) rotate(45deg);
