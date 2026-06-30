@@ -2050,9 +2050,17 @@
         return;
       }
 
+      const isPublicUte = chargeModeSelect && chargeModeSelect.value === "ute_public";
       const tarifaSel = getTarifaSeleccionada();
-      if (!tarifaSel) {
+      const uteCharger = getUteChargerSeleccionado();
+
+      if (!isPublicUte && !tarifaSel) {
         resetChargersTable("Seleccioná una tarifa y franja horaria.");
+        return;
+      }
+
+      if (isPublicUte && !uteCharger) {
+        resetChargersTable("Seleccioná un cargador público de UTE.");
         return;
       }
 
@@ -2071,22 +2079,35 @@
 
       const resultados = [];
 
-      // Opción: carga en casa (UTE)
-      const incluyeIva = includeIvaCheckbox.checked;
-      let precioEnergiaBase = tarifaSel.franja.precio;
-      if (incluyeIva) precioEnergiaBase *= 1.22;
+      // Opción actualmente seleccionada en el cálculo principal
+      if (isPublicUte) {
+        resultados.push({
+          empresa: `${uteCharger.nombre} (UTE público)`,
+          bajada: uteCharger.cargoFijo,
+          precioKwh: uteCharger.precioKwh,
+          costoTotal: lastEvCost,
+          esCasa: false,
+          esSeleccionActual: true,
+          kmEquivalentes: kmEquivalentesBase
+        });
+      } else {
+        const incluyeIva = includeIvaCheckbox.checked;
+        let precioEnergiaBase = tarifaSel.franja.precio;
+        if (incluyeIva) precioEnergiaBase *= 1.22;
 
-      const precioEfectivoKwhCasa =
-        lastEnergyKwh > 0 ? lastEvCost / lastEnergyKwh : precioEnergiaBase;
+        const precioEfectivoKwhCasa =
+          lastEnergyKwh > 0 ? lastEvCost / lastEnergyKwh : precioEnergiaBase;
 
-      resultados.push({
-        empresa: "Carga en casa (UTE)",
-        bajada: 0,
-        precioKwh: precioEfectivoKwhCasa,
-        costoTotal: lastEvCost,
-        esCasa: true,
-        kmEquivalentes: kmEquivalentesBase
-      });
+        resultados.push({
+          empresa: "Carga en casa (UTE)",
+          bajada: 0,
+          precioKwh: precioEfectivoKwhCasa,
+          costoTotal: lastEvCost,
+          esCasa: true,
+          esSeleccionActual: true,
+          kmEquivalentes: kmEquivalentesBase
+        });
+      }
 
       // Cargadores externos (si hay)
       if (cargadores && cargadores.length > 0) {
