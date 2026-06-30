@@ -2162,7 +2162,8 @@
 
       resultados.forEach((r, index) => {
         const isCheapest = index === 0;
-        const color = isCheapest ? "#16a07a" : "#e63946";
+        const isSelected = !!r.esSeleccionActual;
+        const color = isSelected ? "#d4a017" : (isCheapest ? "#16a07a" : "#e63946");
 
         // Tabla
         const tr = document.createElement("tr");
@@ -2177,7 +2178,10 @@
         td3.textContent = "$U " + formatCurrency(r.precioKwh);
         td4.textContent = "$U " + formatCurrency(r.costoTotal);
 
-        if (isCheapest) {
+        if (isSelected) {
+          td4.style.color = "#b8860b";
+          td1.style.fontWeight = "700";
+        } else if (isCheapest) {
           td4.style.color = "#16a07a";
         } else {
           td4.style.color = "#e63946";
