@@ -1,42 +1,38 @@
-const CACHE = 'evuruguay-v1';
-const PRECACHE = [
+const CACHE_NAME = 'evuruguay-pwa-v1';
+const APP_SHELL = [
   '/',
   '/index.html',
-  '/carga.html',
-  '/carbuy/recomendador.html',
-  '/evuy-design.css',
+  '/manifest.webmanifest',
+  '/favicon.ico',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
 ];
 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting())
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL).catch(() => undefined))
+      .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(
+      keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+    )).then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', e => {
-  // Solo cachear GET, ignorar AdSense y APIs externas
-  if (e.request.method !== 'GET') return;
-  if (e.request.url.includes('googlesyndication') || e.request.url.includes('googleapis')) return;
-
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        if (!response || response.status !== 200 || response.type === 'opaque') return response;
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
         const clone = response.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)).catch(() => undefined);
         return response;
-      }).catch(() => caches.match('/index.html'));
-    })
+      })
+      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/index.html')))
   );
 });

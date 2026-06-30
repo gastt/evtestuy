@@ -4,7 +4,23 @@
   <meta charset="UTF-8" />
   <title>Calculá los costos de carga y tu ahorro en EVUruguay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f1f9f5" />
+  <meta name="theme-color" content="#16a07a" />
+  <meta name="description" content="Calculá el costo de carga de tu vehículo eléctrico en Uruguay, compará tarifas, cargadores y ahorro frente a combustión." />
+  <meta name="application-name" content="EVUruguay" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="EVUruguay" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="msapplication-TileColor" content="#16a07a" />
+  <meta name="msapplication-TileImage" content="icons/icon-144x144.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="72x72" href="icons/icon-72x72.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96x96.png" />
+  <link rel="icon" type="image/png" sizes="128x128" href="icons/icon-128x128.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="evuy-design.css" />
   <style>
     /* Page-specific layout */
@@ -526,6 +542,31 @@
       .ad-slot-mock { height: 60px; }
       .advertise-cta { margin: 10px 12px 20px; font-size: 0.8rem; }
     }
+
+    /* ── PWA install button ── */
+    .install-app-btn {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 9998;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(45,212,168,0.28);
+      border-radius: var(--radius-pill);
+      padding: 10px 16px;
+      background: linear-gradient(135deg, var(--ev-green), var(--ev-teal));
+      color: #fff;
+      font: 700 0.82rem var(--font-display);
+      box-shadow: 0 10px 28px rgba(22,160,122,0.24);
+      cursor: pointer;
+    }
+    .install-app-btn.show { display: inline-flex; }
+    .install-app-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 34px rgba(22,160,122,0.3); }
+    @media (max-width: 560px) {
+      .install-app-btn { right: 12px; bottom: 12px; padding: 9px 13px; font-size: 0.76rem; }
+    }
+
     @media (max-width: 560px) {
       .savings-card .ev-table th:nth-child(5),
       .savings-card .ev-table td:nth-child(5),
@@ -647,6 +688,10 @@
   <button class="ev-theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro">
     <span class="icon-light">💡</span>
     <span class="icon-dark">🌙</span>
+  </button>
+
+  <button class="install-app-btn" id="installAppBtn" type="button" aria-label="Instalar EVUruguay en este dispositivo">
+    📱 Instalar EVUruguay
   </button>
 
   <div class="ad-banner-wrap ad-top">
@@ -2438,5 +2483,41 @@
     });
   })();
   </script>
+
+  <script>
+    // PWA: muestra el botón de instalación cuando el navegador lo permite.
+    (function () {
+      let deferredInstallPrompt = null;
+      const installBtn = document.getElementById('installAppBtn');
+
+      window.addEventListener('beforeinstallprompt', function (event) {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        if (installBtn) installBtn.classList.add('show');
+      });
+
+      if (installBtn) {
+        installBtn.addEventListener('click', async function () {
+          if (!deferredInstallPrompt) return;
+          deferredInstallPrompt.prompt();
+          await deferredInstallPrompt.userChoice;
+          deferredInstallPrompt = null;
+          installBtn.classList.remove('show');
+        });
+      }
+
+      window.addEventListener('appinstalled', function () {
+        if (installBtn) installBtn.classList.remove('show');
+        deferredInstallPrompt = null;
+      });
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('sw.js').catch(function () {});
+        });
+      }
+    })();
+  </script>
+
 </body>
 </html>
