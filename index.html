@@ -6,14 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#f1f9f5" />
   <link rel="stylesheet" href="evuy-design.css" />
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="EVUruguay" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2900400294044604"
-     crossorigin="anonymous"></script>
   <style>
     /* Page-specific layout */
     .ev-app {
@@ -479,12 +471,60 @@
       font-size: 0.65rem;
       color: var(--color-text-tertiary);
     }
+    .ad-slot a {
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+    }
+    .ad-slot img {
+      display: block;
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: inherit;
+    }
+    .advertise-cta {
+      max-width: 760px;
+      margin: 12px auto 24px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(45,212,168,0.08), rgba(22,160,122,0.05));
+      border: 1px solid rgba(45,212,168,0.18);
+      color: var(--color-text-secondary);
+      text-align: center;
+      font-size: 0.86rem;
+      line-height: 1.4;
+    }
+    .advertise-cta strong {
+      color: var(--ev-green-deep);
+      font-weight: 800;
+    }
+    .advertise-cta a {
+      color: var(--ev-green-deep);
+      font-weight: 800;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(22,160,122,0.3);
+    }
+    .advertise-cta a:hover {
+      border-bottom-color: currentColor;
+    }
     [data-theme="dark"] .ad-slot {
       border-color: rgba(255,255,255,0.07);
     }
+    [data-theme="dark"] .advertise-cta {
+      background: rgba(45, 212, 168, 0.06);
+      border-color: rgba(45, 212, 168, 0.14);
+    }
+    [data-theme="dark"] .advertise-cta strong,
+    [data-theme="dark"] .advertise-cta a {
+      color: var(--ev-teal);
+    }
     @media (max-width: 560px) {
       .ad-slot { min-height: 60px; }
+      .ad-slot img { height: 60px; }
       .ad-slot-mock { height: 60px; }
+      .advertise-cta { margin: 10px 12px 20px; font-size: 0.8rem; }
     }
     @media (max-width: 560px) {
       .savings-card .ev-table th:nth-child(5),
@@ -497,62 +537,6 @@
       .ev-pill-row { justify-content: center; }
       .status { text-align: center; }
     }
-
-    /* ── PWA Install Banner ── */
-    #pwa-banner {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 18px;
-      background: var(--bg-surface);
-      border-top: 1px solid rgba(45,212,168,0.25);
-      box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    #pwa-banner.visible { transform: translateY(0); }
-    #pwa-banner-icon { width:48px; height:48px; border-radius:12px; flex-shrink:0; overflow:hidden; }
-    #pwa-banner-icon img { width:100%; height:100%; object-fit:cover; }
-    #pwa-banner-text { flex:1; min-width:0; }
-    #pwa-banner-text strong { display:block; font-size:0.88rem; font-weight:700; color:var(--color-text); line-height:1.2; }
-    #pwa-banner-text span { font-size:0.72rem; color:var(--color-text-secondary); line-height:1.3; }
-    #pwa-banner-install {
-      flex-shrink:0;
-      background: linear-gradient(135deg, var(--ev-green), var(--ev-teal));
-      color:#fff; border:none; border-radius:var(--radius-pill);
-      padding:8px 18px; font-size:0.8rem; font-weight:700;
-      cursor:pointer; white-space:nowrap;
-      box-shadow:0 2px 10px rgba(45,212,168,0.35);
-    }
-    #pwa-banner-close { flex-shrink:0; background:none; border:none; color:var(--color-text-tertiary); font-size:1.2rem; cursor:pointer; padding:4px 6px; line-height:1; }
-    #pwa-ios-popup {
-      position:fixed; bottom:80px; left:50%;
-      transform:translateX(-50%) translateY(20px);
-      z-index:99999; width:min(340px, calc(100vw - 32px));
-      background:var(--bg-surface);
-      border:1px solid rgba(45,212,168,0.25);
-      border-radius:var(--radius-md);
-      box-shadow:0 8px 32px rgba(0,0,0,0.18);
-      padding:18px; opacity:0; pointer-events:none;
-      transition:opacity 0.3s ease, transform 0.3s ease;
-    }
-    #pwa-ios-popup.visible { opacity:1; pointer-events:all; transform:translateX(-50%) translateY(0); }
-    #pwa-ios-popup::after {
-      content:''; position:absolute; bottom:-8px; left:50%;
-      width:16px; height:16px; background:var(--bg-surface);
-      border-right:1px solid rgba(45,212,168,0.25);
-      border-bottom:1px solid rgba(45,212,168,0.25);
-      transform:translateX(-50%) rotate(45deg);
-    }
-    #pwa-ios-popup h4 { font-size:0.88rem; font-weight:700; color:var(--color-text); margin:0 0 10px; }
-    #pwa-ios-popup ol { margin:0; padding-left:18px; font-size:0.78rem; color:var(--color-text-secondary); line-height:1.6; }
-    #pwa-ios-popup ol li { margin-bottom:4px; }
-    #pwa-ios-popup .ios-close { display:block; margin-top:14px; width:100%; background:none; border:1px solid rgba(45,212,168,0.3); border-radius:var(--radius-pill); padding:7px; font-size:0.75rem; color:var(--ev-green); font-weight:600; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -668,7 +652,9 @@
   <div class="ad-banner-wrap ad-top">
     <span class="ad-label">Publicidad</span>
     <div class="ad-slot">
-      </div>
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
     </div>
   </div>
 
@@ -1008,9 +994,18 @@
 
   <div class="ad-banner-wrap ad-bottom">
     <div class="ad-slot">
-      </div>
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="img/publicidad.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      </a>
     </div>
     <span class="ad-label">Publicidad</span>
+  </div>
+
+  <div class="advertise-cta">
+    <strong>¿Querés anunciarte en EVUruguay?</strong>
+    Este espacio puede ser tuyo. Escribinos a
+    <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay">contacto@evuruguay.com</a>
+    para conocer las opciones de publicidad disponibles.
   </div>
 
   <!-- Share Card (Story) -->
