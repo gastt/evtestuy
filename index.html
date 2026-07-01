@@ -449,6 +449,14 @@
     .bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;border:1px solid rgba(148,163,184,.25);border-radius:20px;padding:8px;margin-top:2px}.nav-item{border:0;background:transparent;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.68rem;font-weight:700;padding:8px 2px;border-radius:14px}.nav-item.active{color:#34d399;background:rgba(52,211,153,.10);box-shadow:inset 0 0 0 1px rgba(52,211,153,.35)}.nav-icon{font-size:1.1rem}
     @media(max-width:380px){.app{padding-left:12px;padding-right:12px}.metric-value{font-size:1.35rem}.compass-wrap{height:260px;min-height:260px}.start-title{font-size:.92rem}.controls-row.vehicle-row{grid-template-columns:1fr 1fr}.mode-btn{grid-column:1 / -1}.metrics-strip{grid-template-columns:1fr 1fr}.metric{min-height:94px}.bottom-nav{display:none}}
 
+
+
+    /* ─── mobile fit: no manual sliders, no vertical scroll ───────── */
+    html,body{height:100%;overflow:hidden}.app{height:100svh;min-height:0;overflow:hidden;padding:calc(14px + env(safe-area-inset-top)) 14px calc(10px + env(safe-area-inset-bottom));gap:8px}.topbar{height:56px}.brand-logo{width:40px;height:40px}.brand-name{font-size:1.04rem}.brand-sub{font-size:.62rem}.icon-btn{width:38px;height:38px;border-radius:14px}.start-btn{height:62px;border-radius:18px}.start-icon{width:40px;height:40px;border-radius:14px}.start-title{font-size:.92rem}.start-sub{font-size:.62rem}.start-btn::after{width:44px;height:44px;right:16px;font-size:1.35rem}.controls-row.vehicle-row{grid-template-columns:1fr 1fr}.metrics-strip{grid-template-columns:repeat(4,1fr)}.metric{min-height:78px;padding:10px 9px;gap:4px}.metric-label{font-size:.55rem}.metric-value{font-size:1.28rem}.metric-sub{font-size:.6rem}.eff-progress{width:58px}.compass-wrap{height:230px;min-height:230px}.readout{min-height:86px;padding:12px 14px}.readout-text{font-size:.76rem;line-height:1.3}.readout-label{font-size:.64rem}.readout-status{min-width:96px}.status-badge{font-size:.64rem;padding:7px 9px}.custom-panel{display:none!important}.bottom-nav{padding:6px;border-radius:18px}.nav-item{font-size:.58rem;padding:6px 2px}.nav-icon{font-size:.95rem}.manual-inputs-hidden{display:none!important}
+    @media(max-width:380px){.app{gap:7px;padding-left:10px;padding-right:10px}.metrics-strip{grid-template-columns:repeat(4,1fr)}.metric{min-height:72px;padding:9px 7px}.metric-value{font-size:1.12rem}.metric-sub{font-size:.55rem}.compass-wrap{height:210px;min-height:210px}.bottom-nav{display:grid}.readout-status{display:none}.readout{display:block}.readout-text{margin-top:8px}}
+
+
+    @media(max-height:700px){.app{gap:6px;padding-top:calc(8px + env(safe-area-inset-top));padding-bottom:calc(8px + env(safe-area-inset-bottom))}.topbar{height:50px}.start-btn{height:54px}.start-icon{width:36px;height:36px}.start-btn::after{width:38px;height:38px}.vehicle-select{height:38px}.metric{min-height:68px;padding:8px 7px}.metric-value{font-size:1.1rem}.metric-label{font-size:.5rem}.metric-sub{font-size:.52rem}.compass-wrap{height:188px;min-height:188px}.readout{min-height:68px;padding:10px 12px}.readout-text{font-size:.7rem}.status-badge{padding:6px 8px}.bottom-nav{padding:4px}.nav-item{padding:5px 2px}.nav-icon{font-size:.85rem}}
   </style>
 </head>
 <body>
@@ -486,7 +494,6 @@
     <select id="modeloSelect" class="vehicle-select" aria-label="Modelo">
       <option value="">Modelo</option>
     </select>
-    <button class="mode-btn" id="customBtn" type="button">☷ Modo manual</button>
   </div>
   <div id="csvStatusRow" style="min-height:18px;display:flex;align-items:center">
     <span class="status-badge" id="csvStatus" style="font-size:.58rem;padding:2px 8px">Cargando vehículos…</span>
@@ -541,32 +548,14 @@
     <div class="readout-text" id="explanation">Tocá el botón de arriba para activar GPS y viento real. Se calcularán rumbo, velocidad y eficiencia aerodinámica en tiempo real.</div>
   </div>
 
-  <!-- custom panel -->
-  <div class="custom-panel" id="customPanel">
-    <div class="custom-head">
-      <div class="custom-title">☷ Simulador manual</div>
-      <button class="reset-btn" id="resetBtn" type="button">⟳ Restablecer</button>
-    </div>
-    <div class="sliders">
-      <div class="field">
-        <label for="carHeading"><span>Rumbo EV</span><b id="carHeadingVal">35</b>°</label>
-        <input id="carHeading" type="range" min="0" max="359" value="35"/>
-      </div>
-      <div class="field">
-        <label for="windDirection"><span>Viento desde</span><b id="windDirectionVal">225</b>°</label>
-        <input id="windDirection" type="range" min="0" max="359" value="225"/>
-      </div>
-      <div class="field">
-        <label for="windSpeed"><span>Vel. viento</span><b id="windSpeedVal">28</b> km/h</label>
-        <input id="windSpeed" type="range" min="0" max="90" value="28"/>
-      </div>
-      <div class="field">
-        <label for="carSpeed"><span>Vel. EV</span><b id="carSpeedVal">80</b> km/h</label>
-        <input id="carSpeed" type="range" min="0" max="140" value="80"/>
-      </div>
-    </div>
+  <!-- hidden state controls retained for GPS/custom state compatibility; no manual sliders exposed -->
+  <div class="manual-inputs-hidden" aria-hidden="true">
+    <input id="carHeading" type="hidden" value="35"/>
+    <input id="windDirection" type="hidden" value="225"/>
+    <input id="windSpeed" type="hidden" value="28"/>
+    <input id="carSpeed" type="hidden" value="80"/>
+    <b id="carHeadingVal">35</b><b id="windDirectionVal">225</b><b id="windSpeedVal">28</b><b id="carSpeedVal">80</b>
   </div>
-
 
   <nav class="bottom-nav" aria-label="Navegación">
     <button class="nav-item active" type="button"><span class="nav-icon">◈</span><span>Brújula</span></button>
@@ -1296,42 +1285,6 @@ function startGps(){
 
 // ─── event listeners ──────────────────────────────────────────────────────
 $("startBtn").addEventListener("click",startGps);
-
-$("customBtn").addEventListener("click",()=>{
-  customMode=!customMode;
-  $("customPanel").classList.toggle("visible",customMode);
-  $("customBtn").classList.toggle("active",customMode);
-  $("customBtn").textContent=customMode?"✓ Modo manual":"☷ Modo manual";
-  if(customMode){
-    // Initialize state from sliders when entering custom mode
-    state.heading=Number(carHeadingEl.value);
-    state.windFrom=Number(windDirEl.value);
-    state.windKmh=Number(windSpeedEl.value);
-    state.speedKmh=Number(carSpeedEl.value);
-  }
-  showToast(customMode?"Modo manual: usá los sliders para simular.":"Modo real: GPS y viento meteorológico.");
-  updateUI();
-});
-
-
-$("resetBtn").addEventListener("click",()=>{
-  carHeadingEl.value=35;
-  windDirEl.value=225;
-  windSpeedEl.value=28;
-  carSpeedEl.value=80;
-  if(customMode){
-    state.heading=35;
-    state.windFrom=225;
-    state.windKmh=28;
-    state.speedKmh=80;
-  }
-  $("carHeadingVal").textContent="35";
-  $("windDirectionVal").textContent="225";
-  $("windSpeedVal").textContent="28";
-  $("carSpeedVal").textContent="80";
-  showToast("Simulador manual restablecido.");
-  updateUI();
-});
 
 $("themeBtn").addEventListener("click",()=>{
   const root=document.documentElement;
