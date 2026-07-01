@@ -929,12 +929,12 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
 
   // ── viento (dentro del bloque rotado de la rosa) ──
   if(windKmh>1){
-    // Las líneas de viento se dibujan en la dirección windFrom (en coordenadas de la rosa)
-    // windFrom es absoluto (geográfico). En la rosa rotada, windFrom ya está mapeado.
+    // Las líneas de viento pertenecen a la rosa, por eso NO compensan el heading.
+    // Como todo este bloque ya está rotado por roseAngle=-heading, usar sólo windTo
+    // hace que el viento acompañe visualmente el giro de la brújula y quede relativo
+    // al vehículo (que siempre apunta hacia arriba en pantalla).
     const windTo=normDeg(windFrom+180);
-    // El bloque ya está rotado por roseAngle=-heading. Para que las líneas apunten
-    // hacia windTo en pantalla, necesitamos compensar: rotate = (windTo - 90 + heading)°
-    const windCanvasAngle=(windTo - 90 + heading)*Math.PI/180;
+    const windCanvasAngle=(windTo - 90)*Math.PI/180;
 
     ctx.save();
     ctx.rotate(windCanvasAngle);
