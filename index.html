@@ -203,6 +203,10 @@
       border-color:var(--border-hi);
     }
 
+    .vehicle-row{
+      grid-template-columns:1fr 1fr auto;
+    }
+
     /* ─── compass card ────────────────────────────────────────────── */
     .compass-card{
       flex:1;
@@ -460,14 +464,14 @@
   </button>
 
   <!-- vehicle + mode -->
-  <div class="controls-row">
-    <select id="vehicleType" class="vehicle-select" aria-label="Tipo de vehículo">
-      <option value="hatch">🚗 Hatchback</option>
-      <option value="sedan">🚙 Sedán</option>
-      <option value="suv" selected>🚐 SUV</option>
-      <option value="pickup">🛻 Pickup</option>
+  <div class="controls-row vehicle-row">
+    <select id="marcaSelect" class="vehicle-select" aria-label="Marca">
+      <option value="">Cargando...</option>
     </select>
-    <button class="mode-btn" id="customBtn" type="button">⚙️ Manual</button>
+    <select id="modeloSelect" class="vehicle-select" aria-label="Modelo">
+      <option value="">Modelo</option>
+    </select>
+    <button class="mode-btn" id="customBtn" type="button">⚙️</button>
   </div>
 
   <!-- compass card -->
@@ -543,7 +547,7 @@
 <script>
 // ─── helpers ─────────────────────────────────────────────────────────────
 const $=id=>document.getElementById(id);
-const carHeadingEl=$("carHeading"),windDirEl=$("windDirection"),windSpeedEl=$("windSpeed"),carSpeedEl=$("carSpeed"),vehicleTypeEl=$("vehicleType");
+const carHeadingEl=$("carHeading"),windDirEl=$("windDirection"),windSpeedEl=$("windSpeed"),carSpeedEl=$("carSpeed");
 
 function normDeg(d){return((d%360)+360)%360}
 function shortAngle(a,b){let d=Math.abs(normDeg(a)-normDeg(b))%360;return d>180?360-d:d}
@@ -584,6 +588,7 @@ const vehicleImgSize={
 };
 let vehicleImg=new Image();
 function loadVehicleImg(key){
+  state._bodyType = key || "suv";
   const img=new Image();
   img.onload=()=>{vehicleImg=img};
   img.onerror=()=>{vehicleImg=null};
@@ -591,53 +596,140 @@ function loadVehicleImg(key){
 }
 loadVehicleImg("suv");
 
-// ─── vehicle params ───────────────────────────────────────────────────────
-const VP={
-  hatch:{mass:1450,cdA:.60,crr:.010,aux:.8},
-  sedan:{mass:1700,cdA:.56,crr:.010,aux:.8},
-  suv:  {mass:1900,cdA:.72,crr:.011,aux:.9},
-  pickup:{mass:2250,cdA:.95,crr:.012,aux:1.0}
-};
+// ─── vehicle data (loaded from CSV) ──────────────────────────────────────
+let vehiculosDB = []; // [{marca, modelo, bateria_kwh, wltp_km}]
+let vehiculoActual = null; // vehículo seleccionado
 
-// ─── physics ──────────────────────────────────────────────────────────────
-function calcImpact(heading,windFrom,windKmh,speedKmh,vehicleKey){
-  const p=VP[vehicleKey]||VP.suv;
-  const v=Math.max(0,speedKmh/3.6);
-  const w=Math.max(0,windKmh/3.6);
+function parseCSV(text){
+  const lines = text.trim().split(/?
+/).filter(l=>l.trim());
+  const headers = lines[0].split(',').map(h=>h.trim());
+  return lines.slice(1).map(line=>{
+    // Handle commas inside values by splitting carefully
+    const parts = line.split(',');
+    const obj = {};
+    headers.forEach((h,i)=>{ obj[h] = (parts[i]||'').trim(); });
+    return obj;
+  }).filter(r=>r.marca && r.modelo);
+}
 
-  // angle between vehicle heading and wind direction
-  // windFrom = direction wind is coming FROM
-  // wind travels from windFrom toward (windFrom+180)
-  const windTo=normDeg(windFrom+180); // direction wind is moving toward
-  const angleTo=shortAngle(heading,windTo); // angle between car heading and wind movement direction
-  const rad=angleTo*Math.PI/180;
+async function loadVehiculos(){
+  try{
+    const res = await fetch('vehiculos.csv');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    vehiculosDB = parseCSV(text);
+    buildMarcaSelect();
+  }catch(e){
+    console.warn('No se pudo cargar vehiculos.csv:', e);
+    // Fallback: un vehículo genérico para que funcione igual
+    vehiculosDB = [];
+    vehiculoActual = {bateria_kwh:60, wltp_km:400};
+    buildMarcaSelect();
+  }
+}
 
-  // relative air speed: v_rel² = v² + w² - 2vw·cos(angle between car and wind directions)
-  const vAir=Math.sqrt(Math.max(0,v*v+w*w-2*v*w*Math.cos(rad)));
+function buildMarcaSelect(){
+  const marcas = [...new Set(vehiculosDB.map(v=>v.marca))].sort();
+  const sel = $('marcaSelect');
+  sel.innerHTML = '<option value="">— Marca —</option>' +
+    marcas.map(m=>`<option value="${m}">${m}</option>`).join('');
+  // Default a BYD si existe
+  const defaultMarca = marcas.includes('BYD') ? 'BYD' : marcas[0];
+  if(defaultMarca){ sel.value = defaultMarca; buildModeloSelect(defaultMarca); }
+}
 
-  const rho=1.225,g=9.81,eff=0.90;
-  const pDrag0=.5*rho*p.cdA*v*v*v/1000;
-  const pDragW=.5*rho*p.cdA*vAir*vAir*v/1000;
-  const pRoll=p.mass*g*p.crr*v/1000;
-  const pAux=p.aux;
+function buildModeloSelect(marca){
+  const modelos = vehiculosDB.filter(v=>v.marca===marca);
+  const sel = $('modeloSelect');
+  sel.innerHTML = modelos.map(v=>`<option value="${v.modelo}">${v.modelo}</option>`).join('');
+  // Pick first
+  if(modelos.length>0){
+    vehiculoActual = modelos[0];
+    state.vehiculoKey = marca+'|'+modelos[0].modelo;
+    // Load matching image by body type guess
+    loadVehicleImg(guessBodyType(modelos[0].modelo, marca));
+    updateUI();
+  }
+}
 
-  const base=(pDrag0+pRoll+pAux)/eff;
-  const actual=(pDragW+pRoll+pAux)/eff;
-  let efficiency=base>0?(base/actual)*100:100;
-  efficiency=Math.max(60,Math.min(120,Math.round(efficiency)));
+function guessBodyType(modelo, marca){
+  const m = (modelo+' '+marca).toLowerCase();
+  if(/pick.?up|terron|tunland|ridder|wonder|hilux|ranger/i.test(m)) return 'pickup';
+  if(/suv|4x4|4wd|crossover|song|yuan|ev5|g6|g9|sealion|tang|aion v|captiva|equinox|blazer|gs|gsx|euniq|countryman|c11|c16|c10|s7|b10|hy|hyptec|07|9|luxury.+4|eco.+4|horizon/i.test(m)) return 'suv';
+  if(/sedan|seal|eqe|eqs|eqa|eqb|i4|i5|i7|02|z|s5|deepal/i.test(m)) return 'sedan';
+  return 'hatch';
+}
 
-  // Relative direction label
-  const relAngle=((heading-(windFrom))%360+360)%360; // how wind hits the car
-  const absRel=Math.min(relAngle,360-relAngle);
+// ─── physics (portada de Python — lógica de Gemini) ──────────────────────
+// Constantes aerodinámicas por tipo de carrocería (fallback cuando no hay Cd real)
+const CD_POR_TIPO = {hatch:0.28, sedan:0.24, suv:0.32, pickup:0.40};
+const AREA_POR_TIPO = {hatch:2.1, sedan:2.2, suv:2.5, pickup:2.8};
+
+function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
+  // Usar vehiculoActual si está disponible, sino fallback genérico
+  const bateria  = vehiculoActual ? Number(vehiculoActual.bateria_kwh) : 60;
+  const wltp_km  = vehiculoActual ? Number(vehiculoActual.wltp_km)    : 400;
+  const bodyType = guessBodyType(
+    vehiculoActual ? vehiculoActual.modelo : '',
+    vehiculoActual ? vehiculoActual.marca  : ''
+  );
+  const cd   = CD_POR_TIPO[bodyType]  || 0.28;
+  const area = AREA_POR_TIPO[bodyType] || 2.2;
+
+  // Densidad del aire ajustada por temperatura real
+  const temp = Number.isFinite(currentTemp) ? currentTemp : 23;
+  const rho  = 1.225 * (273.15 / (273.15 + temp));
+
+  const v_ms = Math.max(0, speedKmh / 3.6);
+  const w_ms = Math.max(0, windKmh  / 3.6);
+
+  // Velocidad relativa del aire (vectorial, ley del coseno)
+  // angleTo: ángulo entre heading del auto y hacia dónde se mueve el viento
+  const windTo  = normDeg(windFrom + 180);
+  const angleTo = shortAngle(heading, windTo);
+  const rad     = angleTo * Math.PI / 180;
+  const vAir_ms = Math.sqrt(Math.max(0, v_ms*v_ms + w_ms*w_ms - 2*v_ms*w_ms*Math.cos(rad)));
+
+  // Fuerzas de arrastre
+  const fd_base = 0.5 * rho * cd * area * (v_ms * v_ms);      // sin viento
+  const fd_wind = 0.5 * rho * cd * area * (vAir_ms * vAir_ms); // con viento
+
+  // Potencia aerodinámica en ruedas (kW)
+  const p_aero_base = (fd_base * v_ms) / 1000;
+  const p_aero_wind = (fd_wind * v_ms) / 1000;
+
+  // Consumo WLTP base (kWh/km) y consumo real ajustado
+  const consumo_wltp = bateria / wltp_km;                        // kWh/km
+  const factor       = v_ms > 0 ? (vAir_ms / v_ms) : 1;         // relación velocidades
+  const consumo_real = consumo_wltp * (factor * factor) * 0.8;   // factor eficiencia tren motriz
+
+  // Autonomía estimada con margen de seguridad (km)
+  const autonomia_real = consumo_real > 0 ? Math.round((bateria / consumo_real) * 0.95) : wltp_km;
+
+  // Eficiencia como % respecto al escenario sin viento
+  let efficiency = p_aero_base > 0 ? (p_aero_base / p_aero_wind) * 100 : 100;
+  efficiency = Math.max(60, Math.min(120, Math.round(efficiency)));
+
+  // Etiqueta de dirección relativa
+  const relAngle = ((heading - windFrom) % 360 + 360) % 360;
+  const absRel   = Math.min(relAngle, 360 - relAngle);
   let relText;
-  if(absRel<30) relText="Viento frontal";
-  else if(absRel<75) relText="Frontal oblicuo";
-  else if(absRel<115) relText="Viento lateral";
-  else if(absRel<150) relText="Cola lateral";
-  else relText="Viento de cola";
+  if(absRel < 30)       relText = "Viento frontal";
+  else if(absRel < 75)  relText = "Frontal oblicuo";
+  else if(absRel < 115) relText = "Viento lateral";
+  else if(absRel < 150) relText = "Cola lateral";
+  else                  relText = "Viento de cola";
 
-  const consumDelta=actual>0?((actual/base)-1)*100:0;
-  return{efficiency,impact:efficiency-100,relText,vAirKmh:vAir*3.6,consumDelta,windTo};
+  const consumDelta = p_aero_base > 0 ? ((p_aero_wind / p_aero_base) - 1) * 100 : 0;
+
+  return {
+    efficiency, impact: efficiency - 100,
+    relText, vAirKmh: vAir_ms * 3.6,
+    consumDelta, windTo,
+    autonomiaKm: autonomia_real,
+    wltpKm: wltp_km
+  };
 }
 
 function calcThermal(temp){
@@ -842,7 +934,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   ctx.save();
   ctx.translate(cx,cy);
   // sin rotación — el vehículo apunta hacia arriba (norte de pantalla = dirección de marcha)
-  const imgSize=vehicleImgSize[vehicleTypeEl.value||"suv"]||{w:142,h:142};
+  const imgSize=vehicleImgSize[state._bodyType||"suv"]||{w:142,h:142};
   if(vehicleImg&&vehicleImg.complete&&vehicleImg.naturalWidth>0){
     ctx.drawImage(vehicleImg,-imgSize.w/2,-imgSize.h/2,imgSize.w,imgSize.h);
   }
@@ -863,7 +955,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
 
   // ── efficiency arc (fijo, siempre arranca arriba) ──
   if(speedKmh>=5){
-    const d=calcImpact(heading,windFrom,windKmh,speedKmh,vehicleTypeEl.value);
+    const d=calcImpact(heading,windFrom,windKmh,speedKmh,"");
     const eff=d.efficiency;
     const arcColor=eff>=100?C.teal:eff>=90?C.amber:C.red;
     const arcR=R*.54;
@@ -885,9 +977,34 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   }
 }
 
-function animate(){
-  const s=state;
-  drawCompass(s.heading,s.windFrom,s.windKmh,s.speedKmh);
+// ─── smooth interpolation ─────────────────────────────────────────────────
+// Separate "display" values that lag behind the target state via lerp
+const smooth={heading:35,windFrom:225,windKmh:0,speedKmh:0};
+
+// Shortest-path lerp for angles (handles 359->1 correctly)
+function lerpAngle(cur,target,t){
+  let diff=((target-cur+540)%360)-180;
+  return cur+diff*t;
+}
+function lerpVal(cur,target,t){
+  return cur+(target-cur)*t;
+}
+
+let lastTs=null;
+function animate(ts){
+  if(lastTs===null)lastTs=ts;
+  const dt=Math.min(ts-lastTs,100); // cap at 100ms to avoid jumps after tab switch
+  lastTs=ts;
+
+  // Frame-rate independent lerp: base=0.004 gives ~180ms settling time
+  const k=1-Math.pow(0.004,dt/1000);
+
+  smooth.heading  = lerpAngle(smooth.heading,  state.heading,  k);
+  smooth.windFrom = lerpAngle(smooth.windFrom, state.windFrom, k);
+  smooth.windKmh  = lerpVal(smooth.windKmh,   state.windKmh,  k);
+  smooth.speedKmh = lerpVal(smooth.speedKmh,  state.speedKmh, k);
+
+  drawCompass(smooth.heading, smooth.windFrom, smooth.windKmh, smooth.speedKmh);
   animId=requestAnimationFrame(animate);
 }
 
@@ -909,7 +1026,8 @@ function updateUI(){
     effEl.textContent=d.efficiency+"%";
     const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
     effEl.className="metric-value "+cls;
-    $("effLabel").textContent=d.relText;
+    const autoStr = d.autonomiaKm ? ` · ~${d.autonomiaKm} km` : "";
+    $("effLabel").textContent=d.relText + autoStr;
     $("effLabel").className="metric-sub "+cls;
   }
 
@@ -1106,10 +1224,21 @@ $("themeBtn").addEventListener("click",()=>{
   document.querySelector("meta[name=theme-color]").setAttribute("content",next==="dark"?"#06120d":"#edf7f2");
 });
 
-vehicleTypeEl.addEventListener("change",()=>{
-  state.vehicle=vehicleTypeEl.value;
-  loadVehicleImg(vehicleTypeEl.value);
-  updateUI();
+$("marcaSelect").addEventListener("change",()=>{
+  const marca = $("marcaSelect").value;
+  if(marca) buildModeloSelect(marca);
+});
+
+$("modeloSelect").addEventListener("change",()=>{
+  const marca  = $("marcaSelect").value;
+  const modelo = $("modeloSelect").value;
+  const v = vehiculosDB.find(x=>x.marca===marca && x.modelo===modelo);
+  if(v){
+    vehiculoActual = v;
+    state.vehiculoKey = marca+'|'+modelo;
+    loadVehicleImg(guessBodyType(v.modelo, v.marca));
+    updateUI();
+  }
 });
 
 // sliders (custom mode)
@@ -1147,10 +1276,10 @@ new ResizeObserver(()=>{resize();}).observe($("compassCanvas").parentElement);
 
 // Boot
 resize();
-// Default custom mode state to show something useful
-state={heading:35,windFrom:225,windKmh:28,speedKmh:80,vehicle:"suv"};
-updateUI();
+state={heading:35,windFrom:225,windKmh:28,speedKmh:80,vehiculoKey:""};
+smooth.heading=35; smooth.windFrom=225; smooth.windKmh=28; smooth.speedKmh=80;
 animate();
+loadVehiculos(); // async: carga CSV y luego llama updateUI
 </script>
 </body>
 </html>
