@@ -207,20 +207,47 @@
       100%{transform:translateX(calc(100vw + 170px));opacity:0}
     }
 
+
+    .north-axis{
+      position:absolute;
+      left:50%;
+      top:14px;
+      width:2px;
+      height:48px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background:linear-gradient(to bottom, rgba(45,212,168,.95), rgba(45,212,168,0));
+      pointer-events:none;
+      z-index:1;
+    }
+    .north-axis:before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:-3px;
+      width:0;
+      height:0;
+      transform:translateX(-50%);
+      border-left:6px solid transparent;
+      border-right:6px solid transparent;
+      border-bottom:10px solid rgba(45,212,168,.95);
+      filter:drop-shadow(0 0 8px rgba(45,212,168,.45));
+    }
+
     .vehicle-stage{
       position:absolute;
       left:50%;
       top:50%;
-      width:var(--vehicle-stage, min(48vw,190px));
-      height:var(--vehicle-stage, min(48vw,190px));
+      width:var(--vehicle-stage, min(62vw,240px));
+      height:var(--vehicle-stage, min(62vw,240px));
       transform:translate(-50%,-50%);
       display:grid;
       place-items:center;
       pointer-events:none;
     }
     .vehicle-rotor{
-      width:86px;
-      height:140px;
+      width:128px;
+      height:128px;
       transform-origin:center;
       transition:transform .45s cubic-bezier(.2,.8,.2,1);
       filter:drop-shadow(0 14px 16px rgba(0,0,0,.32)) drop-shadow(0 4px 8px rgba(15,123,95,.20));
@@ -711,6 +738,7 @@
         <div class="compass">
           <div class="wind-layer" id="windLayer"></div>
           <div class="ring"></div>
+          <div class="north-axis" aria-hidden="true"></div>
           <div class="cardinal n">N</div><div class="cardinal e">E</div><div class="cardinal s">S</div><div class="cardinal w">O</div>
 
           <div class="vehicle-stage">
@@ -719,7 +747,7 @@
             </div>
           </div>
 
-          <div class="heading-pill"><span>Rumbo</span><strong id="headingHuman">NE</strong></div>
+          <div class="heading-pill"><span>Norte fijo · Rumbo</span><strong id="headingHuman">NE</strong></div>
         </div>
 
       </section>
@@ -770,10 +798,10 @@
     let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false,hasRealSpeed=false,currentTemp=null;
     const vehicleParams={hatch:{mass:1450,cdA:.60,crr:.010,aux:.8},sedan:{mass:1700,cdA:.56,crr:.010,aux:.8},suv:{mass:1900,cdA:.72,crr:.011,aux:.9},pickup:{mass:2250,cdA:.95,crr:.012,aux:1.0}};
     const vehicleStyles={
-      hatch:{src:"assets/vehiculos/hatchback_top_view_200x200.png",width:92,height:154},
-      sedan:{src:"assets/vehiculos/sedan_top_view_200x200.png",width:92,height:158},
-      suv:{src:"assets/vehiculos/suv_top_view_200x200.png",width:94,height:160},
-      pickup:{src:"assets/vehiculos/pickup_top_view_200x200.png",width:98,height:162}
+      hatch:{src:"assets/vehiculos/hatchback_top_view_200x200.png",width:132,height:132},
+      sedan:{src:"assets/vehiculos/sedan_top_view_200x200.png",width:136,height:136},
+      suv:{src:"assets/vehiculos/suv_top_view_200x200.png",width:142,height:142},
+      pickup:{src:"assets/vehiculos/pickup_top_view_200x200.png",width:148,height:148}
     };
 
     function fitCompassCircle(){
@@ -782,7 +810,7 @@
       const r=c.getBoundingClientRect();
       const size=Math.max(120,Math.min(r.width,r.height)-28);
       c.style.setProperty("--compass-size",size+"px");
-      c.style.setProperty("--vehicle-stage",Math.max(120,Math.min(size*.62,210))+"px");
+      c.style.setProperty("--vehicle-stage",Math.max(160,Math.min(size*.82,260))+"px");
     }
 
     function showToast(msg){const t=el("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3500)}
@@ -980,7 +1008,7 @@
     function update(){
       const d=calculateImpact();
       el("carHeadingVal").textContent=d.heading;el("windDirectionVal").textContent=d.windDir;el("windSpeedVal").textContent=d.windKmh;el("carSpeedVal").textContent=d.speedKmh;
-      el("vehicleRotor").style.transform=`rotate(${d.heading}deg)`;
+      // Norte siempre queda arriba; solo rota el vehículo según rumbo GPS.\n      el("vehicleRotor").style.transform=`rotate(${d.heading}deg)`;
       el("headingHuman").textContent=`${degToCardinal(d.heading)} · ${d.heading}°`;
       el("windSpeedMetric").textContent=(!customMode && !hasRealWeather) ? "--" : d.windKmh;el("windDirHuman").textContent=(!customMode && !hasRealWeather) ? "--" : `${degToCardinal(d.windFrom)}`;
       el("relativeAngle").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : Math.round(d.angle);el("carSpeedMetric").textContent=(!customMode && !hasRealGps) ? "--" : d.speedKmh;
