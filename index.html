@@ -494,7 +494,7 @@
           </div>
           <div class="metric">
             <div class="label">Vel. EV</div>
-            <div class="value"><span id="carSpeedMetric">92</span></div>
+            <div class="value"><span id="carSpeedMetric">0</span></div>
             <div class="small">km/h · <span id="relativeAngle">0</span>°</div>
           </div>
         </div>
@@ -503,8 +503,8 @@
 
     <footer class="bottom">
       <section class="readout">
-        <div class="explain-title"><span>Lectura rápida</span><span id="apiHint">API Open-Meteo</span></div>
-        <div class="explain" id="explanation">Tocá GPS + viento para obtener rumbo, velocidad del vehículo y viento real.</div>
+        <div class="explain-title"><span>Lectura rápida</span><span id="apiHint">Open-Meteo 10 m</span></div>
+        <div class="explain" id="explanation">Tocá GPS + viento para obtener rumbo, velocidad real del vehículo y viento meteorológico real.</div>
         <div class="status-row">
           <div class="status" id="gpsStatus">GPS: sin iniciar</div>
           <div class="status" id="weatherStatus">Clima: sin consultar</div>
@@ -514,7 +514,7 @@
       <section class="custom-panel" id="customPanel" aria-label="Modo personalizado">
         <div class="custom-head">
           <strong>Modo personalizado</strong>
-          <span>Solo para simular escenarios. Por defecto la herramienta usa datos reales.</span>
+          <span>Solo para simular escenarios. El modo normal calcula con GPS + viento real.</span>
         </div>
         <div class="sliders">
           <div class="field">
@@ -530,8 +530,8 @@
             <input id="windSpeed" type="range" min="0" max="90" value="28" />
           </div>
           <div class="field">
-            <label for="carSpeed"><span>Km/h EV</span><span><b id="carSpeedVal">92</b></span></label>
-            <input id="carSpeed" type="range" min="0" max="140" value="92" />
+            <label for="carSpeed"><span>Km/h EV</span><span><b id="carSpeedVal">0</b></span></label>
+            <input id="carSpeed" type="range" min="0" max="140" value="0" />
           </div>
         </div>
       </section>
@@ -543,8 +543,8 @@
   <script>
     const el=id=>document.getElementById(id);
     const carHeading=el("carHeading"),windDirection=el("windDirection"),windSpeed=el("windSpeed"),carSpeed=el("carSpeed"),vehicleType=el("vehicleType"),vehicleColor=el("vehicleColor");
-    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false;
-    const vehicleFactors={hatch:.82,sedan:.72,suv:1,pickup:1.18};
+    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false,hasRealSpeed=false;
+    const vehicleParams={hatch:{mass:1450,cdA:.60,crr:.010,aux:.8},sedan:{mass:1700,cdA:.56,crr:.010,aux:.8},suv:{mass:1900,cdA:.72,crr:.011,aux:.9},pickup:{mass:2250,cdA:.95,crr:.012,aux:1.0}};
     const vehicleShapes={
       hatch:{body:"M60 8 C81 14 93 38 96 72 L101 139 C103 164 86 184 60 184 C34 184 17 164 19 139 L24 72 C27 38 39 14 60 8Z",glass:"M60 22 C74 28 80 47 82 66 L38 66 C40 47 46 28 60 22Z",shadow:"M35 82 L85 82 L90 134 C91 150 80 162 60 162 C40 162 29 150 30 134Z",width:82,height:136},
       sedan:{body:"M60 3 C80 9 91 34 96 70 L104 146 C107 171 90 187 60 187 C30 187 13 171 16 146 L24 70 C29 34 40 9 60 3Z",glass:"M60 20 C74 26 81 45 84 66 L36 66 C39 45 46 26 60 20Z",shadow:"M32 78 L88 78 L95 140 C96 156 83 169 60 169 C37 169 24 156 25 140Z",width:84,height:142},
@@ -575,6 +575,11 @@
     function bearingBetween(lat1,lon1,lat2,lon2){
       const r=d=>d*Math.PI/180,D=r=>r*180/Math.PI,p1=r(lat1),p2=r(lat2),dl=r(lon2-lon1),y=Math.sin(dl)*Math.cos(p2),x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
       return normalizeDeg(D(Math.atan2(y,x)));
+    }
+    function distanceMeters(lat1,lon1,lat2,lon2){
+      const R=6371000,r=d=>d*Math.PI/180;
+      const dLat=r(lat2-lat1),dLon=r(lon2-lon1),a=Math.sin(dLat/2)**2+Math.cos(r(lat1))*Math.cos(r(lat2))*Math.sin(dLon/2)**2;
+      return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
     }
 
     async function fetchWeather(lat,lon,force=false){
@@ -611,13 +616,36 @@
         const c=pos.coords;
         hasRealGps=true;
         el("gpsStatus").innerHTML=`<span class="status-ok">GPS: OK · ±${Math.round(c.accuracy||0)} m</span>`;
+        const nowMs=Date.now();
+        let kmh=null;
+
         if(typeof c.speed==="number"&&Number.isFinite(c.speed)){
-          const kmh=Math.max(0,Math.round(c.speed*3.6));
-          if(kmh>2)carSpeed.value=Math.min(140,kmh);
+          kmh=Math.max(0,Math.round(c.speed*3.6));
+        }else if(lastPosition){
+          const meters=distanceMeters(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude);
+          const seconds=Math.max(.5,(nowMs-lastPosition.t)/1000);
+          const estimated=Math.round((meters/seconds)*3.6);
+          if(Number.isFinite(estimated)) kmh=Math.max(0,Math.min(140,estimated));
         }
-        if(typeof c.heading==="number"&&Number.isFinite(c.heading)&&c.heading>=0)carHeading.value=Math.round(c.heading);
-        else if(lastPosition)carHeading.value=Math.round(bearingBetween(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude));
-        lastPosition={lat:c.latitude,lon:c.longitude};
+
+        if(kmh!==null){
+          hasRealSpeed=true;
+          carSpeed.value=String(Math.min(140,kmh));
+        }else{
+          hasRealSpeed=false;
+          carSpeed.value="0";
+        }
+
+        if(kmh!==null && kmh<3){
+          carHeading.value=carHeading.value;
+        }else if(typeof c.heading==="number"&&Number.isFinite(c.heading)&&c.heading>=0){
+          carHeading.value=Math.round(c.heading);
+        }else if(lastPosition){
+          const meters=distanceMeters(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude);
+          if(meters>=3) carHeading.value=Math.round(bearingBetween(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude));
+        }
+
+        lastPosition={lat:c.latitude,lon:c.longitude,t:nowMs};
         fetchWeather(c.latitude,c.longitude);
         update();
       },err=>{
@@ -628,13 +656,26 @@
     }
 
     function calculateImpact(){
-      const heading=Number(carHeading.value),windDir=Number(windDirection.value),windKmh=Number(windSpeed.value),speedKmh=Number(carSpeed.value),vf=vehicleFactors[vehicleType.value]||1,angle=shortestAngle(heading,windDir),tail=Math.cos(angle*Math.PI/180),head=-tail,speedF=Math.min(1.35,Math.max(.25,speedKmh/100)),windF=Math.min(1.55,windKmh/45);
-      let impact;
-      if(head>0)impact=-(head*windF*speedF*vf*13);else impact=Math.abs(head)*windF*speedF*5.5;
-      const cross=Math.sin(angle*Math.PI/180);
-      impact-=Math.abs(cross)*windF*speedF*vf*3.2;
-      impact=Math.max(-24,Math.min(10,impact));
-      return{heading,windDir,windKmh,speedKmh,angle,impact};
+      const heading=Number(carHeading.value),windDir=Number(windDirection.value),windKmh=Number(windSpeed.value),speedKmh=Number(carSpeed.value);
+      const p=vehicleParams[vehicleType.value]||vehicleParams.suv;
+      const angle=shortestAngle(heading,windDir);
+      const v=Math.max(0,speedKmh/3.6), w=Math.max(0,windKmh/3.6);
+      const rad=angle*Math.PI/180;
+      const vAir=Math.sqrt(Math.max(0,v*v+w*w-2*v*w*Math.cos(rad)));
+      const rho=1.225,g=9.81;
+      const pDrag0=.5*rho*p.cdA*v*v*v/1000;
+      const pDragW=.5*rho*p.cdA*vAir*vAir*v/1000;
+      const pRoll=p.mass*g*p.crr*v/1000;
+      const pAux=p.aux;
+      const base=pDrag0+pRoll+pAux;
+      const actual=pDragW+pRoll+pAux;
+      const consumptionDelta=base>0?((actual/base)-1)*100:0;
+      const impact=base>0?((base/actual)-1)*100:0;
+      const headComponent=-Math.cos(rad)*windKmh;
+      const crossComponent=Math.sin(rad)*windKmh;
+      const aeroShare=actual>0?(pDragW/actual)*100:0;
+      const pExtra=pDragW-pDrag0;
+      return{heading,windDir,windKmh,speedKmh,angle,impact,consumptionDelta,headComponent,crossComponent,aeroShare,pExtra,actual,base,vAirKmh:vAir*3.6};
     }
 
     function updateWindLines(windDir,windKmh){
@@ -664,12 +705,35 @@
       el("impactValue").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : `${rounded>0?"+":""}${rounded}%`;
       const metric=el("impactMetric");metric.classList.remove("good","warn","bad");
       let label,explanation;
-      if(rounded>=2){metric.classList.add("good");label="A favor";explanation="El viento acompaña el rumbo del vehículo. Puede ayudar levemente a la eficiencia."}
-      else if(rounded<=-8){metric.classList.add("bad");label=d.angle>125?"De frente":"Frente-lateral";explanation=`El viento entra ${d.angle>125?"casi de frente":"de frente-lateral"}. A ${d.speedKmh} km/h puede aumentar el consumo.`}
-      else if(rounded<0){metric.classList.add("warn");label=d.angle>65&&d.angle<115?"Lateral":"Moderado";explanation="El impacto parece moderado. Puede afectar la eficiencia, sobre todo en ruta."}
-      else{metric.classList.add("warn");label="Bajo";explanation="El viento actual no debería perjudicar demasiado la eficiencia."}
+      const extraKw=Math.abs(d.pExtra||0).toFixed(1);
+      const consumo=Math.abs(d.consumptionDelta||0).toFixed(0);
+      if(d.speedKmh<12){
+        metric.classList.add("warn");
+        label="Sin rumbo estable";
+        explanation="Estás quieto o casi quieto: la velocidad real del GPS es muy baja. Para calcular viento relativo hace falta moverse unos metros y estabilizar el rumbo.";
+      }else if(rounded>=3){
+        metric.classList.add("good");
+        label="Viento favorable";
+        explanation=`El viento acompaña el rumbo. El aire relativo baja a ${Math.round(d.vAirKmh)} km/h y el consumo aerodinámico mejora aprox. ${Math.abs(rounded)}%.`;
+      }else if(rounded<=-18){
+        metric.classList.add("bad");
+        label="Muy ineficiente";
+        explanation=`Alerta: viento de frente/fuerte. El aire relativo sube a ${Math.round(d.vAirKmh)} km/h, el consumo estimado aumenta ~${consumo}% y exige +${extraKw} kW aerodinámicos. Bajar 10–15 km/h puede recuperar mucha autonomía.`;
+      }else if(rounded<=-10){
+        metric.classList.add("bad");
+        label=d.angle>125?"Viento de frente":"Frente-lateral";
+        explanation=`Condición ineficiente: el consumo estimado sube ~${consumo}% por viento. El arrastre aerodinámico pesa ~${Math.round(d.aeroShare)}% de la demanda; reducir velocidad ayuda bastante.`;
+      }else if(rounded<0){
+        metric.classList.add("warn");
+        label=d.angle>65&&d.angle<115?"Viento lateral":"Impacto moderado";
+        explanation=`Impacto moderado: consumo estimado +${consumo}%. El viento no es crítico, pero en ruta puede notarse en la autonomía.`;
+      }else{
+        metric.classList.add("warn");
+        label="Impacto bajo";
+        explanation="El viento actual tiene poco efecto sobre la eficiencia aerodinámica estimada.";
+      }
       if(!customMode){
-        if(!hasRealGps && !hasRealWeather) explanation="Tocá GPS + viento para obtener rumbo, velocidad del vehículo y viento real. Sin permiso de ubicación no se calcula con datos reales.";
+        if(!hasRealGps && !hasRealWeather) explanation="Tocá GPS + viento para obtener rumbo, velocidad real del vehículo y viento meteorológico real. Sin permiso de ubicación no se calcula con datos reales.";
         else if(!hasRealGps) explanation="Falta dato real de GPS. La herramienta necesita permiso de ubicación y movimiento para estimar rumbo y velocidad.";
         else if(!hasRealWeather) explanation="GPS activo, pero falta el viento real de la API meteorológica. Reintentá en unos segundos.";
       }
