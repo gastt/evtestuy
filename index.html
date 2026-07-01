@@ -678,17 +678,17 @@ function buildModeloSelect(marca){
   if(modelos.length>0){
     vehiculoActual = modelos[0];
     state.vehiculoKey = marca+'|'+modelos[0].modelo;
-    // Load matching image by body type guess
-    loadVehicleImg(guessBodyType(modelos[0].modelo, marca));
+    loadVehicleImg(modelos[0].tipo || guessBodyType(modelos[0].modelo, marca));
     updateUI();
   }
 }
 
 function guessBodyType(modelo, marca){
   const m = (modelo+' '+marca).toLowerCase();
-  if(/pick.?up|terron|tunland|ridder|wonder|hilux|ranger/i.test(m)) return 'pickup';
-  if(/suv|4x4|4wd|crossover|song|yuan|ev5|g6|g9|sealion|tang|aion v|captiva|equinox|blazer|gs|gsx|euniq|countryman|c11|c16|c10|s7|b10|hy|hyptec|07|9|luxury.+4|eco.+4|horizon/i.test(m)) return 'suv';
-  if(/sedan|seal|eqe|eqs|eqa|eqb|i4|i5|i7|02|z|s5|deepal/i.test(m)) return 'sedan';
+  if(/deliver|sprinter|tunland|wonder box|toano|e-toano|cargo van|van|minibus|cabina/i.test(m)) return 'pickup';
+  if(/pick.?up|terron|ridder|foton e wonder pick|hilux|ranger/i.test(m)) return 'pickup';
+  if(/suv|4x4|crossover|song|yuan|ev5|g6|g9|sealion|tang|aion v|captiva|equinox|blazer|euniq|countryman|c11|c16|c10|s7|b10|hyptec|horizon|zeekr x|zeekr 7|aion ut|leapmotor b|leapmotor c|geely ex5|geely geometry c|lynk|omoda|chery eq7|jaecoo|smart #1|smart #3|jeep|riddara|gac|jmev gse|dongfeng mage|fiat 600|geely ex5/i.test(m)) return 'suv';
+  if(/seal$|seal 4wd|eqe|eqs|eqa|eqb|i4|i5|i7|zeekr 001|deepal s5|gac aion es/i.test(m)) return 'sedan';
   return 'hatch';
 }
 
@@ -701,12 +701,19 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
   // Usar vehiculoActual si está disponible, sino fallback genérico
   const bateria  = vehiculoActual ? Number(vehiculoActual.bateria_kwh) : 60;
   const wltp_km  = vehiculoActual ? Number(vehiculoActual.wltp_km)    : 400;
-  const bodyType = guessBodyType(
-    vehiculoActual ? vehiculoActual.modelo : '',
-    vehiculoActual ? vehiculoActual.marca  : ''
-  );
-  const cd   = CD_POR_TIPO[bodyType]  || 0.28;
-  const area = AREA_POR_TIPO[bodyType] || 2.2;
+  const bodyType = vehiculoActual && vehiculoActual.tipo
+    ? vehiculoActual.tipo
+    : guessBodyType(
+        vehiculoActual ? vehiculoActual.modelo : '',
+        vehiculoActual ? vehiculoActual.marca  : ''
+      );
+  // Usar cd y area_m2 reales del CSV si están disponibles; sino fallback por tipo
+  const cd   = vehiculoActual && Number(vehiculoActual.cd)      > 0
+               ? Number(vehiculoActual.cd)
+               : (CD_POR_TIPO[bodyType]   || 0.28);
+  const area = vehiculoActual && Number(vehiculoActual.area_m2) > 0
+               ? Number(vehiculoActual.area_m2)
+               : (AREA_POR_TIPO[bodyType] || 2.2);
 
   // Densidad del aire ajustada por temperatura real
   const temp = Number.isFinite(currentTemp) ? currentTemp : 23;
@@ -1267,7 +1274,7 @@ $("modeloSelect").addEventListener("change",()=>{
   if(v){
     vehiculoActual = v;
     state.vehiculoKey = marca+'|'+modelo;
-    loadVehicleImg(guessBodyType(v.modelo, v.marca));
+    loadVehicleImg(v.tipo || guessBodyType(v.modelo, v.marca));
     updateUI();
   }
 });
