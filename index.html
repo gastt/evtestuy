@@ -712,40 +712,79 @@ const CD_POR_TIPO = {hatch:0.28, sedan:0.24, suv:0.32, pickup:0.40};
 const AREA_POR_TIPO = {hatch:2.1, sedan:2.2, suv:2.5, pickup:2.8};
 
 function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wltpKmOverride){
-  // Datos del vehículo desde parámetros explícitos, vehiculos.csv o fallback genérico.
-  // Los overrides preservan compatibilidad: si el 5º parámetro es un string de UI,
-  // se ignora y se usan los datos del vehículo seleccionado.
+  /*
+    Cálculo simplificado EVUruguay:
+    1) Parte de la autonomía WLTP del vehículo.
+    2) Aplica una penalización base por velocidad.
+    3) Corrige esa autonomía con el componente real del viento.
+
+    Ventaja frente al modelo anterior:
+    - No usa Cd, área frontal, densidad del aire ni proporciones aerodinámicas manuales.
+    - Evita resultados ridículos a baja velocidad.
+    - Da números más estables y fáciles de explicar al usuario.
+  */
+
   const bateriaParam = Number(bateriaKwhOverride);
   const wltpParam = Number(wltpKmOverride);
   const bateriaCsv = vehiculoActual ? Number(vehiculoActual.bateria_kwh) : NaN;
   const wltpCsv = vehiculoActual ? Number(vehiculoActual.wltp_km) : NaN;
+
   const bateria = bateriaParam > 0 ? bateriaParam : (bateriaCsv > 0 ? bateriaCsv : 60);
   const wltp_km = wltpParam > 0 ? wltpParam : (wltpCsv > 0 ? wltpCsv : 400);
-  const bodyType = vehiculoActual && vehiculoActual.tipo
-    ? vehiculoActual.tipo
-    : guessBodyType(vehiculoActual ? vehiculoActual.modelo : '', vehiculoActual ? vehiculoActual.marca : '');
-  const cd = vehiculoActual && Number(vehiculoActual.cd) > 0
-    ? Number(vehiculoActual.cd)
-    : (CD_POR_TIPO[bodyType] || 0.28);
-  const area = vehiculoActual && Number(vehiculoActual.area_m2) > 0
-    ? Number(vehiculoActual.area_m2)
-    : (AREA_POR_TIPO[bodyType] || 2.2);
 
-  // Densidad del aire por temperatura: aire frío = más denso = más arrastre.
-  // Aproximación por gas ideal manteniendo presión constante respecto a 15 °C.
-  const temp = Number.isFinite(currentTemp) ? currentTemp : 15;
-  const rho = 1.225 * (288.15 / (273.15 + temp));
+  const speed = Math.max(0, Number(speedKmh) || 0);
+  const wind = Math.max(0, Number(windKmh) || 0);
+  const carHeading = normDeg(Number(heading) || 0);
+  const windFromDeg = normDeg(Number(windFrom) || 0);
+  const windTo = normDeg(windFromDeg + 180);
 
-  const v_car_ms = Math.max(0, Number(speedKmh) || 0) / 3.6;
-  const wind_ms = Math.max(0, Number(windKmh) || 0) / 3.6;
+  const consumoWltp100 = bateria > 0 && wltp_km > 0 ? (bateria / wltp_km) * 100 : 15;
 
-  // Consumo WLTP base: consumo ideal sin viento.
-  const consumoBaseKm = bateria / wltp_km;
-  const consumoBase100 = consumoBaseKm * 100;
+  function speedPenaltyPercent(v){
+    if(v < 50) return 5;
+    if(v < 90) return 10;
+    if(v < 100) return 15;
+    if(v < 110) return 20;
+    if(v < 120) return 25;
+    if(v < 130) return 30;
+    if(v < 135) return 35;
+    if(v < 140) return 40;
+    if(v < 145) return 45;
+    return 50;
+  }
 
-  // Etiqueta de UI: se calcula con windTo para describir si el flujo viene de cola/frente.
-  const windTo = normDeg((Number(windFrom) || 0) + 180);
-  const absRel = shortAngle(Number(heading) || 0, windTo);
+  /*
+    Peso automático del viento.
+    No se muestra al usuario: sólo evita exageraciones.
+    A baja velocidad casi no pesa; en ruta pesa bastante más.
+  */
+  function windWeightBySpeed(v){
+    if(v < 50) return 0.08;
+    if(v < 70) return 0.15;
+    if(v < 90) return 0.25;
+    if(v < 110) return 0.40;
+    if(v < 130) return 0.55;
+    return 0.65;
+  }
+
+  /*
+    Límite interno del impacto del viento.
+    No es un control de UI; es una protección para mantener resultados creíbles.
+  */
+  function maxWindImpactBySpeed(v){
+    if(v < 50) return 5;
+    if(v < 70) return 8;
+    if(v < 90) return 12;
+    if(v < 110) return 18;
+    if(v < 130) return 25;
+    return 35;
+  }
+
+  function clamp(value, min, max){
+    return Math.max(min, Math.min(max, value));
+  }
+
+  const absRel = shortAngle(carHeading, windTo);
   let relText;
   if(absRel < 30)       relText = "Viento de cola";
   else if(absRel < 75)  relText = "Cola lateral";
@@ -753,10 +792,10 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wl
   else if(absRel < 150) relText = "Frontal oblicuo";
   else                  relText = "Viento frontal";
 
-  // Vehículo quieto: no tiene sentido convertir potencia aerodinámica a consumo por distancia.
-  if(v_car_ms === 0){
+  // Sin velocidad útil, no forzamos cálculo aerodinámico.
+  if(speed < 5){
     return {
-      consumoEst: consumoBase100,
+      consumoEst: consumoWltp100,
       autonomiaEst: Math.round(wltp_km),
       vAirKmh: 0,
       efficiency: 100,
@@ -769,73 +808,53 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wl
     };
   }
 
-  // Velocidad relativa del aire (descomposición vectorial real).
-  // beta usa directamente heading - windFrom: si ambos coinciden, cos(0)=1
-  // y el viento se interpreta como frontal puro; a 180° se interpreta como cola.
-  const beta = ((Number(heading) || 0) - (Number(windFrom) || 0)) * Math.PI / 180;
+  // Componente del viento sobre el eje de marcha.
+  // Positivo = viento de cola; negativo = viento frontal.
+  const delta = ((windTo - carHeading + 540) % 360) - 180;
+  const tailwindComponent = wind * Math.cos(delta * Math.PI / 180);
 
-  // v_headwind: positivo es viento de frente, negativo es viento de cola.
-  const v_headwind = wind_ms * Math.cos(beta);
-  const v_crosswind = Math.abs(wind_ms * Math.sin(beta));
+  // Velocidad relativa del aire.
+  const vAirKmh = Math.max(1, speed - tailwindComponent);
 
-  // Velocidad frontal efectiva del aire. No puede ser menor que 0.
-  const vAir_ms = Math.max(0, v_car_ms + v_headwind);
+  // 1) Penalización base por velocidad contra WLTP.
+  const basePenalty = speedPenaltyPercent(speed);
+  const baseRangeFactor = 1 - basePenalty / 100;
 
-  // Para el cálculo de consumo limitamos la bonificación aerodinámica máxima de
-  // vientos de cola fuertes. El valor vAir_ms real se sigue mostrando en UI, pero
-  // el WLTP base ya incluye tramos de baja/alta velocidad, pérdidas de tren motriz
-  // y turbulencia alrededor del vehículo; por eso una cola de 28 km/h a 80 km/h no
-  // debe convertirse en una mejora extrema de autonomía. Los vientos de frente no
-  // se capan: siempre penalizan con la velocidad frontal efectiva completa.
-  const TAILWIND_AERO_FLOOR = 0.85;
-  const vAero_ms = v_headwind < 0 ? Math.max(vAir_ms, v_car_ms * TAILWIND_AERO_FLOOR) : vAir_ms;
+  // 2) Corrección progresiva por viento.
+  const windWeight = windWeightBySpeed(speed);
+  const rawWindConsumptionFactor =
+    (1 - windWeight) + windWeight * Math.pow(vAirKmh / speed, 2);
 
-  // Fuerzas de arrastre: base sin viento vs. condición con viento frontal efectivo.
-  const fd_base = 0.5 * rho * cd * area * (v_car_ms * v_car_ms);
-  const fd_wind = 0.5 * rho * cd * area * (vAero_ms * vAero_ms);
+  const rawWindImpactPercent = (rawWindConsumptionFactor - 1) * 100;
+  const maxWindImpact = maxWindImpactBySpeed(speed);
+  const windImpactPercent = clamp(rawWindImpactPercent, -maxWindImpact, maxWindImpact);
+  const windConsumptionFactor = 1 + windImpactPercent / 100;
 
-  // Potencia aerodinámica en ruedas (kW). El cociente de potencias equivale al
-  // cociente de arrastres porque ambas se calculan contra la misma velocidad del auto.
-  const p_aero_base = (fd_base * v_car_ms) / 1000;
-  const p_aero_wind = (fd_wind * v_car_ms) / 1000;
-  const factorAero = p_aero_base > 0 ? p_aero_wind / p_aero_base : 1;
+  // Resultado final.
+  const autonomiaBase = wltp_km * baseRangeFactor;
+  const autonomiaEst = Math.round(autonomiaBase / windConsumptionFactor);
 
-  // Penalización por viento lateral: esfuerzo de dirección y fricción de neumáticos.
-  // Nunca bonifica: sólo suma pérdidas y queda limitada al 15%.
-  const penalizacionLateral = (v_car_ms > 0 && v_crosswind > 0)
-    ? Math.min(0.15, (v_crosswind / v_car_ms) * 0.12)
-    : 0;
-  const factorLateral = 1 + penalizacionLateral;
+  const consumoBaseReal100 = consumoWltp100 / baseRangeFactor;
+  const consumoEst = consumoBaseReal100 * windConsumptionFactor;
 
-  // Consumo real (kWh/km): 65% aerodinámico varía con V² y 35% queda fijo.
-  // Luego se aplica la penalización lateral como pérdida adicional de neumáticos/corrección.
-  const proporcion_aero = 0.65;
-  const proporcion_fija = 0.35;
-  const consumo_real = consumoBaseKm * (proporcion_fija + proporcion_aero * factorAero) * factorLateral;
-
-  // Autonomía real estimada sin margen artificial: batería / consumo real.
-  const autonomia_real = consumo_real > 0 ? Math.round(bateria / consumo_real) : wltp_km;
-
-  // Salidas explícitas solicitadas: consumoEst en kWh/100km y autonomía en km.
-  const consumoEst = consumo_real * 100;
-  const autonomiaEst = autonomia_real;
-
-  // Eficiencia real: compara consumo ideal sin viento vs. consumo real con viento.
-  // Mayor consumo => <100%; viento de cola útil => >100%. No se clampa para no ocultar incongruencias.
-  const efficiency = consumoEst > 0 ? Math.round((consumoBase100 / consumoEst) * 100) : 100;
-  const consumDelta = ((consumoEst / consumoBase100) - 1) * 100;
+  // Eficiencia: porcentaje de autonomía estimada contra WLTP.
+  // Ej.: 400 WLTP y 320 reales => 80%.
+  const efficiency = wltp_km > 0 ? Math.round((autonomiaEst / wltp_km) * 100) : 100;
+  const consumDelta = ((consumoEst / consumoWltp100) - 1) * 100;
 
   return {
     consumoEst,
     autonomiaEst,
-    vAirKmh: vAir_ms * 3.6,
+    vAirKmh,
     efficiency,
     impact: efficiency - 100,
     relText,
     windTo,
     consumDelta,
     autonomiaKm: autonomiaEst,
-    wltpKm: wltp_km
+    wltpKm: wltp_km,
+    basePenalty,
+    windImpactPercent
   };
 }
 
