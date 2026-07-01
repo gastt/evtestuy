@@ -317,11 +317,6 @@
     .status-warn{color:var(--amber)}
 
     .sliders{
-      border-radius:20px;
-      background:var(--card);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      padding:8px 10px;
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:7px 10px;
@@ -342,6 +337,38 @@
     .field label span:last-child{color:var(--forest)}
     [data-theme=dark] .field label span:last-child{color:var(--teal)}
     input[type=range]{width:100%;height:16px;accent-color:var(--green)}
+
+
+    .custom-panel{
+      display:none;
+      border-radius:20px;
+      background:var(--card);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      padding:8px;
+      overflow:hidden;
+    }
+    body.custom-mode .custom-panel{display:grid;gap:7px}
+    body.custom-mode .app{grid-template-rows:auto minmax(0,1fr) auto}
+    .custom-head{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:flex-start;
+      color:var(--muted);
+      font-size:.62rem;
+      line-height:1.15;
+    }
+    .custom-head strong{
+      color:var(--forest);
+      white-space:nowrap;
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    [data-theme=dark] .custom-head strong{color:var(--teal)}
+    body:not(.custom-mode) .bottom{grid-template-rows:auto}
+    body:not(.custom-mode) .readout{min-height:78px}
 
     .toast{
       position:fixed;
@@ -404,6 +431,7 @@
       </a>
       <div class="top-actions">
         <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
+        <button class="icon-btn" id="customBtn" type="button" aria-label="Modo personalizado">⚙️</button>
         <button class="icon-btn" id="themeBtn" type="button">🌙</button>
       </div>
     </header>
@@ -456,8 +484,8 @@
         <div class="metrics">
           <div class="metric impact" id="impactMetric">
             <div class="label">Impacto</div>
-            <div class="value" id="impactValue">-8%</div>
-            <div class="small" id="impactLabel">Frente-lateral</div>
+            <div class="value" id="impactValue">--</div>
+            <div class="small" id="impactLabel">Sin datos reales</div>
           </div>
           <div class="metric">
             <div class="label">Viento</div>
@@ -476,29 +504,35 @@
     <footer class="bottom">
       <section class="readout">
         <div class="explain-title"><span>Lectura rápida</span><span id="apiHint">API Open-Meteo</span></div>
-        <div class="explain" id="explanation">Esperando datos reales o ajuste manual.</div>
+        <div class="explain" id="explanation">Tocá GPS + viento para obtener rumbo, velocidad del vehículo y viento real.</div>
         <div class="status-row">
           <div class="status" id="gpsStatus">GPS: sin iniciar</div>
           <div class="status" id="weatherStatus">Clima: sin consultar</div>
         </div>
       </section>
 
-      <section class="sliders" aria-label="Controles manuales">
-        <div class="field">
-          <label for="carHeading"><span>Rumbo</span><span><b id="carHeadingVal">35</b>°</span></label>
-          <input id="carHeading" type="range" min="0" max="359" value="35" />
+      <section class="custom-panel" id="customPanel" aria-label="Modo personalizado">
+        <div class="custom-head">
+          <strong>Modo personalizado</strong>
+          <span>Solo para simular escenarios. Por defecto la herramienta usa datos reales.</span>
         </div>
-        <div class="field">
-          <label for="windDirection"><span>Viento</span><span><b id="windDirectionVal">225</b>°</span></label>
-          <input id="windDirection" type="range" min="0" max="359" value="225" />
-        </div>
-        <div class="field">
-          <label for="windSpeed"><span>Km/h viento</span><span><b id="windSpeedVal">28</b></span></label>
-          <input id="windSpeed" type="range" min="0" max="90" value="28" />
-        </div>
-        <div class="field">
-          <label for="carSpeed"><span>Km/h EV</span><span><b id="carSpeedVal">92</b></span></label>
-          <input id="carSpeed" type="range" min="0" max="140" value="92" />
+        <div class="sliders">
+          <div class="field">
+            <label for="carHeading"><span>Rumbo</span><span><b id="carHeadingVal">35</b>°</span></label>
+            <input id="carHeading" type="range" min="0" max="359" value="35" />
+          </div>
+          <div class="field">
+            <label for="windDirection"><span>Viento</span><span><b id="windDirectionVal">225</b>°</span></label>
+            <input id="windDirection" type="range" min="0" max="359" value="225" />
+          </div>
+          <div class="field">
+            <label for="windSpeed"><span>Km/h viento</span><span><b id="windSpeedVal">28</b></span></label>
+            <input id="windSpeed" type="range" min="0" max="90" value="28" />
+          </div>
+          <div class="field">
+            <label for="carSpeed"><span>Km/h EV</span><span><b id="carSpeedVal">92</b></span></label>
+            <input id="carSpeed" type="range" min="0" max="140" value="92" />
+          </div>
         </div>
       </section>
     </footer>
@@ -509,7 +543,7 @@
   <script>
     const el=id=>document.getElementById(id);
     const carHeading=el("carHeading"),windDirection=el("windDirection"),windSpeed=el("windSpeed"),carSpeed=el("carSpeed"),vehicleType=el("vehicleType"),vehicleColor=el("vehicleColor");
-    let watchId=null,lastPosition=null,lastWeatherAt=0;
+    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false;
     const vehicleFactors={hatch:.82,sedan:.72,suv:1,pickup:1.18};
     const vehicleShapes={
       hatch:{body:"M60 8 C81 14 93 38 96 72 L101 139 C103 164 86 184 60 184 C34 184 17 164 19 139 L24 72 C27 38 39 14 60 8Z",glass:"M60 22 C74 28 80 47 82 66 L38 66 C40 47 46 28 60 22Z",shadow:"M35 82 L85 82 L90 134 C91 150 80 162 60 162 C40 162 29 150 30 134Z",width:82,height:136},
@@ -558,9 +592,11 @@
         const data=await res.json(),c=data.current||{},speed=Number(c.wind_speed_10m),from=Number(c.wind_direction_10m),gust=Number(c.wind_gusts_10m);
         if(Number.isFinite(speed))windSpeed.value=Math.round(speed);
         if(Number.isFinite(from))windDirection.value=Math.round(normalizeDeg(from+180));
+        hasRealWeather=true;
         el("weatherStatus").innerHTML=`<span class="status-ok">Clima: ${Math.round(speed)} km/h${Number.isFinite(gust)?" · r "+Math.round(gust):""}</span>`;
         update();
       }catch(e){
+        hasRealWeather=false;
         el("weatherStatus").innerHTML="<span class='status-warn'>Clima: error</span>";
         showToast("No se pudo consultar viento. Podés usar los controles manuales.");
       }
@@ -573,6 +609,7 @@
       if(watchId!==null)navigator.geolocation.clearWatch(watchId);
       watchId=navigator.geolocation.watchPosition(pos=>{
         const c=pos.coords;
+        hasRealGps=true;
         el("gpsStatus").innerHTML=`<span class="status-ok">GPS: OK · ±${Math.round(c.accuracy||0)} m</span>`;
         if(typeof c.speed==="number"&&Number.isFinite(c.speed)){
           const kmh=Math.max(0,Math.round(c.speed*3.6));
@@ -584,6 +621,7 @@
         fetchWeather(c.latitude,c.longitude);
         update();
       },err=>{
+        hasRealGps=false;
         el("gpsStatus").innerHTML="<span class='status-warn'>GPS: sin permiso</span>";
         showToast("No se pudo acceder al GPS: "+err.message);
       },{enableHighAccuracy:true,maximumAge:1000,timeout:12000});
@@ -620,16 +658,22 @@
       el("carHeadingVal").textContent=d.heading;el("windDirectionVal").textContent=d.windDir;el("windSpeedVal").textContent=d.windKmh;el("carSpeedVal").textContent=d.speedKmh;
       el("vehicleRotor").style.transform=`rotate(${d.heading}deg)`;
       el("headingHuman").textContent=`${degToCardinal(d.heading)} · ${d.heading}°`;
-      el("windSpeedMetric").textContent=d.windKmh;el("windDirHuman").textContent=`${degToCardinal(d.windDir)}`;
-      el("relativeAngle").textContent=Math.round(d.angle);el("carSpeedMetric").textContent=d.speedKmh;
+      el("windSpeedMetric").textContent=(!customMode && !hasRealWeather) ? "--" : d.windKmh;el("windDirHuman").textContent=(!customMode && !hasRealWeather) ? "--" : `${degToCardinal(d.windDir)}`;
+      el("relativeAngle").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : Math.round(d.angle);el("carSpeedMetric").textContent=(!customMode && !hasRealGps) ? "--" : d.speedKmh;
       const rounded=Math.round(d.impact);
-      el("impactValue").textContent=`${rounded>0?"+":""}${rounded}%`;
+      el("impactValue").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : `${rounded>0?"+":""}${rounded}%`;
       const metric=el("impactMetric");metric.classList.remove("good","warn","bad");
       let label,explanation;
       if(rounded>=2){metric.classList.add("good");label="A favor";explanation="El viento acompaña el rumbo del vehículo. Puede ayudar levemente a la eficiencia."}
       else if(rounded<=-8){metric.classList.add("bad");label=d.angle>125?"De frente":"Frente-lateral";explanation=`El viento entra ${d.angle>125?"casi de frente":"de frente-lateral"}. A ${d.speedKmh} km/h puede aumentar el consumo.`}
       else if(rounded<0){metric.classList.add("warn");label=d.angle>65&&d.angle<115?"Lateral":"Moderado";explanation="El impacto parece moderado. Puede afectar la eficiencia, sobre todo en ruta."}
       else{metric.classList.add("warn");label="Bajo";explanation="El viento actual no debería perjudicar demasiado la eficiencia."}
+      if(!customMode){
+        if(!hasRealGps && !hasRealWeather) explanation="Tocá GPS + viento para obtener rumbo, velocidad del vehículo y viento real. Sin permiso de ubicación no se calcula con datos reales.";
+        else if(!hasRealGps) explanation="Falta dato real de GPS. La herramienta necesita permiso de ubicación y movimiento para estimar rumbo y velocidad.";
+        else if(!hasRealWeather) explanation="GPS activo, pero falta el viento real de la API meteorológica. Reintentá en unos segundos.";
+      }
+      if(!customMode && (!hasRealGps || !hasRealWeather)) label="Sin datos reales";
       el("impactLabel").textContent=label;el("explanation").textContent=explanation;
       updateWindLines(d.windDir,d.windKmh);
     }
@@ -639,6 +683,13 @@
       [vehicleType,vehicleColor].forEach(n=>n.addEventListener(evt,applyVehicleStyle));
     });
     el("startBtn").addEventListener("click",startGps);
+    el("customBtn").addEventListener("click",()=>{
+      customMode=!customMode;
+      document.body.classList.toggle("custom-mode",customMode);
+      el("customBtn").textContent=customMode?"✅":"⚙️";
+      showToast(customMode?"Modo personalizado activado. Los controles manuales quedan visibles.":"Modo real activado. Se usarán GPS y viento meteorológico.");
+      update();
+    });
     el("themeBtn").addEventListener("click",()=>{
       const root=document.documentElement,next=root.getAttribute("data-theme")==="dark"?"light":"dark";
       root.setAttribute("data-theme",next);
