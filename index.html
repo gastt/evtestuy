@@ -473,6 +473,9 @@
     </select>
     <button class="mode-btn" id="customBtn" type="button">⚙️</button>
   </div>
+  <div id="csvStatusRow" style="min-height:18px;display:flex;align-items:center">
+    <span class="status-badge" id="csvStatus" style="font-size:.58rem;padding:2px 8px">Cargando vehículos…</span>
+  </div>
 
   <!-- compass card -->
   <div class="compass-card">
@@ -601,31 +604,59 @@ let vehiculosDB = []; // [{marca, modelo, bateria_kwh, wltp_km}]
 let vehiculoActual = null; // vehículo seleccionado
 
 function parseCSV(text){
-  const lines = text.trim().split(/?
-/).filter(l=>l.trim());
-  const headers = lines[0].split(',').map(h=>h.trim());
-  return lines.slice(1).map(line=>{
-    // Handle commas inside values by splitting carefully
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim() !== '');
+  if(lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  return lines.slice(1).map(line => {
     const parts = line.split(',');
     const obj = {};
-    headers.forEach((h,i)=>{ obj[h] = (parts[i]||'').trim(); });
+    headers.forEach((h, i) => { obj[h] = (parts[i] || '').trim(); });
     return obj;
-  }).filter(r=>r.marca && r.modelo);
+  }).filter(r => r.marca && r.marca !== '' && r.modelo && r.modelo !== '');
 }
 
 async function loadVehiculos(){
+  const statusEl = $("csvStatus");
+  const rowEl    = $("csvStatusRow");
+
+  // Try XHR first (works on file:// in some browsers), then fetch
+  function xhrGet(url){
+    return new Promise((resolve, reject)=>{
+      const x = new XMLHttpRequest();
+      x.open("GET", url);
+      x.onload  = ()=> x.status < 400 ? resolve(x.responseText) : reject(new Error("XHR HTTP "+x.status));
+      x.onerror = ()=> reject(new Error("XHR network error"));
+      x.send();
+    });
+  }
+
+  async function getText(url){
+    // Try XHR first, then fetch as fallback
+    try{ return await xhrGet(url); }
+    catch(e1){
+      const res = await fetch(url, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      return await res.text();
+    }
+  }
+
   try{
-    const res = await fetch('vehiculos.csv');
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const text = await res.text();
+    if(statusEl) statusEl.textContent = "Cargando vehículos…";
+    const text = await getText('./vehiculos.csv');
     vehiculosDB = parseCSV(text);
+    if(vehiculosDB.length === 0) throw new Error("CSV vacío o sin filas válidas");
+    if(rowEl) rowEl.remove();
     buildMarcaSelect();
   }catch(e){
-    console.warn('No se pudo cargar vehiculos.csv:', e);
-    // Fallback: un vehículo genérico para que funcione igual
-    vehiculosDB = [];
+    console.warn("vehiculos.csv:", e.message);
+    if(statusEl){
+      statusEl.textContent = "⚠️ vehiculos.csv no cargó: "+e.message;
+      statusEl.className = "status-badge warn";
+    }
     vehiculoActual = {bateria_kwh:60, wltp_km:400};
-    buildMarcaSelect();
+    $("marcaSelect").innerHTML = '<option>Sin datos</option>';
+    $("modeloSelect").innerHTML = '<option>—</option>';
+    updateUI();
   }
 }
 
@@ -1279,7 +1310,7 @@ resize();
 state={heading:35,windFrom:225,windKmh:28,speedKmh:80,vehiculoKey:""};
 smooth.heading=35; smooth.windFrom=225; smooth.windKmh=28; smooth.speedKmh=80;
 animate();
-loadVehiculos(); // async: carga CSV y luego llama updateUI
+loadVehiculos(); // fetch ./vehiculos.csv — mismo directorio que el HTML
 </script>
 </body>
 </html>
