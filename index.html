@@ -697,16 +697,16 @@ function guessBodyType(modelo, marca){
 const CD_POR_TIPO = {hatch:0.28, sedan:0.24, suv:0.32, pickup:0.40};
 const AREA_POR_TIPO = {hatch:2.1, sedan:2.2, suv:2.5, pickup:2.8};
 
-function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
-  // Datos del vehículo desde vehiculos.csv o fallback genérico.
-  // El CSV puede aportar bateria_kwh, wltp_km, cd y area_m2; si faltan Cd/área,
-  // usamos valores típicos por tipo de carrocería para no romper el simulador.
-  const bateria = vehiculoActual && Number(vehiculoActual.bateria_kwh) > 0
-    ? Number(vehiculoActual.bateria_kwh)
-    : 60;
-  const wltp_km = vehiculoActual && Number(vehiculoActual.wltp_km) > 0
-    ? Number(vehiculoActual.wltp_km)
-    : 400;
+function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wltpKmOverride){
+  // Datos del vehículo desde parámetros explícitos, vehiculos.csv o fallback genérico.
+  // Los overrides preservan compatibilidad: si el 5º parámetro es un string de UI,
+  // se ignora y se usan los datos del vehículo seleccionado.
+  const bateriaParam = Number(bateriaKwhOverride);
+  const wltpParam = Number(wltpKmOverride);
+  const bateriaCsv = vehiculoActual ? Number(vehiculoActual.bateria_kwh) : NaN;
+  const wltpCsv = vehiculoActual ? Number(vehiculoActual.wltp_km) : NaN;
+  const bateria = bateriaParam > 0 ? bateriaParam : (bateriaCsv > 0 ? bateriaCsv : 60);
+  const wltp_km = wltpParam > 0 ? wltpParam : (wltpCsv > 0 ? wltpCsv : 400);
   const bodyType = vehiculoActual && vehiculoActual.tipo
     ? vehiculoActual.tipo
     : guessBodyType(vehiculoActual ? vehiculoActual.modelo : '', vehiculoActual ? vehiculoActual.marca : '');
@@ -725,8 +725,9 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
   const v_car_ms = Math.max(0, Number(speedKmh) || 0) / 3.6;
   const wind_ms = Math.max(0, Number(windKmh) || 0) / 3.6;
 
-  // Consumo WLTP base en kWh/100 km. Se usa como consumo total sin viento.
-  const consumoBase100 = (bateria / wltp_km) * 100;
+  // Consumo WLTP base: consumo ideal sin viento.
+  const consumoBaseKm = bateria / wltp_km;
+  const consumoBase100 = consumoBaseKm * 100;
 
   // Etiqueta de UI: se calcula con windTo para describir si el flujo viene de cola/frente.
   const windTo = normDeg((Number(windFrom) || 0) + 180);
@@ -783,25 +784,22 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
     : 0;
   const factorLateral = 1 + penalizacionLateral;
 
-  // Consumo WLTP base (kWh/km). El viento frontal sólo afecta la porción
-  // aerodinámica estimada del consumo; rodadura/auxiliares no deben multiplicarse
-  // por el cuadrado del viento. Esto evita que un viento oblicuo/lateral aparezca
-  // como una bonificación exagerada o como un castigo desproporcionado.
-  const consumo_wltp = bateria / wltp_km;
+  // Consumo real (kWh/km): 65% aerodinámico varía con V² y 35% queda fijo.
+  // Luego se aplica la penalización lateral como pérdida adicional de neumáticos/corrección.
   const proporcion_aero = 0.65;
   const proporcion_fija = 0.35;
-  const consumo_real = consumo_wltp * (proporcion_fija + proporcion_aero * factorAero) * factorLateral;
+  const consumo_real = consumoBaseKm * (proporcion_fija + proporcion_aero * factorAero) * factorLateral;
 
-  // Autonomía estimada con margen de seguridad (km).
-  const autonomia_real = consumo_real > 0
-    ? Math.round((bateria / consumo_real) * 0.95)
-    : wltp_km;
+  // Autonomía real estimada sin margen artificial: batería / consumo real.
+  const autonomia_real = consumo_real > 0 ? Math.round(bateria / consumo_real) : wltp_km;
 
   // Salidas explícitas solicitadas: consumoEst en kWh/100km y autonomía en km.
   const consumoEst = consumo_real * 100;
   const autonomiaEst = autonomia_real;
-  // Métricas derivadas conservadas para la UI actual.
-  const efficiency = Math.max(60, Math.min(120, Math.round((consumoBase100 / consumoEst) * 100)));
+
+  // Eficiencia real: compara consumo ideal sin viento vs. consumo real con viento.
+  // Mayor consumo => <100%; viento de cola útil => >100%. No se clampa para no ocultar incongruencias.
+  const efficiency = consumoEst > 0 ? Math.round((consumoBase100 / consumoEst) * 100) : 100;
   const consumDelta = ((consumoEst / consumoBase100) - 1) * 100;
 
   return {
