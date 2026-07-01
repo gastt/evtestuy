@@ -767,9 +767,18 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wl
   // Velocidad frontal efectiva del aire. No puede ser menor que 0.
   const vAir_ms = Math.max(0, v_car_ms + v_headwind);
 
+  // Para el cálculo de consumo limitamos la bonificación aerodinámica máxima de
+  // vientos de cola fuertes. El valor vAir_ms real se sigue mostrando en UI, pero
+  // el WLTP base ya incluye tramos de baja/alta velocidad, pérdidas de tren motriz
+  // y turbulencia alrededor del vehículo; por eso una cola de 28 km/h a 80 km/h no
+  // debe convertirse en una mejora extrema de autonomía. Los vientos de frente no
+  // se capan: siempre penalizan con la velocidad frontal efectiva completa.
+  const TAILWIND_AERO_FLOOR = 0.85;
+  const vAero_ms = v_headwind < 0 ? Math.max(vAir_ms, v_car_ms * TAILWIND_AERO_FLOOR) : vAir_ms;
+
   // Fuerzas de arrastre: base sin viento vs. condición con viento frontal efectivo.
   const fd_base = 0.5 * rho * cd * area * (v_car_ms * v_car_ms);
-  const fd_wind = 0.5 * rho * cd * area * (vAir_ms * vAir_ms);
+  const fd_wind = 0.5 * rho * cd * area * (vAero_ms * vAero_ms);
 
   // Potencia aerodinámica en ruedas (kW). El cociente de potencias equivale al
   // cociente de arrastres porque ambas se calculan contra la misma velocidad del auto.
