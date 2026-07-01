@@ -1,1109 +1,1155 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>EVUruguay — Eficiencia por viento</title>
-  <meta name="theme-color" content="#07140f" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>EVUruguay — Brújula EV</title>
+  <meta name="theme-color" content="#06120d"/>
   <style>
+    /* ─── tokens ─────────────────────────────────────────────────── */
     :root{
-      --bg:#07140f;--card:rgba(14,36,27,.88);--card2:#10251c;--text:#e8f5ee;--muted:#a7f3d0;--dim:rgba(167,243,208,.55);
-      --green:#16a07a;--teal:#2dd4a8;--forest:#0f7b5f;--amber:#d4a017;--red:#e63946;--border:rgba(45,212,168,.2);
-      --shadow:0 16px 42px rgba(0,0,0,.34);
+      --bg:#06120d;
+      --surface:#0d2018;
+      --panel:rgba(13,32,24,.92);
+      --border:rgba(52,211,153,.18);
+      --border-hi:rgba(52,211,153,.42);
+      --text:#dff5eb;
+      --muted:#6ee7b7;
+      --dim:rgba(110,231,183,.5);
+      --teal:#34d399;
+      --green:#10b981;
+      --forest:#059669;
+      --amber:#f59e0b;
+      --red:#f43f5e;
+      --blue:#38bdf8;
+      --shadow:0 20px 60px rgba(0,0,0,.55);
     }
     [data-theme=light]{
-      --bg:#f1f9f5;--card:rgba(255,255,255,.9);--card2:#fff;--text:#1e293b;--muted:#64748b;--dim:#94a3b8;
-      --border:rgba(45,212,168,.18);--shadow:0 16px 42px rgba(15,123,95,.12);
-    }
-    [data-theme=dark]{
-      --bg:#07140f;--card:rgba(14,36,27,.88);--card2:#10251c;--text:#e8f5ee;--muted:#a7f3d0;--dim:rgba(167,243,208,.55);
-      --border:rgba(45,212,168,.2);--shadow:0 16px 42px rgba(0,0,0,.34);
+      --bg:#edf7f2;
+      --surface:#fff;
+      --panel:rgba(255,255,255,.92);
+      --border:rgba(5,150,105,.18);
+      --border-hi:rgba(5,150,105,.42);
+      --text:#0f2419;
+      --muted:#064e3b;
+      --dim:rgba(6,78,59,.5);
+      --teal:#059669;
+      --green:#047857;
+      --forest:#065f46;
+      --shadow:0 12px 40px rgba(5,150,105,.12);
     }
 
-    *{box-sizing:border-box}
-    html{
-      margin:0;
+    *{box-sizing:border-box;margin:0;padding:0}
+
+    html,body{
       width:100%;
       min-height:100%;
-      background:#07140f;
-      color-scheme:dark;
-    }
-    body{
-      margin:0;
-      width:100%;
-      min-height:100%;
-      background:#07140f;
+      background:var(--bg);
       color:var(--text);
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+      -webkit-font-smoothing:antialiased;
     }
+
     body::before{
       content:"";
       position:fixed;
       inset:0;
-      z-index:-1;
+      z-index:0;
       background:
-        radial-gradient(circle at top left,rgba(45,212,168,.18),transparent 35%),
-        radial-gradient(circle at bottom right,rgba(22,160,122,.12),transparent 34%),
+        radial-gradient(ellipse 60% 50% at 20% 10%,rgba(52,211,153,.12),transparent),
+        radial-gradient(ellipse 50% 60% at 80% 90%,rgba(16,185,129,.09),transparent),
         var(--bg);
+      pointer-events:none;
     }
 
     .app{
+      position:relative;
+      z-index:1;
       width:100%;
-      height:100svh;
-      height:100dvh;
-      display:grid;
-      grid-template-rows:auto minmax(0,1fr) auto;
-      gap:8px;
-      padding:calc(8px + env(safe-area-inset-top)) 10px calc(8px + env(safe-area-inset-bottom));
-      overflow:hidden;
-      background:transparent;
+      min-height:100svh;
+      max-width:480px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      padding:
+        calc(10px + env(safe-area-inset-top))
+        12px
+        calc(10px + env(safe-area-inset-bottom));
+      gap:10px;
     }
 
+    /* ─── topbar ──────────────────────────────────────────────────── */
     .topbar{
-      height:42px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:8px;
-      min-height:0;
+      height:44px;
+      flex-shrink:0;
     }
-    .brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);min-width:0}
-    .brand-logo{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;color:#082018;font-weight:950;font-size:.86rem;background:linear-gradient(135deg,var(--teal),var(--green));box-shadow:0 8px 22px rgba(45,212,168,.32);flex:0 0 auto}
-    .brand-text{min-width:0;line-height:1.02}
-    .brand-text strong{display:block;font-size:.95rem;font-weight:950;white-space:nowrap}
-    .brand-text span{display:block;font-size:.58rem;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.11em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .top-actions{display:flex;gap:6px;align-items:center;flex:0 0 auto}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+    }
+    .brand-logo{
+      width:36px;
+      height:36px;
+      border-radius:11px;
+      background:linear-gradient(135deg,var(--teal),var(--forest));
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      font-size:.8rem;
+      color:#06120d;
+      flex-shrink:0;
+      box-shadow:0 4px 16px rgba(52,211,153,.35);
+    }
+    .brand-name{
+      font-size:.95rem;
+      font-weight:700;
+      color:var(--text);
+      letter-spacing:-.02em;
+    }
+    .brand-sub{
+      font-size:.58rem;
+      font-weight:600;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      margin-top:1px;
+    }
+    .top-right{display:flex;gap:6px;align-items:center}
     .icon-btn{
       height:34px;
       min-width:34px;
       padding:0 10px;
       border-radius:999px;
       border:1px solid var(--border);
-      background:var(--card);
-      color:var(--forest);
-      font-weight:900;
-      text-decoration:none;
+      background:var(--panel);
+      color:var(--muted);
+      font-size:.82rem;
+      cursor:pointer;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      box-shadow:0 6px 16px rgba(15,123,95,.08);
+      backdrop-filter:blur(8px);
+      transition:border-color .18s, background .18s;
     }
-    [data-theme=dark] .icon-btn{color:var(--teal)}
+    .icon-btn:active{background:var(--surface)}
 
-    .main{
-      min-height:0;
-      display:grid;
-      grid-template-rows:auto minmax(0,1fr) auto;
-      gap:8px;
-      overflow:hidden;
-    }
-
-    .control-strip{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:6px;
-      min-height:0;
-    }
-
-    select{
-      width:100%;
-      height:36px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:var(--card2);
-      color:var(--text);
-      font-weight:850;
-      font-size:.75rem;
-      padding:0 9px;
-      outline:none;
-    }
+    /* ─── start btn ───────────────────────────────────────────────── */
     .start-btn{
       width:100%;
-      height:36px;
-      border:0;
-      border-radius:14px;
+      height:48px;
+      border:none;
+      border-radius:16px;
       background:linear-gradient(135deg,var(--teal),var(--green));
-      color:#082018;
-      font-weight:950;
-      font-size:.74rem;
+      color:#06120d;
+      font-size:.88rem;
+      font-weight:700;
+      letter-spacing:.01em;
       cursor:pointer;
-      box-shadow:0 8px 18px rgba(22,160,122,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      box-shadow:0 8px 24px rgba(52,211,153,.3);
+      transition:transform .15s, box-shadow .15s;
+      flex-shrink:0;
+    }
+    .start-btn:active{transform:scale(.98);box-shadow:0 4px 12px rgba(52,211,153,.2)}
+    .start-btn svg{width:18px;height:18px}
+
+    /* ─── vehicle select ──────────────────────────────────────────── */
+    .controls-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+      flex-shrink:0;
+    }
+    .vehicle-select{
+      height:40px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      font-size:.82rem;
+      font-weight:600;
+      padding:0 10px;
+      backdrop-filter:blur(8px);
+      outline:none;
+      cursor:pointer;
+    }
+    .mode-btn{
+      height:40px;
+      padding:0 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--muted);
+      font-size:.78rem;
+      font-weight:600;
+      cursor:pointer;
+      backdrop-filter:blur(8px);
+      white-space:nowrap;
+      transition:background .18s, color .18s, border-color .18s;
+    }
+    .mode-btn.active{
+      background:rgba(52,211,153,.15);
+      color:var(--teal);
+      border-color:var(--border-hi);
     }
 
-    .visual{
+    /* ─── compass card ────────────────────────────────────────────── */
+    .compass-card{
+      flex:1;
       min-height:0;
       border-radius:24px;
-      background:var(--card);
+      background:var(--panel);
       border:1px solid var(--border);
       box-shadow:var(--shadow);
-      padding:8px;
-      display:grid;
-      grid-template-rows:auto minmax(0,1fr);
-      gap:7px;
+      backdrop-filter:blur(12px);
       overflow:hidden;
-    }
-
-    .compass{
       position:relative;
-      min-height:0;
-      border-radius:20px;
-      overflow:hidden;
-      background:radial-gradient(circle at center,rgba(45,212,168,.13),transparent 38%),linear-gradient(135deg,rgba(45,212,168,.08),rgba(37,99,235,.04)),var(--card2);
-      border:1px solid var(--border);
-    }
-    .ring{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width:var(--compass-size, min(88vw, 320px));
-      height:var(--compass-size, min(88vw, 320px));
-      transform:translate(-50%,-50%);
-      border-radius:50%;
-      border:1.5px solid rgba(45,212,168,.3);
-      box-shadow:inset 0 0 0 1px rgba(45,212,168,.08),0 0 44px rgba(45,212,168,.08);
-      pointer-events:none;
-    }
-    .ring:before,.ring:after{
-      content:"";
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-50%);
-      border-radius:50%;
-      border:1px dashed rgba(45,212,168,.17);
-    }
-    .ring:before{width:68%;height:68%}
-    .ring:after{width:38%;height:38%}
-    .cardinal{position:absolute;font-weight:950;color:var(--forest);opacity:.7;letter-spacing:.08em;font-size:.72rem;pointer-events:none}
-    [data-theme=dark] .cardinal{color:var(--teal)}
-    .n{top:10px;left:50%;transform:translateX(-50%)}.s{bottom:10px;left:50%;transform:translateX(-50%)}.e{right:12px;top:50%;transform:translateY(-50%)}.w{left:12px;top:50%;transform:translateY(-50%)}
-
-    .wind-layer{position:absolute;inset:0;overflow:hidden;transform-origin:center;opacity:.9;pointer-events:none}
-    .wind-line{
-      position:absolute;
-      height:3px;
-      border-radius:999px;
-      background:linear-gradient(90deg,transparent,rgba(37,99,235,.25),rgba(45,212,168,.95),transparent);
-      animation:windFlow 2.6s linear infinite;
-      opacity:.78;
-      box-shadow:0 0 14px rgba(45,212,168,.16);
-    }
-    .wind-line:after{
-      content:"";
-      position:absolute;
-      right:15px;
-      top:-4px;
-      width:9px;
-      height:9px;
-      border-top:2px solid rgba(45,212,168,.85);
-      border-right:2px solid rgba(45,212,168,.85);
-      transform:rotate(45deg);
-    }
-    @keyframes windFlow{
-      0%{transform:translateX(-170px);opacity:0}
-      12%{opacity:.8}
-      82%{opacity:.8}
-      100%{transform:translateX(calc(100vw + 170px));opacity:0}
+      display:flex;
+      flex-direction:column;
     }
 
-
-    .north-axis{
-      position:absolute;
-      left:50%;
-      top:14px;
-      width:2px;
-      height:48px;
-      transform:translateX(-50%);
-      border-radius:999px;
-      background:linear-gradient(to bottom, rgba(45,212,168,.95), rgba(45,212,168,0));
-      pointer-events:none;
-      z-index:1;
-    }
-    .north-axis:before{
-      content:"";
-      position:absolute;
-      left:50%;
-      top:-3px;
-      width:0;
-      height:0;
-      transform:translateX(-50%);
-      border-left:6px solid transparent;
-      border-right:6px solid transparent;
-      border-bottom:10px solid rgba(45,212,168,.95);
-      filter:drop-shadow(0 0 8px rgba(45,212,168,.45));
-    }
-
-    .vehicle-stage{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width:var(--vehicle-stage, min(62vw,240px));
-      height:var(--vehicle-stage, min(62vw,240px));
-      transform:translate(-50%,-50%);
+    /* metrics strip at top of card */
+    .metrics-strip{
       display:grid;
-      place-items:center;
-      pointer-events:none;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:1px;
+      background:var(--border);
+      border-bottom:1px solid var(--border);
+      flex-shrink:0;
     }
-    .vehicle-rotor{
-      width:128px;
-      height:128px;
-      transform-origin:center;
-      transition:transform .45s cubic-bezier(.2,.8,.2,1);
-      filter:drop-shadow(0 14px 16px rgba(0,0,0,.32)) drop-shadow(0 4px 8px rgba(15,123,95,.20));
+    .metric{
+      padding:10px 10px 8px;
+      background:var(--panel);
+      display:flex;
+      flex-direction:column;
+      gap:2px;
     }
-    .vehicle-img{
+    .metric:first-child{border-radius:0}
+    .metric-label{
+      font-size:.55rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.09em;
+      color:var(--dim);
+    }
+    .metric-value{
+      font-size:1.45rem;
+      font-weight:800;
+      letter-spacing:-.04em;
+      line-height:1;
+      color:var(--text);
+      transition:color .3s;
+    }
+    .metric-value.good{color:var(--teal)}
+    .metric-value.warn{color:var(--amber)}
+    .metric-value.bad{color:var(--red)}
+    .metric-sub{
+      font-size:.6rem;
+      font-weight:600;
+      color:var(--muted);
+      margin-top:1px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .metric-sub.good{color:var(--green)}
+    .metric-sub.warn{color:var(--amber)}
+    .metric-sub.bad{color:var(--red)}
+
+    /* compass canvas area */
+    .compass-wrap{
+      flex:1;
+      min-height:0;
+      position:relative;
+    }
+    canvas#compassCanvas{
+      position:absolute;
+      inset:0;
       width:100%;
       height:100%;
-      display:block;
-      object-fit:contain;
-      image-rendering:auto;
-      filter:drop-shadow(0 14px 16px rgba(0,0,0,.22));
     }
-.heading-pill{
+
+    /* heading pill overlay */
+    .heading-pill{
       position:absolute;
-      left:50%;
       bottom:10px;
+      left:50%;
       transform:translateX(-50%);
       display:inline-flex;
       align-items:center;
       gap:6px;
+      padding:6px 14px;
       border-radius:999px;
       border:1px solid var(--border);
-      background:rgba(255,255,255,.68);
+      background:rgba(6,18,13,.72);
       color:var(--muted);
-      padding:7px 10px;
-      font-weight:850;
-      font-size:.67rem;
+      font-size:.68rem;
+      font-weight:600;
       backdrop-filter:blur(10px);
       white-space:nowrap;
-    }
-    [data-theme=dark] .heading-pill{background:rgba(7,20,15,.58)}
-
-    .metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
-    .metric{
-      position:relative;
-      min-width:0;
-      border-radius:16px;
-      background:
-        radial-gradient(circle at 18% 12%, rgba(45,212,168,.16), transparent 32%),
-        var(--card2);
-      border:1px solid var(--border);
-      padding:9px 8px;
-      min-height:70px;
-      overflow:hidden;
-    }
-    .metric:after{
-      content:"";
-      position:absolute;
-      right:-18px;
-      bottom:-22px;
-      width:62px;
-      height:62px;
-      border-radius:50%;
-      background:rgba(45,212,168,.08);
       pointer-events:none;
     }
-    .metric.wind-widget:before{
-      content:"";
-      position:absolute;
-      left:8px;
-      right:8px;
-      bottom:7px;
-      height:2px;
-      border-radius:999px;
-      background:linear-gradient(90deg, transparent, rgba(45,212,168,.75), transparent);
-      opacity:.55;
-    }
-    .metric .label{
-      font-size:.55rem;
-      color:var(--dim);
-      text-transform:uppercase;
-      font-weight:950;
-      letter-spacing:.07em;
-      margin-bottom:5px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .metric .value{
-      font-size:1.22rem;
-      font-weight:950;
-      letter-spacing:-.04em;
-      line-height:1;
-    }
-    .metric .small{
-      color:var(--muted);
-      font-size:.58rem;
-      font-weight:760;
-      margin-top:5px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .impact .value{font-size:1.7rem}
-    .impact.good .value{color:var(--green)}
-    .impact.warn .value{color:var(--amber)}
-    .impact.bad .value{color:var(--red)}
+    [data-theme=light] .heading-pill{background:rgba(237,247,242,.82)}
+    .heading-pill strong{color:var(--teal);font-weight:700}
 
-    .bottom{
-      min-height:0;
-      display:grid;
-      grid-template-rows:auto auto;
-      gap:7px;
-    }
+    /* ─── readout ─────────────────────────────────────────────────── */
     .readout{
-      border-radius:20px;
-      background:var(--card);
+      flex-shrink:0;
+      border-radius:18px;
+      background:var(--panel);
       border:1px solid var(--border);
       box-shadow:var(--shadow);
-      padding:9px 10px;
-      display:grid;
-      gap:6px;
-      overflow:hidden;
-    }
-    .explain-title{
+      backdrop-filter:blur(12px);
+      padding:12px 14px;
       display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .readout-head{
+      display:flex;
+      align-items:center;
       justify-content:space-between;
       gap:8px;
-      color:var(--dim);
+    }
+    .readout-label{
+      font-size:.56rem;
+      font-weight:700;
       text-transform:uppercase;
-      font-size:.57rem;
-      font-weight:950;
-      letter-spacing:.08em;
+      letter-spacing:.09em;
+      color:var(--dim);
     }
-    .explain{
-      color:var(--muted);
-      font-size:.72rem;
-      line-height:1.25;
-      display:-webkit-box;
-      -webkit-line-clamp:2;
-      -webkit-box-orient:vertical;
-      overflow:hidden;
-    }
-    .status-row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
+    .readout-status{
+      display:flex;
       gap:6px;
     }
-    .status{
-      border-radius:14px;
-      background:var(--card2);
+    .status-badge{
+      font-size:.6rem;
+      font-weight:600;
+      padding:3px 8px;
+      border-radius:999px;
+      background:rgba(110,231,183,.08);
+      color:var(--dim);
       border:1px solid var(--border);
-      padding:7px 8px;
-      min-width:0;
-      font-size:.62rem;
-      font-weight:850;
-      color:var(--muted);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
     }
-    .status-ok{color:var(--green)}
-    .status-warn{color:var(--amber)}
+    .status-badge.ok{background:rgba(52,211,153,.12);color:var(--teal);border-color:rgba(52,211,153,.3)}
+    .status-badge.warn{background:rgba(245,158,11,.1);color:var(--amber);border-color:rgba(245,158,11,.3)}
+    .readout-text{
+      font-size:.78rem;
+      line-height:1.4;
+      color:var(--muted);
+    }
 
+    /* ─── custom panel ────────────────────────────────────────────── */
+    .custom-panel{
+      display:none;
+      flex-shrink:0;
+      border-radius:18px;
+      background:var(--panel);
+      border:1px solid var(--border-hi);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+      padding:12px 14px;
+      flex-direction:column;
+      gap:10px;
+    }
+    .custom-panel.visible{display:flex}
+    .custom-title{
+      font-size:.62rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.09em;
+      color:var(--teal);
+    }
     .sliders{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:7px 10px;
-      overflow:hidden;
+      gap:10px 16px;
     }
-    .field{min-width:0}
     .field label{
       display:flex;
       justify-content:space-between;
-      gap:8px;
+      font-size:.6rem;
+      font-weight:600;
       color:var(--muted);
-      font-size:.56rem;
-      font-weight:950;
       text-transform:uppercase;
       letter-spacing:.06em;
-      margin-bottom:2px;
+      margin-bottom:4px;
     }
-    .field label span:last-child{color:var(--forest)}
-    [data-theme=dark] .field label span:last-child{color:var(--teal)}
-    input[type=range]{width:100%;height:16px;accent-color:var(--green)}
-
-
-    .custom-panel{
-      display:none;
-      border-radius:20px;
-      background:var(--card);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      padding:8px;
-      overflow:hidden;
-    }
-    body.custom-mode .custom-panel{display:grid;gap:7px}
-    body.custom-mode .app{grid-template-rows:auto minmax(0,1fr) auto}
-    .custom-head{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      align-items:flex-start;
-      color:var(--muted);
-      font-size:.62rem;
-      line-height:1.15;
-    }
-    .custom-head strong{
-      color:var(--forest);
-      white-space:nowrap;
-      font-size:.68rem;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-    }
-    [data-theme=dark] .custom-head strong{color:var(--teal)}
-    body:not(.custom-mode) .bottom{grid-template-rows:auto}
-    body:not(.custom-mode) .readout{min-height:78px}
-
-
-    .ev-speed-compact{display:none}
-    .efficiency-widget,.wind-widget{
-      min-height:74px;
-      padding-left:12px;
-    }
-    .efficiency-widget .value,.wind-widget .value{
-      font-size:1.62rem;
-    }
-    .efficiency-widget .small,.wind-widget .small{
-      font-size:.66rem;
-      font-weight:850;
-    }
-    .wind-widget .value::after{
-      content:" km/h";
-      font-size:.62rem;
-      color:var(--muted);
-      font-weight:850;
-      letter-spacing:0;
+    .field label b{color:var(--teal);font-weight:700}
+    input[type=range]{
+      width:100%;
+      height:20px;
+      accent-color:var(--teal);
+      cursor:pointer;
     }
 
-
-    .thermal-widget .value::after{
-      content:"°C";
-      font-size:.62rem;
-      color:var(--muted);
-      font-weight:850;
-      margin-left:1px;
-    }
-    .thermal-widget.good .value{color:var(--green)}
-    .thermal-widget.warn .value{color:var(--amber)}
-    .thermal-widget.bad .value{color:var(--red)}
-    @media (max-width:380px){
-      .metric .label{font-size:.50rem}
-      .efficiency-widget .value,.wind-widget .value,.thermal-widget .value{font-size:1.30rem}
-      .metric .small{font-size:.52rem}
-    }
-
-
-    /* Ajustes de legibilidad móvil: evitar textos cortados en widgets */
-    .metric{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:3px;
-      min-height:78px;
-    }
-
-    .metric .label{
-      white-space:normal;
-      overflow:visible;
-      text-overflow:clip;
-      line-height:1.05;
-      min-height:1.05em;
-    }
-
-    .metric .value{
-      line-height:.95;
-      white-space:nowrap;
-    }
-
-    .metric .small{
-      white-space:normal;
-      overflow:visible;
-      text-overflow:clip;
-      line-height:1.08;
-      min-height:2.05em;
-      display:block;
-    }
-
-    .efficiency-widget .value,
-    .wind-widget .value,
-    .thermal-widget .value{
-      font-size:clamp(1.15rem, 6vw, 1.55rem);
-    }
-
-    .wind-widget .value::after,
-    .thermal-widget .value::after{
-      font-size:.55rem;
-    }
-
-    .readout{
-      min-height:auto;
-    }
-
-    .explain-title{
-      align-items:flex-start;
-      line-height:1.1;
-    }
-
-    .explain-title span{
-      white-space:normal;
-    }
-
-    .explain{
-      display:block;
-      -webkit-line-clamp:unset;
-      overflow:visible;
-      font-size:.69rem;
-      line-height:1.22;
-      max-height:3.65em;
-    }
-
-    .status{
-      white-space:normal;
-      overflow:visible;
-      text-overflow:clip;
-      line-height:1.12;
-      min-height:2.2em;
-      display:flex;
-      align-items:center;
-    }
-
-    @media (max-width:390px){
-      .metrics{gap:5px}
-      .metric{
-        padding:7px 6px;
-        border-radius:14px;
-        min-height:76px;
-      }
-      .metric .label{
-        font-size:.48rem;
-        letter-spacing:.04em;
-      }
-      .metric .small{
-        font-size:.50rem;
-      }
-      .efficiency-widget .value,
-      .wind-widget .value,
-      .thermal-widget .value{
-        font-size:1.18rem;
-      }
-      .readout{
-        padding:7px 8px;
-      }
-      .explain{
-        font-size:.64rem;
-        line-height:1.18;
-        max-height:3.55em;
-      }
-      .status{
-        font-size:.55rem;
-      }
-    }
-
-    @media (max-height:690px){
-      .metric{
-        min-height:68px;
-        padding-top:6px;
-        padding-bottom:6px;
-      }
-      .metric .small{
-        min-height:1.9em;
-      }
-      .explain{
-        max-height:2.45em;
-        font-size:.62rem;
-      }
-      .status{
-        min-height:1.9em;
-        font-size:.54rem;
-      }
-    }
-
-    @media (max-height:620px){
-      .explain{
-        max-height:2.25em;
-      }
-      .status-row{
-        display:none;
-      }
-    }
-
+    /* ─── toast ───────────────────────────────────────────────────── */
     .toast{
       position:fixed;
       left:50%;
-      bottom:calc(12px + env(safe-area-inset-bottom));
-      transform:translateX(-50%);
-      width:min(520px,calc(100% - 24px));
-      padding:10px 13px;
-      border-radius:16px;
-      background:rgba(15,123,95,.96);
-      color:white;
-      font-weight:850;
-      font-size:.76rem;
+      bottom:calc(16px + env(safe-area-inset-bottom));
+      transform:translateX(-50%) translateY(10px);
+      width:min(440px,calc(100% - 24px));
+      padding:11px 16px;
+      border-radius:14px;
+      background:rgba(5,150,105,.95);
+      color:#fff;
+      font-size:.78rem;
+      font-weight:600;
+      text-align:center;
       opacity:0;
       pointer-events:none;
-      transition:opacity .22s ease,transform .22s ease;
-      z-index:20;
-      text-align:center;
+      transition:opacity .22s, transform .22s;
+      z-index:100;
+      backdrop-filter:blur(8px);
     }
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(-5px)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-    @supports (-webkit-touch-callout:none){
-      html,body{background:#07140f}
+    /* ─── responsive ──────────────────────────────────────────────── */
+    @media(max-width:360px){
+      .metric-value{font-size:1.2rem}
+      .metric-sub{font-size:.54rem}
     }
-
-    @media (min-width:760px){
-      body{overflow:auto}
-      .app{
-        width:min(760px,100%);
-        margin:0 auto;
-        height:100svh;
-      }
-      .vehicle-rotor{width:108px;height:176px}
-      .metric{min-height:82px}
-      .metric .value{font-size:1.5rem}
-      .impact .value{font-size:2.25rem}
-      .explain{font-size:.82rem}
+    @media(max-height:680px){
+      .app{gap:7px}
+      .start-btn{height:40px;font-size:.82rem}
+      .metrics-strip .metric{padding:8px 8px 6px}
+      .metric-value{font-size:1.25rem}
     }
-
-    @media (max-height:720px){
-      .app{gap:6px;padding-top:calc(6px + env(safe-area-inset-top));padding-bottom:calc(6px + env(safe-area-inset-bottom))}
-      .topbar{height:36px}.brand-logo{width:30px;height:30px;border-radius:10px}.brand-text strong{font-size:.88rem}.icon-btn{height:30px;min-width:30px;padding:0 8px;font-size:.74rem}
-      select,input[type=color],.start-btn{height:32px;border-radius:12px;font-size:.68rem}
-      .visual{padding:6px;border-radius:20px;gap:5px}.compass{border-radius:17px}.ring{inset:17px}
-      .vehicle-rotor{width:72px;height:118px}.metric{min-height:60px;padding:7px 7px;border-radius:14px}.metric .value{font-size:1.02rem}.impact .value{font-size:1.35rem}
-      .readout{padding:7px 8px;border-radius:16px}.sliders{padding:6px 8px;border-radius:16px;gap:4px 8px}.explain{-webkit-line-clamp:1;font-size:.66rem}
-      .status{padding:6px 7px;font-size:.58rem}.field label{font-size:.52rem}
-    }
-
-    @media (max-height:620px){
-      .sliders{grid-template-columns:1fr 1fr}
-      .field:nth-child(3),.field:nth-child(4){display:none}
-      .metric{min-height:54px}
+    @media(max-height:580px){
+      .readout .readout-text{display:none}
+      .sliders .field:nth-child(3),.sliders .field:nth-child(4){display:none}
       .heading-pill{display:none}
-      .visual{grid-template-rows:minmax(0,1fr) auto}
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="topbar">
-      <a class="brand" href="https://evuruguay.com">
-        <div class="brand-logo">EV</div>
-        <div class="brand-text"><strong>EVUruguay</strong><span>Eficiencia por viento</span></div>
-      </a>
-      <div class="top-actions">
-        <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
-        <button class="icon-btn" id="customBtn" type="button" aria-label="Modo personalizado">⚙️</button>
-        <button class="icon-btn" id="themeBtn" type="button">☀️</button>
+<div class="app">
+
+  <!-- topbar -->
+  <header class="topbar">
+    <a class="brand" href="https://evuruguay.com">
+      <div class="brand-logo">EV</div>
+      <div>
+        <div class="brand-name">EVUruguay</div>
+        <div class="brand-sub">Brújula de eficiencia</div>
       </div>
-    </header>
+    </a>
+    <div class="top-right">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Tema">🌙</button>
+      <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
+    </div>
+  </header>
 
-    <main class="main">
-      <section class="control-strip">
-        <button class="start-btn" id="startBtn" type="button">📍 GPS + viento</button>
-        <select id="vehicleType" aria-label="Tipo de vehículo">
-          <option value="hatch">Hatch</option>
-          <option value="sedan">Sedán</option>
-          <option value="suv" selected>SUV</option>
-          <option value="pickup">Pickup</option>
-        </select>
-      </section>
+  <!-- start -->
+  <button class="start-btn" id="startBtn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M16.9 16.9l2.1 2.1M4.9 19.1l2.1-2.1M16.9 7.1l2.1-2.1"/>
+    </svg>
+    GPS + Brújula + Viento real
+  </button>
 
-      <section class="visual">
-        <div class="metrics">
-          <div class="metric impact efficiency-widget" id="impactMetric">
-            <div class="label">🌱 Eficiencia</div>
-            <div class="value" id="impactValue">--%</div>
-            <div class="small" id="impactLabel">Esperando</div>
-          </div>
-          <div class="metric wind-widget">
-            <div class="label">🌬️ Viento</div>
-            <div class="value"><span id="windSpeedMetric">28</span></div>
-            <div class="small">km/h · <span id="windDirHuman">SO</span></div>
-          </div>
-          <div class="metric thermal-widget" id="thermalMetric">
-            <div class="label">🌡️ Temp.</div>
-            <div class="value"><span id="tempMetric">--</span></div>
-            <div class="small" id="thermalLabel">Sin clima</div>
-          </div>
-          <div class="metric ev-speed-compact">
-            <div class="label">🚗 Vel. EV</div>
-            <div class="value"><span id="carSpeedMetric">0</span></div>
-            <div class="small">km/h · <span id="relativeAngle">0</span>°</div>
-          </div>
-        </div>
-
-        <div class="compass">
-          <div class="wind-layer" id="windLayer"></div>
-          <div class="ring"></div>
-          <div class="north-axis" aria-hidden="true"></div>
-          <div class="cardinal n">N</div><div class="cardinal e">E</div><div class="cardinal s">S</div><div class="cardinal w">O</div>
-
-          <div class="vehicle-stage">
-            <div class="vehicle-rotor" id="vehicleRotor">
-              <img id="vehicleImage" class="vehicle-img" src="assets/vehiculos/suv_top_view_200x200.png" alt="Vehículo visto desde arriba" />
-            </div>
-          </div>
-
-          <div class="heading-pill"><span>Norte GPS · Rumbo</span><strong id="headingHuman">NE</strong></div>
-        </div>
-
-      </section>
-    </main>
-
-    <footer class="bottom">
-      <section class="readout">
-        <div class="explain-title"><span>Lectura rápida</span><span id="apiHint">GPS + Open-Meteo</span></div>
-        <div class="explain" id="explanation">Tocá GPS + viento. Se usará ubicación, velocidad y rumbo por GPS, más viento y temperatura actual.</div>
-        <div class="status-row">
-          <div class="status" id="gpsStatus">GPS: sin iniciar</div>
-          <div class="status" id="weatherStatus">Clima: sin consultar</div>
-        </div>
-      </section>
-
-      <section class="custom-panel" id="customPanel" aria-label="Modo personalizado">
-        <div class="custom-head">
-          <strong>Modo personalizado</strong>
-          <span>Solo para simular escenarios. El modo normal calcula con GPS + viento real.</span>
-        </div>
-        <div class="sliders">
-          <div class="field">
-            <label for="carHeading"><span>Rumbo</span><span><b id="carHeadingVal">35</b>°</span></label>
-            <input id="carHeading" type="range" min="0" max="359" value="35" />
-          </div>
-          <div class="field">
-            <label for="windDirection"><span>Viento hacia</span><span><b id="windDirectionVal">225</b>°</span></label>
-            <input id="windDirection" type="range" min="0" max="359" value="225" />
-          </div>
-          <div class="field">
-            <label for="windSpeed"><span>Km/h viento</span><span><b id="windSpeedVal">28</b></span></label>
-            <input id="windSpeed" type="range" min="0" max="90" value="28" />
-          </div>
-          <div class="field">
-            <label for="carSpeed"><span>Km/h EV</span><span><b id="carSpeedVal">0</b></span></label>
-            <input id="carSpeed" type="range" min="0" max="140" value="0" />
-          </div>
-        </div>
-      </section>
-    </footer>
+  <!-- vehicle + mode -->
+  <div class="controls-row">
+    <select id="vehicleType" class="vehicle-select" aria-label="Tipo de vehículo">
+      <option value="hatch">🚗 Hatchback</option>
+      <option value="sedan">🚙 Sedán</option>
+      <option value="suv" selected>🚐 SUV</option>
+      <option value="pickup">🛻 Pickup</option>
+    </select>
+    <button class="mode-btn" id="customBtn" type="button">⚙️ Manual</button>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- compass card -->
+  <div class="compass-card">
+    <!-- metrics strip -->
+    <div class="metrics-strip">
+      <div class="metric">
+        <div class="metric-label">Eficiencia</div>
+        <div class="metric-value" id="effValue">--%</div>
+        <div class="metric-sub" id="effLabel">Esperando</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Viento</div>
+        <div class="metric-value" id="windValue">-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span></div>
+        <div class="metric-sub" id="windLabel">sin datos</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Temp.</div>
+        <div class="metric-value" id="tempValue">-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span></div>
+        <div class="metric-sub" id="tempLabel">sin datos</div>
+      </div>
+    </div>
 
-  <script>
-    const el=id=>document.getElementById(id);
-    const carHeading=el("carHeading"),windDirection=el("windDirection"),windSpeed=el("windSpeed"),carSpeed=el("carSpeed"),vehicleType=el("vehicleType");
-    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false,hasRealSpeed=false,currentTemp=null;
-    const vehicleParams={hatch:{mass:1450,cdA:.60,crr:.010,aux:.8},sedan:{mass:1700,cdA:.56,crr:.010,aux:.8},suv:{mass:1900,cdA:.72,crr:.011,aux:.9},pickup:{mass:2250,cdA:.95,crr:.012,aux:1.0}};
-    const vehicleStyles={
-      hatch:{src:"assets/vehiculos/hatchback_top_view_200x200.png",width:132,height:132},
-      sedan:{src:"assets/vehiculos/sedan_top_view_200x200.png",width:136,height:136},
-      suv:{src:"assets/vehiculos/suv_top_view_200x200.png",width:142,height:142},
-      pickup:{src:"assets/vehiculos/pickup_top_view_200x200.png",width:148,height:148}
-    };
+    <!-- canvas compass -->
+    <div class="compass-wrap">
+      <canvas id="compassCanvas"></canvas>
+      <div class="heading-pill">
+        <span id="headingHuman">Norte · 0°</span>
+        <strong id="speedHuman">-- km/h</strong>
+      </div>
+    </div>
+  </div>
 
-    function fitCompassCircle(){
-      const c=document.querySelector(".compass");
-      if(!c)return;
-      const r=c.getBoundingClientRect();
-      const size=Math.max(120,Math.min(r.width,r.height)-28);
-      c.style.setProperty("--compass-size",size+"px");
-      c.style.setProperty("--vehicle-stage",Math.max(160,Math.min(size*.82,260))+"px");
+  <!-- readout -->
+  <div class="readout">
+    <div class="readout-head">
+      <span class="readout-label">Lectura</span>
+      <div class="readout-status">
+        <span class="status-badge" id="gpsStatus">GPS: --</span>
+        <span class="status-badge" id="weatherStatus">Clima: --</span>
+      </div>
+    </div>
+    <div class="readout-text" id="explanation">Tocá el botón de arriba para activar GPS y viento real. Se calcularán rumbo, velocidad y eficiencia aerodinámica en tiempo real.</div>
+  </div>
+
+  <!-- custom panel -->
+  <div class="custom-panel" id="customPanel">
+    <div class="custom-title">Simulador manual</div>
+    <div class="sliders">
+      <div class="field">
+        <label for="carHeading"><span>Rumbo EV</span><b id="carHeadingVal">35</b>°</label>
+        <input id="carHeading" type="range" min="0" max="359" value="35"/>
+      </div>
+      <div class="field">
+        <label for="windDirection"><span>Viento desde</span><b id="windDirectionVal">225</b>°</label>
+        <input id="windDirection" type="range" min="0" max="359" value="225"/>
+      </div>
+      <div class="field">
+        <label for="windSpeed"><span>Vel. viento</span><b id="windSpeedVal">28</b> km/h</label>
+        <input id="windSpeed" type="range" min="0" max="90" value="28"/>
+      </div>
+      <div class="field">
+        <label for="carSpeed"><span>Vel. EV</span><b id="carSpeedVal">80</b> km/h</label>
+        <input id="carSpeed" type="range" min="0" max="140" value="80"/>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── helpers ─────────────────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const carHeadingEl=$("carHeading"),windDirEl=$("windDirection"),windSpeedEl=$("windSpeed"),carSpeedEl=$("carSpeed"),vehicleTypeEl=$("vehicleType");
+
+function normDeg(d){return((d%360)+360)%360}
+function shortAngle(a,b){let d=Math.abs(normDeg(a)-normDeg(b))%360;return d>180?360-d:d}
+function toCardinal(deg){return["N","NE","E","SE","S","SO","O","NO"][Math.round(normDeg(deg)/45)%8]}
+function bearingBetween(la1,lo1,la2,lo2){
+  const r=d=>d*Math.PI/180,D=r=>r*180/Math.PI;
+  const y=Math.sin(r(lo2-lo1))*Math.cos(r(la2)),x=Math.cos(r(la1))*Math.sin(r(la2))-Math.sin(r(la1))*Math.cos(r(la2))*Math.cos(r(lo2-lo1));
+  return normDeg(D(Math.atan2(y,x)));
+}
+function distMeters(la1,lo1,la2,lo2){
+  const R=6371000,r=d=>d*Math.PI/180,dLa=r(la2-la1),dLo=r(lo2-lo1);
+  const a=Math.sin(dLa/2)**2+Math.cos(r(la1))*Math.cos(r(la2))*Math.sin(dLo/2)**2;
+  return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function showToast(msg){
+  const t=$("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3800);
+}
+
+// ─── state ────────────────────────────────────────────────────────────────
+let watchId=null,lastPos=null,lastWeatherAt=0;
+let customMode=false,hasGps=false,hasWeather=false;
+let currentTemp=null,deviceHeading=null,hasCompass=false;
+let lastLat=null,lastLon=null;
+
+// Internal state (used for canvas draw and computation)
+let state={heading:35,windFrom:225,windKmh:0,speedKmh:0,vehicle:"suv"};
+
+// ─── vehicle images ───────────────────────────────────────────────────────
+const vehicleImgSrc={
+  hatch:"assets/vehiculos/hatchback_top_view_200x200.png",
+  sedan:"assets/vehiculos/sedan_top_view_200x200.png",
+  suv:  "assets/vehiculos/suv_top_view_200x200.png",
+  pickup:"assets/vehiculos/pickup_top_view_200x200.png"
+};
+const vehicleImgSize={
+  hatch:{w:132,h:132},sedan:{w:136,h:136},suv:{w:142,h:142},pickup:{w:148,h:148}
+};
+let vehicleImg=new Image();
+function loadVehicleImg(key){
+  const img=new Image();
+  img.onload=()=>{vehicleImg=img};
+  img.onerror=()=>{vehicleImg=null};
+  img.src=vehicleImgSrc[key]||vehicleImgSrc.suv;
+}
+loadVehicleImg("suv");
+
+// ─── vehicle params ───────────────────────────────────────────────────────
+const VP={
+  hatch:{mass:1450,cdA:.60,crr:.010,aux:.8},
+  sedan:{mass:1700,cdA:.56,crr:.010,aux:.8},
+  suv:  {mass:1900,cdA:.72,crr:.011,aux:.9},
+  pickup:{mass:2250,cdA:.95,crr:.012,aux:1.0}
+};
+
+// ─── physics ──────────────────────────────────────────────────────────────
+function calcImpact(heading,windFrom,windKmh,speedKmh,vehicleKey){
+  const p=VP[vehicleKey]||VP.suv;
+  const v=Math.max(0,speedKmh/3.6);
+  const w=Math.max(0,windKmh/3.6);
+
+  // angle between vehicle heading and wind direction
+  // windFrom = direction wind is coming FROM
+  // wind travels from windFrom toward (windFrom+180)
+  const windTo=normDeg(windFrom+180); // direction wind is moving toward
+  const angleTo=shortAngle(heading,windTo); // angle between car heading and wind movement direction
+  const rad=angleTo*Math.PI/180;
+
+  // relative air speed: v_rel² = v² + w² - 2vw·cos(angle between car and wind directions)
+  const vAir=Math.sqrt(Math.max(0,v*v+w*w-2*v*w*Math.cos(rad)));
+
+  const rho=1.225,g=9.81,eff=0.90;
+  const pDrag0=.5*rho*p.cdA*v*v*v/1000;
+  const pDragW=.5*rho*p.cdA*vAir*vAir*v/1000;
+  const pRoll=p.mass*g*p.crr*v/1000;
+  const pAux=p.aux;
+
+  const base=(pDrag0+pRoll+pAux)/eff;
+  const actual=(pDragW+pRoll+pAux)/eff;
+  let efficiency=base>0?(base/actual)*100:100;
+  efficiency=Math.max(60,Math.min(120,Math.round(efficiency)));
+
+  // Relative direction label
+  const relAngle=((heading-(windFrom))%360+360)%360; // how wind hits the car
+  const absRel=Math.min(relAngle,360-relAngle);
+  let relText;
+  if(absRel<30) relText="Viento frontal";
+  else if(absRel<75) relText="Frontal oblicuo";
+  else if(absRel<115) relText="Viento lateral";
+  else if(absRel<150) relText="Cola lateral";
+  else relText="Viento de cola";
+
+  const consumDelta=actual>0?((actual/base)-1)*100:0;
+  return{efficiency,impact:efficiency-100,relText,vAirKmh:vAir*3.6,consumDelta,windTo};
+}
+
+function calcThermal(temp){
+  if(!Number.isFinite(temp))return{score:null,label:"sin temp.",cls:"warn"};
+  if(temp>=18&&temp<=28) return{score:100,label:"Temp. óptima",cls:"good"};
+  if(temp>=12&&temp<18)  return{score:96, label:"Leve frío",cls:"warn"};
+  if(temp>=5&&temp<12)   return{score:91, label:"Frío mod.",cls:"warn"};
+  if(temp>=0&&temp<5)    return{score:86, label:"Frío",cls:"bad"};
+  if(temp<0)             return{score:78, label:"Frío ext.",cls:"bad"};
+  if(temp>28&&temp<=34)  return{score:96, label:"Calor leve",cls:"warn"};
+  if(temp>34&&temp<=40)  return{score:90, label:"Calor",cls:"warn"};
+  return{score:84,label:"Calor ext.",cls:"bad"};
+}
+
+// ─── canvas compass ────────────────────────────────────────────────────────
+const canvas=$("compassCanvas");
+const ctx=canvas.getContext("2d");
+let animId=null;
+let windAnimOffset=0;
+
+function resize(){
+  const wrap=canvas.parentElement;
+  const w=wrap.clientWidth,h=wrap.clientHeight;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=w*dpr;
+  canvas.height=h*dpr;
+  canvas.style.width=w+"px";
+  canvas.style.height=h+"px";
+  ctx.scale(dpr,dpr);
+}
+
+function getColors(){
+  const s=getComputedStyle(document.documentElement);
+  return{
+    teal:s.getPropertyValue("--teal").trim()||"#34d399",
+    muted:s.getPropertyValue("--muted").trim()||"#6ee7b7",
+    dim:s.getPropertyValue("--dim").trim()||"rgba(110,231,183,.5)",
+    text:s.getPropertyValue("--text").trim()||"#dff5eb",
+    amber:s.getPropertyValue("--amber").trim()||"#f59e0b",
+    red:s.getPropertyValue("--red").trim()||"#f43f5e",
+    bg:s.getPropertyValue("--surface").trim()||"#0d2018",
+    forest:s.getPropertyValue("--forest").trim()||"#059669",
+  };
+}
+
+function drawCompass(heading,windFrom,windKmh,speedKmh){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(w===0||h===0)return;
+  ctx.clearRect(0,0,w,h);
+
+  const cx=w/2,cy=h/2;
+  const R=Math.min(w,h)*0.42;
+  const C=getColors();
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+  const windTo=normDeg(windFrom+180);
+
+  // ── outer ring ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.strokeStyle=isDark?"rgba(52,211,153,.22)":"rgba(5,150,105,.2)";
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+
+  // inner rings (dashed)
+  [.68,.38].forEach(f=>{
+    ctx.beginPath();
+    ctx.arc(cx,cy,R*f,0,Math.PI*2);
+    ctx.setLineDash([4,6]);
+    ctx.strokeStyle=isDark?"rgba(52,211,153,.12)":"rgba(5,150,105,.14)";
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // ── degree ticks ──
+  for(let i=0;i<360;i+=10){
+    const major=i%90===0;
+    const mid=i%30===0;
+    const a=(i-90)*Math.PI/180;
+    const r1=major?R-16:mid?R-10:R-6;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
+    ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);
+    ctx.strokeStyle=major?(C.teal):mid?C.dim:"rgba(52,211,153,.18)";
+    ctx.lineWidth=major?1.5:1;
+    ctx.stroke();
+  }
+
+  // ── cardinal labels (fixed, north always up) ──
+  const cardinals=[["N",0],["E",90],["S",180],["O",270]];
+  cardinals.forEach(([lbl,deg])=>{
+    const a=(deg-90)*Math.PI/180;
+    const rL=R-30;
+    ctx.font=`700 ${lbl==="N"?13:11}px -apple-system,sans-serif`;
+    ctx.fillStyle=lbl==="N"?C.teal:C.muted;
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(lbl,cx+Math.cos(a)*rL,cy+Math.sin(a)*rL);
+  });
+  ctx.restore();
+
+  // ── wind stream lines ──
+  if(windKmh>1){
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate((windTo-90)*Math.PI/180);
+
+    const count=Math.min(20,Math.max(6,Math.round(windKmh/3.5)));
+    const alpha=Math.min(.75,windKmh/60+.2);
+    windAnimOffset=(windAnimOffset+windKmh/2000)%1;
+
+    for(let i=0;i<count;i++){
+      const spread=R*.85;
+      const xOff=(((i+.5)/count)-.5)*spread*2;
+      const phase=((i/count)+windAnimOffset)%1;
+      const lineLen=R*(.45+windKmh/120);
+      const startY=-R*.98+(phase*R*1.96);
+
+      // Only draw within circle approx
+      const distFromCenter=Math.sqrt(xOff*xOff);
+      if(distFromCenter>R*.88)continue;
+
+      const g=ctx.createLinearGradient(xOff,startY,xOff,startY+lineLen);
+      g.addColorStop(0,"transparent");
+      g.addColorStop(.3,`rgba(52,211,153,${alpha*.7})`);
+      g.addColorStop(.85,`rgba(52,211,153,${alpha})`);
+      g.addColorStop(1,"transparent");
+      ctx.beginPath();
+      ctx.moveTo(xOff,startY);
+      ctx.lineTo(xOff,startY+lineLen);
+      ctx.strokeStyle=g;
+      ctx.lineWidth=windKmh>30?2:1.5;
+      ctx.stroke();
+
+      // arrowhead at end
+      const ay=startY+lineLen*.75;
+      ctx.beginPath();
+      ctx.moveTo(xOff,ay+8);
+      ctx.lineTo(xOff-4,ay);
+      ctx.lineTo(xOff+4,ay);
+      ctx.closePath();
+      ctx.fillStyle=`rgba(52,211,153,${alpha*.8})`;
+      ctx.fill();
     }
+    ctx.restore();
+  }
 
-    function showToast(msg){const t=el("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3500)}
-    function normalizeDeg(d){return((d%360)+360)%360}
-    function shortestAngle(a,b){let d=Math.abs(normalizeDeg(a)-normalizeDeg(b))%360;return d>180?360-d:d}
-    function degToCardinal(deg){const dirs=["N","NE","E","SE","S","SO","O","NO"];return dirs[Math.round(normalizeDeg(deg)/45)%8]}
-    function applyVehicleStyle(){
-      const s=vehicleStyles[vehicleType.value]||vehicleStyles.suv;
-      const img=el("vehicleImage");
-      if(img) img.src=s.src;
-      const r=el("vehicleRotor");
-      r.style.width=s.width+"px";
-      r.style.height=s.height+"px";
-      update();
-    }
+  // ── wind direction indicator line (from outside ring) ──
+  if(windKmh>1){
+    ctx.save();
+    ctx.translate(cx,cy);
+    const windA=(windFrom-90)*Math.PI/180; // arrow points FROM this direction
+    // draw arrow from outside ring pointing toward center
+    const arrowR=R+12;
+    const arrowTip=R-8;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(windA)*arrowR,Math.sin(windA)*arrowR);
+    ctx.lineTo(Math.cos(windA)*arrowTip,Math.sin(windA)*arrowTip);
+    ctx.strokeStyle=isDark?"rgba(56,189,248,.8)":"rgba(2,132,199,.8)";
+    ctx.lineWidth=2.5;
+    ctx.setLineDash([4,3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // arrowhead pointing inward
+    const tipX=Math.cos(windA)*arrowTip,tipY=Math.sin(windA)*arrowTip;
+    const perpA=windA+Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(tipX,tipY);
+    ctx.lineTo(tipX+Math.cos(perpA)*5+Math.cos(windA+Math.PI)*9,tipY+Math.sin(perpA)*5+Math.sin(windA+Math.PI)*9);
+    ctx.lineTo(tipX-Math.cos(perpA)*5+Math.cos(windA+Math.PI)*9,tipY-Math.sin(perpA)*5+Math.sin(windA+Math.PI)*9);
+    ctx.closePath();
+    ctx.fillStyle=isDark?"rgba(56,189,248,.8)":"rgba(2,132,199,.8)";
+    ctx.fill();
 
-    function bearingBetween(lat1,lon1,lat2,lon2){
-      const r=d=>d*Math.PI/180,D=r=>r*180/Math.PI,p1=r(lat1),p2=r(lat2),dl=r(lon2-lon1),y=Math.sin(dl)*Math.cos(p2),x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
-      return normalizeDeg(D(Math.atan2(y,x)));
-    }
-    function distanceMeters(lat1,lon1,lat2,lon2){
-      const R=6371000,r=d=>d*Math.PI/180;
-      const dLat=r(lat2-lat1),dLon=r(lon2-lon1),a=Math.sin(dLat/2)**2+Math.cos(r(lat1))*Math.cos(r(lat2))*Math.sin(dLon/2)**2;
-      return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-    }
+    // wind label
+    const lblR=R+28;
+    ctx.font="600 9px -apple-system,sans-serif";
+    ctx.fillStyle=isDark?"rgba(56,189,248,.9)":"rgba(2,132,199,.9)";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText("VIENTO",Math.cos(windA)*lblR,Math.sin(windA)*lblR);
+    ctx.restore();
+  }
 
-    async function fetchWeather(lat,lon,force=false){
-      const now=Date.now();
-      if(!force&&now-lastWeatherAt<5*60*1000)return;
-      lastWeatherAt=now;
-      el("weatherStatus").innerHTML="<span class='status-warn'>Clima: consultando…</span>";
-      const url=new URL("https://api.open-meteo.com/v1/forecast");
-      url.searchParams.set("latitude",lat);url.searchParams.set("longitude",lon);
-      url.searchParams.set("current","wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m");
-      url.searchParams.set("wind_speed_unit","kmh");url.searchParams.set("timezone","auto");
-      try{
-        const res=await fetch(url.toString(),{cache:"no-store"});
-        if(!res.ok)throw new Error("HTTP "+res.status);
-        const data=await res.json(),c=data.current||{},speed=Number(c.wind_speed_10m),from=Number(c.wind_direction_10m),gust=Number(c.wind_gusts_10m),temp=Number(c.temperature_2m);
-        if(Number.isFinite(speed))windSpeed.value=Math.round(speed);
-        if(Number.isFinite(from))windDirection.value=Math.round(normalizeDeg(from+180));if(Number.isFinite(temp))currentTemp=Math.round(temp);
-        hasRealWeather=true;
-        el("weatherStatus").innerHTML=`<span class="status-ok">Clima: ${Math.round(speed)} km/h${Number.isFinite(gust)?" · r "+Math.round(gust):""}</span>`;
-        update();
-      }catch(e){
-        hasRealWeather=false,currentTemp=null;
-        el("weatherStatus").innerHTML="<span class='status-warn'>Clima: error</span>";
-        showToast("No se pudo consultar viento. Podés usar los controles manuales.");
+  // ── vehicle image (rotated to heading) ──
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate((heading-90)*Math.PI/180);
+  const imgSize=vehicleImgSize[vehicleTypeEl.value||"suv"]||{w:142,h:142};
+  if(vehicleImg&&vehicleImg.complete&&vehicleImg.naturalWidth>0){
+    ctx.drawImage(vehicleImg,-imgSize.w/2,-imgSize.h/2,imgSize.w,imgSize.h);
+  }
+  ctx.restore();
+
+  // ── north indicator (always points up) ──
+  ctx.save();
+  ctx.translate(cx,cy);
+  // north is 0° which maps to -90° in canvas = top = up. Always fixed.
+  const nA=-Math.PI/2;
+  const nR=R*.92,nTip=R*.85;
+  ctx.beginPath();
+  ctx.moveTo(Math.cos(nA)*nR,Math.sin(nA)*nR);
+  ctx.lineTo(Math.cos(nA)*nTip,Math.sin(nA)*nTip);
+  ctx.strokeStyle=C.teal;
+  ctx.lineWidth=2.5;
+  ctx.stroke();
+  // tip triangle
+  const nt={x:Math.cos(nA)*nTip,y:Math.sin(nA)*nTip};
+  const pa=nA+Math.PI/2;
+  ctx.beginPath();
+  ctx.moveTo(nt.x,nt.y);
+  ctx.lineTo(nt.x+Math.cos(pa)*5+Math.cos(nA+Math.PI)*8,nt.y+Math.sin(pa)*5+Math.sin(nA+Math.PI)*8);
+  ctx.lineTo(nt.x-Math.cos(pa)*5+Math.cos(nA+Math.PI)*8,nt.y-Math.sin(pa)*5+Math.sin(nA+Math.PI)*8);
+  ctx.closePath();
+  ctx.fillStyle=C.teal;
+  ctx.fill();
+  ctx.restore();
+
+  // ── efficiency arc ──
+  if(speedKmh>=5){
+    const d=calcImpact(heading,windFrom,windKmh,speedKmh,vehicleTypeEl.value);
+    const eff=d.efficiency;
+    const arcColor=eff>=100?C.teal:eff>=90?C.amber:C.red;
+    const arcR=R*.54;
+    // arc from -π/2 scaled by efficiency/100
+    const arcEnd=-Math.PI/2+(2*Math.PI*(Math.min(eff,115)/115));
+    ctx.save();
+    ctx.translate(cx,cy);
+    // background arc
+    ctx.beginPath();
+    ctx.arc(0,0,arcR,0,Math.PI*2);
+    ctx.strokeStyle=isDark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+    ctx.lineWidth=5;
+    ctx.stroke();
+    // value arc
+    ctx.beginPath();
+    ctx.arc(0,0,arcR,-Math.PI/2,arcEnd);
+    ctx.strokeStyle=arcColor;
+    ctx.lineWidth=5;
+    ctx.lineCap="round";
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function animate(){
+  const s=state;
+  drawCompass(s.heading,s.windFrom,s.windKmh,s.speedKmh);
+  animId=requestAnimationFrame(animate);
+}
+
+// ─── metrics update ───────────────────────────────────────────────────────
+function updateUI(){
+  const s=state;
+  const waiting=!customMode&&!hasGps&&!hasWeather;
+  const d=calcImpact(s.heading,s.windFrom,s.windKmh,s.speedKmh,s.vehicle);
+  const thermal=calcThermal(currentTemp);
+
+  // efficiency metric
+  const effEl=$("effValue");
+  if(waiting||s.speedKmh<5){
+    effEl.textContent="--";
+    effEl.className="metric-value";
+    $("effLabel").textContent=s.speedKmh<5&&(customMode||hasGps)?"<12 km/h":"Esperando";
+    $("effLabel").className="metric-sub warn";
+  }else{
+    effEl.textContent=d.efficiency+"%";
+    const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
+    effEl.className="metric-value "+cls;
+    $("effLabel").textContent=d.relText;
+    $("effLabel").className="metric-sub "+cls;
+  }
+
+  // wind metric
+  if(!customMode&&!hasWeather){
+    $("windValue").innerHTML='-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span>';
+    $("windLabel").textContent="sin datos";
+    $("windLabel").className="metric-sub";
+  }else{
+    // wColor unused but calculated for future use
+    $("windValue").innerHTML=`${Math.round(s.windKmh)} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span>`;
+    $("windLabel").textContent=`${toCardinal(s.windFrom)} · ${Math.round(s.windFrom)}°`;
+    $("windLabel").className="metric-sub";
+  }
+
+  // temp metric
+  if(!customMode&&!hasWeather||currentTemp===null){
+    $("tempValue").innerHTML='-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>';
+    $("tempLabel").textContent="sin datos";
+    $("tempLabel").className="metric-sub";
+  }else{
+    $("tempValue").innerHTML=`${currentTemp} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>`;
+    $("tempLabel").textContent=thermal.label;
+    $("tempLabel").className="metric-sub "+thermal.cls;
+  }
+
+  // heading pill
+  $("headingHuman").textContent=`${toCardinal(s.heading)} · ${Math.round(s.heading)}°`;
+  $("speedHuman").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)} km/h`:"-- km/h";
+
+  // explanation
+  let exp="";
+  if(!customMode&&!hasGps&&!hasWeather){
+    exp="Tocá el botón para activar GPS y viento real. La brújula calculará eficiencia aerodinámica según tu rumbo, velocidad y el viento local.";
+  }else if(!customMode&&!hasGps){
+    exp="GPS solicitado. Permití ubicación y movete unos metros para que el sistema calcule rumbo y velocidad real.";
+  }else if(!customMode&&!hasWeather){
+    exp="GPS activo. Consultando clima en Open-Meteo, reintentá si demora.";
+  }else if(s.speedKmh<12){
+    exp="Velocidad muy baja. Movete más rápido para que el GPS calcule rumbo real con precisión.";
+  }else if(d.efficiency>=105){
+    exp=`${d.relText}: el viento te ayuda. Velocidad relativa del aire ${Math.round(d.vAirKmh)} km/h → eficiencia +${Math.round(d.impact)}%. ${currentTemp!==null&&thermal.score!==null&&thermal.score<97?thermal.label+": "+currentTemp+"°C puede afectar batería.":""}`;
+  }else if(d.efficiency>=98){
+    exp=`${d.relText}: impacto casi neutro. Eficiencia estimada ${d.efficiency}%.`;
+  }else if(d.efficiency<85){
+    exp=`⚠️ ${d.relText}: viento muy desfavorable. Eficiencia ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%. Bajar velocidad ayuda mucho (la resistencia crece con el cuadrado de la velocidad del aire).`;
+  }else{
+    exp=`${d.relText}. Eficiencia estimada ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%.`;
+  }
+  $("explanation").textContent=exp;
+}
+
+// ─── GPS + weather ────────────────────────────────────────────────────────
+async function fetchWeather(lat,lon,force=false){
+  const now=Date.now();
+  if(!force&&now-lastWeatherAt<5*60*1000)return;
+  lastWeatherAt=now;
+  $("weatherStatus").textContent="Clima: …";
+  $("weatherStatus").className="status-badge";
+  const url=new URL("https://api.open-meteo.com/v1/forecast");
+  url.searchParams.set("latitude",lat);
+  url.searchParams.set("longitude",lon);
+  url.searchParams.set("current","wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m");
+  url.searchParams.set("wind_speed_unit","kmh");
+  url.searchParams.set("timezone","auto");
+  try{
+    const res=await fetch(url.toString(),{cache:"no-store"});
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const data=await res.json();
+    const c=data.current||{};
+    const spd=Number(c.wind_speed_10m);
+    const from=Number(c.wind_direction_10m); // Open-Meteo gives direction wind is coming FROM
+    const gust=Number(c.wind_gusts_10m);
+    const temp=Number(c.temperature_2m);
+    if(Number.isFinite(spd)){
+      windSpeedEl.value=Math.round(spd);
+      state.windKmh=Math.round(spd);
+    }
+    if(Number.isFinite(from)){
+      // Open-Meteo wind_direction_10m = direction FROM which wind blows
+      windDirEl.value=Math.round(normDeg(from)); // store as "from"
+      state.windFrom=Math.round(normDeg(from));
+    }
+    if(Number.isFinite(temp))currentTemp=Math.round(temp);
+    hasWeather=true;
+    $("weatherStatus").textContent=`Clima: ${Math.round(spd)} km/h${Number.isFinite(gust)?" · r "+Math.round(gust):""}`;
+    $("weatherStatus").className="status-badge ok";
+    updateUI();
+  }catch(e){
+    hasWeather=false;currentTemp=null;
+    $("weatherStatus").textContent="Clima: error";
+    $("weatherStatus").className="status-badge warn";
+    showToast("No se pudo consultar Open-Meteo. Verificá conexión.");
+  }
+}
+
+async function startCompass(){
+  try{
+    if(typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientationEvent.requestPermission==="function"){
+      const perm=await DeviceOrientationEvent.requestPermission();
+      if(perm!=="granted"){hasCompass=false;return}
+    }
+    window.addEventListener("deviceorientation",ev=>{
+      let h=null;
+      if(typeof ev.webkitCompassHeading==="number"&&Number.isFinite(ev.webkitCompassHeading)){
+        h=ev.webkitCompassHeading;
+      }else if(typeof ev.alpha==="number"&&Number.isFinite(ev.alpha)){
+        h=360-ev.alpha;
       }
+      if(h!==null){deviceHeading=normDeg(h);hasCompass=true;}
+    },true);
+  }catch(e){hasCompass=false}
+}
+
+function startGps(){
+  if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
+  showToast("Solicitando GPS y brújula…");
+  startCompass().catch(()=>{hasCompass=false});
+  $("gpsStatus").textContent="GPS: solicitando…";
+  $("gpsStatus").className="status-badge warn";
+  if(lastLat!==null&&lastLon!==null)fetchWeather(lastLat,lastLon,true);
+  if(watchId!==null)navigator.geolocation.clearWatch(watchId);
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    const c=pos.coords;
+    hasGps=true;
+    $("gpsStatus").textContent=`GPS: ±${Math.round(c.accuracy||0)}m`;
+    $("gpsStatus").className="status-badge ok";
+    const nowMs=Date.now();
+    let kmh=null;
+    if(typeof c.speed==="number"&&Number.isFinite(c.speed)){
+      kmh=Math.max(0,Math.round(c.speed*3.6));
+    }else if(lastPos){
+      const m=distMeters(lastPos.lat,lastPos.lon,c.latitude,c.longitude);
+      const sec=Math.max(.5,(nowMs-lastPos.t)/1000);
+      const est=Math.round((m/sec)*3.6);
+      if(Number.isFinite(est))kmh=Math.max(0,Math.min(140,est));
     }
-
-    function startGps(){
-      if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
-      showToast("Solicitando permiso de ubicación…");
-      el("gpsStatus").innerHTML="<span class='status-warn'>GPS: solicitando…</span>";
-      if(watchId!==null)navigator.geolocation.clearWatch(watchId);
-      watchId=navigator.geolocation.watchPosition(pos=>{
-        const c=pos.coords;
-        hasRealGps=true;
-        el("gpsStatus").innerHTML=`<span class="status-ok">GPS: OK · ±${Math.round(c.accuracy||0)} m</span>`;
-        const nowMs=Date.now();
-        let kmh=null;
-
-        if(typeof c.speed==="number"&&Number.isFinite(c.speed)){
-          kmh=Math.max(0,Math.round(c.speed*3.6));
-        }else if(lastPosition){
-          const meters=distanceMeters(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude);
-          const seconds=Math.max(.5,(nowMs-lastPosition.t)/1000);
-          const estimated=Math.round((meters/seconds)*3.6);
-          if(Number.isFinite(estimated)) kmh=Math.max(0,Math.min(140,estimated));
+    if(kmh!==null){
+      carSpeedEl.value=String(Math.min(140,kmh));
+      state.speedKmh=Math.min(140,kmh);
+    }else{
+      state.speedKmh=0;
+    }
+    if(kmh!==null&&kmh>=3){
+      if(typeof c.heading==="number"&&Number.isFinite(c.heading)&&c.heading>=0){
+        const h=Math.round(c.heading);
+        carHeadingEl.value=h;
+        state.heading=h;
+      }else if(lastPos){
+        const m=distMeters(lastPos.lat,lastPos.lon,c.latitude,c.longitude);
+        if(m>=3){
+          const h=Math.round(bearingBetween(lastPos.lat,lastPos.lon,c.latitude,c.longitude));
+          carHeadingEl.value=h;
+          state.heading=h;
         }
-
-        if(kmh!==null){
-          hasRealSpeed=true;
-          carSpeed.value=String(Math.min(140,kmh));
-        }else{
-          hasRealSpeed=false;
-          carSpeed.value="0";
-        }
-
-        if(kmh!==null && kmh<3){
-          carHeading.value=carHeading.value;
-        }else if(typeof c.heading==="number"&&Number.isFinite(c.heading)&&c.heading>=0){
-          carHeading.value=Math.round(c.heading);
-        }else if(lastPosition){
-          const meters=distanceMeters(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude);
-          if(meters>=3) carHeading.value=Math.round(bearingBetween(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude));
-        }
-
-        lastPosition={lat:c.latitude,lon:c.longitude,t:nowMs};
-        fetchWeather(c.latitude,c.longitude);
-        update();
-      },err=>{
-        hasRealGps=false;
-        el("gpsStatus").innerHTML="<span class='status-warn'>GPS: sin permiso</span>";
-        showToast("No se pudo acceder al GPS: "+err.message);
-      },{enableHighAccuracy:true,maximumAge:1000,timeout:12000});
-    }
-
-    function angleDiff(a,b){
-      return ((a-b+540)%360)-180;
-    }
-
-    function calculateThermalEfficiency(temp){
-      if(!Number.isFinite(temp)) return {score:null,label:"Esperando clima",message:"Esperando temperatura real para estimar rendimiento térmico.",severity:"warn"};
-      let score,label,message,severity;
-      if(temp>=18 && temp<=28){score=100;label="Óptima";severity="good";message=`Temp. ideal (${temp}°C): batería y climatización trabajan bien.`}
-      else if(temp>=12 && temp<18){score=96;label="Leve frío";severity="warn";message=`${temp}°C: impacto bajo. Puede haber una pequeña pérdida por batería más fría o calefacción.`}
-      else if(temp>=5 && temp<12){score=91;label="Frío mod.";severity="warn";message=`${temp}°C: la eficiencia puede bajar por batería fría y uso de calefacción. Preacondicionar ayuda.`}
-      else if(temp>=0 && temp<5){score=86;label="Frío";severity="bad";message=`${temp}°C: rendimiento afectado. Puede notarse menor autonomía y más consumo de climatización.`}
-      else if(temp<0){score=78;label="Frío ext.";severity="bad";message=`${temp}°C: condición muy desfavorable. La batería entrega menos energía útil y la calefacción consume bastante.`}
-      else if(temp>28 && temp<=34){score=96;label="Calor leve";severity="warn";message=`${temp}°C: impacto bajo/moderado. Puede subir el consumo por aire acondicionado.`}
-      else if(temp>34 && temp<=40){score=90;label="Calor";severity="warn";message=`${temp}°C: el rendimiento puede verse afectado por refrigeración de batería y cabina.`}
-      else{score=84;label="Calor ext.";severity="bad";message=`${temp}°C: condición térmica exigente. Puede aumentar consumo y conviene evitar carga rápida innecesaria.`}
-      return {score,label,message,severity};
-    }
-
-    function angleDiff(a,b){
-      return ((a-b+540)%360)-180;
-    }
-
-    function calculateImpact(){
-      const heading=Number(carHeading.value);
-      const windTo=Number(windDirection.value); // hacia dónde sopla el viento
-      const windFrom=normalizeDeg(windTo+180); // desde dónde viene el viento
-      const windKmh=Number(windSpeed.value);
-      const speedKmh=Number(carSpeed.value);
-      const p=vehicleParams[vehicleType.value]||vehicleParams.suv;
-
-      // Relación direccional para mensajes.
-      const incomingRelative=angleDiff(windFrom,heading);
-      const absRel=Math.abs(incomingRelative);
-      const side=incomingRelative<0?"derecha":"izquierda";
-      let relativeText;
-      if(absRel<35) relativeText="Viento frontal";
-      else if(absRel<80) relativeText=`Frontal ${side}`;
-      else if(absRel<115) relativeText=`Lateral ${side}`;
-      else if(absRel<150) relativeText="Cola lateral";
-      else relativeText="Viento de cola";
-
-      // Modelo físico simplificado:
-      // La resistencia aerodinámica depende de la velocidad RELATIVA del aire respecto al auto.
-      // Si el viento sopla hacia el mismo rumbo del auto => cola => vAir baja.
-      // Si sopla contra el auto => frente => vAir sube.
-      const v=Math.max(0,speedKmh/3.6);
-      const w=Math.max(0,windKmh/3.6);
-      const angleTo=shortestAngle(heading,windTo);
-      const rad=angleTo*Math.PI/180;
-      const vAir=Math.sqrt(Math.max(0,v*v+w*w-2*v*w*Math.cos(rad)));
-
-      const rho=1.225; // kg/m³, aire estándar
-      const g=9.81;
-      const drivetrainEff=0.90;
-
-      // Potencia de arrastre necesaria en las ruedas: F_drag * velocidad del vehículo.
-      const pDrag0=.5*rho*p.cdA*v*v*v/1000;          // sin viento
-      const pDragW=.5*rho*p.cdA*vAir*vAir*v/1000;    // con viento
-      const pRoll=p.mass*g*p.crr*v/1000;
-      const pAux=p.aux;
-
-      const base=(pDrag0+pRoll+pAux)/drivetrainEff;
-      const actual=(pDragW+pRoll+pAux)/drivetrainEff;
-
-      let efficiency=base>0?(base/actual)*100:100;
-      efficiency=Math.max(60,Math.min(115,Math.round(efficiency)));
-      const impact=efficiency-100;
-      const consumptionDelta=actual>0?((actual/base)-1)*100:0;
-      const aeroDeltaKw=pDragW-pDrag0;
-      const aeroShare=actual>0?(pDragW/actual)*100:0;
-
-      return{
-        heading,windDir:windTo,windFrom,windKmh,speedKmh,
-        angle:absRel,angleTo,impact,efficiency,relativeText,
-        consumptionDelta,aeroShare,pExtra:aeroDeltaKw,
-        vAirKmh:vAir*3.6,base,actual
-      };
-    }
-
-    function updateWindLines(windDir,windKmh){
-      const layer=el("windLayer");layer.innerHTML="";
-      const count=Math.max(10,Math.min(24,Math.round(8+windKmh/4))),speed=Math.max(1.2,4-windKmh/30);
-      for(let i=0;i<count;i++){
-        const line=document.createElement("div");
-        line.className="wind-line";
-        line.style.top=`${8+Math.random()*84}%`;
-        line.style.left=`${-42+Math.random()*45}%`;
-        line.style.width=`${62+Math.random()*92}px`;
-        line.style.animationDuration=`${speed+Math.random()*1.1}s`;
-        line.style.animationDelay=`${Math.random()*-4}s`;
-        layer.appendChild(line);
       }
-      layer.style.transform=`rotate(${windDir}deg)`;
     }
+    lastLat=c.latitude;lastLon=c.longitude;
+    lastPos={lat:c.latitude,lon:c.longitude,t:nowMs};
+    fetchWeather(c.latitude,c.longitude);
+    updateUI();
+  },err=>{
+    hasGps=false;
+    $("gpsStatus").textContent="GPS: sin permiso";
+    $("gpsStatus").className="status-badge warn";
+    showToast("No se pudo acceder al GPS: "+err.message);
+  },{enableHighAccuracy:true,maximumAge:1500,timeout:14000});
+}
 
-    function update(){
-      const d=calculateImpact();
-      el("carHeadingVal").textContent=d.heading;el("windDirectionVal").textContent=d.windDir;el("windSpeedVal").textContent=d.windKmh;el("carSpeedVal").textContent=d.speedKmh;
-      // Norte siempre queda arriba; solo rota el vehículo según rumbo GPS.\n      el("vehicleRotor").style.transform=`rotate(${d.heading}deg)`;
-      el("headingHuman").textContent=`${degToCardinal(d.heading)} · ${d.heading}°`;
-      el("windSpeedMetric").textContent=(!customMode && !hasRealWeather) ? "--" : d.windKmh;el("windDirHuman").textContent=(!customMode && !hasRealWeather) ? "--" : `${degToCardinal(d.windFrom)}`;
-      el("relativeAngle").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : Math.round(d.angle);el("carSpeedMetric").textContent=(!customMode && !hasRealGps) ? "--" : d.speedKmh;
-      const rounded=Math.round(d.impact);
-      const efficiency=d.efficiency;
-      el("impactValue").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--%" : `${efficiency}%`;
+// ─── event listeners ──────────────────────────────────────────────────────
+$("startBtn").addEventListener("click",startGps);
 
-      el("windSpeedMetric").textContent=(!customMode && !hasRealWeather) ? "--" : d.windKmh;
-      el("windDirHuman").textContent=(!customMode && !hasRealWeather) ? "--" : `${d.windDir}°`;
-      el("relativeAngle").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : Math.round(d.angle);
-      el("carSpeedMetric").textContent=(!customMode && !hasRealGps) ? "--" : d.speedKmh;
-      const thermal=calculateThermalEfficiency(currentTemp);
-      const thermalMetric=el("thermalMetric");
-      if(thermalMetric){
-        thermalMetric.classList.remove("good","warn","bad");
-        if(thermal.score===null || (!customMode && !hasRealWeather)){
-          el("tempMetric").textContent="--";
-          el("thermalLabel").textContent="Sin clima";
-        }else{
-          el("tempMetric").textContent=currentTemp;
-          el("thermalLabel").textContent=`${thermal.score}% · ${thermal.label}`;
-          thermalMetric.classList.add(thermal.severity);
-        }
-      }
+$("customBtn").addEventListener("click",()=>{
+  customMode=!customMode;
+  $("customPanel").classList.toggle("visible",customMode);
+  $("customBtn").classList.toggle("active",customMode);
+  $("customBtn").textContent=customMode?"✅ Manual":"⚙️ Manual";
+  if(customMode){
+    // Initialize state from sliders when entering custom mode
+    state.heading=Number(carHeadingEl.value);
+    state.windFrom=Number(windDirEl.value);
+    state.windKmh=Number(windSpeedEl.value);
+    state.speedKmh=Number(carSpeedEl.value);
+  }
+  showToast(customMode?"Modo manual: usá los sliders para simular.":"Modo real: GPS y viento meteorológico.");
+  updateUI();
+});
 
-      const metric=el("impactMetric");metric.classList.remove("good","warn","bad");
-      const windWidget=document.querySelector(".wind-widget");
-      if(windWidget){
-        windWidget.style.borderColor=d.windKmh<15?"rgba(125,211,252,.38)":d.windKmh<30?"rgba(45,212,168,.38)":d.windKmh<50?"rgba(212,160,23,.42)":d.windKmh<70?"rgba(249,115,22,.46)":"rgba(230,57,70,.48)";
-      }
+$("themeBtn").addEventListener("click",()=>{
+  const root=document.documentElement;
+  const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
+  root.setAttribute("data-theme",next);
+  $("themeBtn").textContent=next==="dark"?"🌙":"☀️";
+  document.querySelector("meta[name=theme-color]").setAttribute("content",next==="dark"?"#06120d":"#edf7f2");
+});
 
-      let label=d.relativeText,explanation;
-      if(d.speedKmh<12){
-        metric.classList.add("warn");
-        label="Sin rumbo estable";
-        explanation="Estás quieto o casi quieto. Movete unos metros para que el GPS calcule rumbo real.";
-      }else if(efficiency>=105){
-        metric.classList.add("good");
-        label=d.relativeText;
-        explanation=`${d.relativeText}: favorable. El aire relativo baja a ${Math.round(d.vAirKmh)} km/h y la eficiencia estimada sube a ${efficiency}%.`;
-      }else if(efficiency>=100){
-        metric.classList.add("good");
-        label=d.relativeText;
-        explanation=`${d.relativeText}: leve ayuda o impacto casi neutro. Eficiencia estimada ${efficiency}%.`;
-      }else if(efficiency<82){
-        metric.classList.add("bad");
-        label="Muy ineficiente";
-        explanation=`⚠️ ${d.relativeText}. El aire relativo sube a ${Math.round(d.vAirKmh)} km/h, eficiencia ${efficiency}% y consumo +~${Math.round(d.consumptionDelta)}%. Bajar velocidad ayuda mucho porque el arrastre crece con la velocidad del aire al cuadrado.`;
-      }else if(efficiency<92){
-        metric.classList.add("bad");
-        label=d.relativeText;
-        explanation=`${d.relativeText}: condición desfavorable. Eficiencia estimada ${efficiency}% y consumo +~${Math.round(d.consumptionDelta)}%.`;
-      }else{
-        metric.classList.add("warn");
-        label=d.relativeText;
-        explanation=`${d.relativeText}. Eficiencia estimada ${efficiency}%. Impacto moderado/bajo por viento.`;
-      }
+vehicleTypeEl.addEventListener("change",()=>{
+  state.vehicle=vehicleTypeEl.value;
+  loadVehicleImg(vehicleTypeEl.value);
+  updateUI();
+});
 
-      if(!customMode){
-        if(!hasRealGps && !hasRealWeather) explanation="Tocá GPS + viento. Se usará ubicación, velocidad y rumbo por GPS, más viento y temperatura actual.";
-        else if(!hasRealGps) explanation="Falta GPS real. Permití ubicación y movete unos metros para estimar rumbo y velocidad.";
-        else if(!hasRealWeather) explanation="GPS activo, pero falta clima real. Reintentá en unos segundos.";
-      }
-      if(!customMode && (!hasRealGps || !hasRealWeather)) label="Esperando";
-      if(hasRealWeather && thermal && thermal.score!==null && thermal.score<97 && !explanation.includes("GPS + viento")){
-        explanation = explanation + " " + thermal.message;
-      }
-      el("impactLabel").textContent=label;el("explanation").textContent=explanation;
-      fitCompassCircle();
-      updateWindLines(d.windDir,d.windKmh);
+// sliders (custom mode)
+function onSlider(){
+  if(!customMode)return;
+  state.heading=Number(carHeadingEl.value);
+  state.windFrom=Number(windDirEl.value);
+  state.windKmh=Number(windSpeedEl.value);
+  state.speedKmh=Number(carSpeedEl.value);
+  $("carHeadingVal").textContent=Math.round(state.heading);
+  $("windDirectionVal").textContent=Math.round(state.windFrom);
+  $("windSpeedVal").textContent=Math.round(state.windKmh);
+  $("carSpeedVal").textContent=Math.round(state.speedKmh);
+  updateUI();
+}
+[carHeadingEl,windDirEl,windSpeedEl,carSpeedEl].forEach(el=>{
+  el.addEventListener("input",onSlider);
+  el.addEventListener("change",onSlider);
+});
+
+// compass heading from device
+setInterval(()=>{
+  if(hasCompass&&Number.isFinite(deviceHeading)&&!customMode&&hasGps){
+    // deviceHeading = direction device faces. For car heading, GPS heading is more accurate.
+    // We use device compass only if GPS heading unavailable (low speed).
+    if(state.speedKmh<8){
+      state.heading=normDeg(deviceHeading);
     }
+  }
+},250);
 
-    ["input","change"].forEach(evt=>{
-      [carHeading,windDirection,windSpeed,carSpeed].forEach(n=>n.addEventListener(evt,update));
-      [vehicleType].forEach(n=>n.addEventListener(evt,applyVehicleStyle));
-    });
-    el("startBtn").addEventListener("click",startGps);
-    el("customBtn").addEventListener("click",()=>{
-      customMode=!customMode;
-      document.body.classList.toggle("custom-mode",customMode);
-      el("customBtn").textContent=customMode?"✅":"⚙️";
-      showToast(customMode?"Modo personalizado activado. Los controles manuales quedan visibles.":"Modo real activado. Se usarán GPS y viento meteorológico.");
-      update();
-    });
-    el("themeBtn").addEventListener("click",()=>{
-      const root=document.documentElement,next=root.getAttribute("data-theme")==="dark"?"light":"dark";
-      root.setAttribute("data-theme",next);
-      document.querySelector('meta[name="theme-color"]').setAttribute("content",next==="dark"?"#07140f":"#f1f9f5");
-      document.documentElement.style.backgroundColor=next==="dark"?"#07140f":"#f1f9f5";
-      document.body.style.backgroundColor=next==="dark"?"#07140f":"#f1f9f5";
-      el("themeBtn").textContent=next==="dark"?"☀️":"🌙";
-    });
-    window.addEventListener("resize",()=>{fitCompassCircle();update();});
-    applyVehicleStyle();
-    update();
-  </script>
+// ─── resize & init ────────────────────────────────────────────────────────
+window.addEventListener("resize",()=>{resize();});
+new ResizeObserver(()=>{resize();}).observe($("compassCanvas").parentElement);
+
+// Boot
+resize();
+// Default custom mode state to show something useful
+state={heading:35,windFrom:225,windKmh:28,speedKmh:80,vehicle:"suv"};
+updateUI();
+animate();
+</script>
 </body>
 </html>
