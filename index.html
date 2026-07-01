@@ -717,15 +717,19 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
   // Consumo base del vehículo (kWh/km)
   const consumo_wltp = bateria / wltp_km;
 
-  // Etiqueta de dirección relativa (para UI)
-  const absRel = shortAngle(heading, windFrom);
-  let relText;
-  if(absRel < 30)       relText = "Viento frontal";
-  else if(absRel < 75)  relText = "Frontal oblicuo";
-  else if(absRel < 115) relText = "Viento lateral";
-  else if(absRel < 150) relText = "Cola lateral";
-  else                  relText = "Viento de cola";
+  // windTo = hacia dónde se mueve el viento
   const windTo = normDeg(windFrom + 180);
+
+  // Etiqueta de dirección relativa (para UI):
+  // El ángulo debe medirse entre el rumbo del auto y windTo (hacia dónde va el viento),
+  // no windFrom (de dónde viene). Así 0° = cola pura, 180° = frente puro.
+  const absRel = shortAngle(heading, windTo);
+  let relText;
+  if(absRel < 30)       relText = "Viento de cola";
+  else if(absRel < 75)  relText = "Cola lateral";
+  else if(absRel < 115) relText = "Viento lateral";
+  else if(absRel < 150) relText = "Frontal oblicuo";
+  else                  relText = "Viento frontal";
 
   // Vehículo quieto: devolver valores base sin cálculo de viento
   if(v_ms === 0){
@@ -955,41 +959,6 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     }
     ctx.restore();
 
-    // flecha de dirección del viento sobre el anillo exterior (en coordenadas de rosa)
-    const windFromCanvasAngle=(windFrom-90)*Math.PI/180;
-    const arrowR=R+12,arrowTip=R-8;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(windFromCanvasAngle)*arrowR,Math.sin(windFromCanvasAngle)*arrowR);
-    ctx.lineTo(Math.cos(windFromCanvasAngle)*arrowTip,Math.sin(windFromCanvasAngle)*arrowTip);
-    ctx.strokeStyle=isDark?"rgba(56,189,248,.8)":"rgba(2,132,199,.8)";
-    ctx.lineWidth=2.5;
-    ctx.setLineDash([4,3]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    // punta de flecha
-    const tipX=Math.cos(windFromCanvasAngle)*arrowTip,tipY=Math.sin(windFromCanvasAngle)*arrowTip;
-    const perp=windFromCanvasAngle+Math.PI/2;
-    ctx.beginPath();
-    ctx.moveTo(tipX,tipY);
-    ctx.lineTo(tipX+Math.cos(perp)*5+Math.cos(windFromCanvasAngle+Math.PI)*9,
-               tipY+Math.sin(perp)*5+Math.sin(windFromCanvasAngle+Math.PI)*9);
-    ctx.lineTo(tipX-Math.cos(perp)*5+Math.cos(windFromCanvasAngle+Math.PI)*9,
-               tipY-Math.sin(perp)*5+Math.sin(windFromCanvasAngle+Math.PI)*9);
-    ctx.closePath();
-    ctx.fillStyle=isDark?"rgba(56,189,248,.8)":"rgba(2,132,199,.8)";
-    ctx.fill();
-    // etiqueta "VIENTO" — contra-rotar para que sea legible
-    const lblR=R+28;
-    const lblX=Math.cos(windFromCanvasAngle)*lblR,lblY=Math.sin(windFromCanvasAngle)*lblR;
-    ctx.save();
-    ctx.translate(lblX,lblY);
-    ctx.rotate(-roseAngle);
-    ctx.font="600 9px -apple-system,sans-serif";
-    ctx.fillStyle=isDark?"rgba(56,189,248,.9)":"rgba(2,132,199,.9)";
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.fillText("VIENTO",0,0);
-    ctx.restore();
   }
 
   ctx.restore(); // fin bloque rotado de la rosa
@@ -1133,7 +1102,7 @@ function updateUI(){
   }else if(s.speedKmh<12){
     exp="Velocidad muy baja. Movete más rápido para que el GPS calcule rumbo real con precisión.";
   }else if(d.efficiency>=105){
-    exp=`${d.relText}: el viento te ayuda. Velocidad relativa del aire ${Math.round(d.vAirKmh)} km/h → eficiencia +${Math.round(d.impact)}%. ${currentTemp!==null&&thermal.score!==null&&thermal.score<97?thermal.label+": "+currentTemp+"°C puede afectar batería.":""}`;
+    exp=`${d.relText}: el viento te favorece. Consumo estimado ${d.consumDelta<0?Math.round(Math.abs(d.consumDelta))+"% menos":"+"+Math.round(d.consumDelta)+"%"}, autonomía ~${d.autonomiaKm} km.${currentTemp!==null&&thermal.score!==null&&thermal.score<97?" "+thermal.label+": "+currentTemp+"°C puede afectar batería.":""}`;
   }else if(d.efficiency>=98){
     exp=`${d.relText}: impacto casi neutro. Eficiencia estimada ${d.efficiency}%.`;
   }else if(d.efficiency<85){
