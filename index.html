@@ -770,22 +770,27 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
   const fd_base = 0.5 * rho * cd * area * (v_car_ms * v_car_ms);
   const fd_wind = 0.5 * rho * cd * area * (vAir_ms * vAir_ms);
 
-  // Potencia aerodinámica en ruedas (kW). Se conserva para trazabilidad del modelo.
+  // Potencia aerodinámica en ruedas (kW). El cociente de potencias equivale al
+  // cociente de arrastres porque ambas se calculan contra la misma velocidad del auto.
   const p_aero_base = (fd_base * v_car_ms) / 1000;
   const p_aero_wind = (fd_wind * v_car_ms) / 1000;
+  const factorAero = p_aero_base > 0 ? p_aero_wind / p_aero_base : 1;
 
   // Penalización por viento lateral: esfuerzo de dirección y fricción de neumáticos.
-  let penalizacionLateral = 0;
-  if(v_car_ms > 0 && v_crosswind > 0){
-    penalizacionLateral = Math.min(0.15, (v_crosswind / v_car_ms) * 0.12);
-  }
+  // Nunca bonifica: sólo suma pérdidas y queda limitada al 15%.
+  const penalizacionLateral = (v_car_ms > 0 && v_crosswind > 0)
+    ? Math.min(0.15, (v_crosswind / v_car_ms) * 0.12)
+    : 0;
+  const factorLateral = 1 + penalizacionLateral;
 
-  // Consumo WLTP base (kWh/km) y consumo real ajustado.
+  // Consumo WLTP base (kWh/km). El viento frontal sólo afecta la porción
+  // aerodinámica estimada del consumo; rodadura/auxiliares no deben multiplicarse
+  // por el cuadrado del viento. Esto evita que un viento oblicuo/lateral aparezca
+  // como una bonificación exagerada o como un castigo desproporcionado.
   const consumo_wltp = bateria / wltp_km;
-
-  // Integramos la penalización lateral directamente al factor de resistencia.
-  const factor = v_car_ms > 0 ? (vAir_ms / v_car_ms) * (1 + penalizacionLateral) : 1;
-  const consumo_real = consumo_wltp * (factor * factor) * 0.8;
+  const proporcion_aero = 0.65;
+  const proporcion_fija = 0.35;
+  const consumo_real = consumo_wltp * (proporcion_fija + proporcion_aero * factorAero) * factorLateral;
 
   // Autonomía estimada con margen de seguridad (km).
   const autonomia_real = consumo_real > 0
