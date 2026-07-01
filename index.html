@@ -208,6 +208,15 @@
     }
 
 
+
+    .compass-rose{
+      position:absolute;
+      inset:0;
+      transform-origin:50% 50%;
+      pointer-events:none;
+      z-index:1;
+    }
+
     .north-axis{
       position:absolute;
       left:50%;
@@ -244,6 +253,7 @@
       display:grid;
       place-items:center;
       pointer-events:none;
+      z-index:2;
     }
     .vehicle-rotor{
       width:128px;
@@ -702,7 +712,7 @@
 
     <main class="main">
       <section class="control-strip">
-        <button class="start-btn" id="startBtn" type="button">📍 GPS + viento</button>
+        <button class="start-btn" id="startBtn" type="button">📍 GPS + brújula + viento</button>
         <select id="vehicleType" aria-label="Tipo de vehículo">
           <option value="hatch">Hatch</option>
           <option value="sedan">Sedán</option>
@@ -738,8 +748,10 @@
         <div class="compass">
           <div class="wind-layer" id="windLayer"></div>
           <div class="ring"></div>
-          <div class="north-axis" aria-hidden="true"></div>
-          <div class="cardinal n">N</div><div class="cardinal e">E</div><div class="cardinal s">S</div><div class="cardinal w">O</div>
+          <div class="compass-rose" id="compassRose">
+            <div class="north-axis" aria-hidden="true"></div>
+            <div class="cardinal n">N</div><div class="cardinal e">E</div><div class="cardinal s">S</div><div class="cardinal w">O</div>
+          </div>
 
           <div class="vehicle-stage">
             <div class="vehicle-rotor" id="vehicleRotor">
@@ -747,7 +759,7 @@
             </div>
           </div>
 
-          <div class="heading-pill"><span>Norte fijo · Rumbo</span><strong id="headingHuman">NE</strong></div>
+          <div class="heading-pill"><span>Norte real · Rumbo</span><strong id="headingHuman">NE</strong></div>
         </div>
 
       </section>
@@ -795,7 +807,7 @@
   <script>
     const el=id=>document.getElementById(id);
     const carHeading=el("carHeading"),windDirection=el("windDirection"),windSpeed=el("windSpeed"),carSpeed=el("carSpeed"),vehicleType=el("vehicleType");
-    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false,hasRealSpeed=false,currentTemp=null;
+    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false,hasRealSpeed=false,currentTemp=null,deviceHeading=null,hasCompass=false;
     const vehicleParams={hatch:{mass:1450,cdA:.60,crr:.010,aux:.8},sedan:{mass:1700,cdA:.56,crr:.010,aux:.8},suv:{mass:1900,cdA:.72,crr:.011,aux:.9},pickup:{mass:2250,cdA:.95,crr:.012,aux:1.0}};
     const vehicleStyles={
       hatch:{src:"assets/vehiculos/hatchback_top_view_200x200.png",width:132,height:132},
@@ -862,9 +874,47 @@
       }
     }
 
+    function displayAngle(deg){
+      return normalizeDeg(deg-(hasCompass&&Number.isFinite(deviceHeading)?deviceHeading:0));
+    }
+
+    async function startCompass(){
+      try{
+        if(typeof DeviceOrientationEvent!=="undefined" && typeof DeviceOrientationEvent.requestPermission==="function"){
+          const permission=await DeviceOrientationEvent.requestPermission();
+          if(permission!=="granted"){
+            hasCompass=false;
+            return;
+          }
+        }
+
+        window.addEventListener("deviceorientation",ev=>{
+          let heading=null;
+
+          // iOS/Safari: rumbo real/magnético del dispositivo respecto al norte.
+          if(typeof ev.webkitCompassHeading==="number" && Number.isFinite(ev.webkitCompassHeading)){
+            heading=ev.webkitCompassHeading;
+          }
+          // Android/Chrome: alpha suele ser orientación del dispositivo; se invierte para aproximar rumbo.
+          else if(typeof ev.alpha==="number" && Number.isFinite(ev.alpha)){
+            heading=360-ev.alpha;
+          }
+
+          if(heading!==null){
+            deviceHeading=normalizeDeg(heading);
+            hasCompass=true;
+            update();
+          }
+        },true);
+      }catch(e){
+        hasCompass=false;
+      }
+    }
+
     function startGps(){
       if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
-      showToast("Solicitando permiso de ubicación…");
+      showToast("Solicitando permiso de ubicación y brújula…");
+      startCompass();
       el("gpsStatus").innerHTML="<span class='status-warn'>GPS: solicitando…</span>";
       if(watchId!==null)navigator.geolocation.clearWatch(watchId);
       watchId=navigator.geolocation.watchPosition(pos=>{
@@ -1002,14 +1052,17 @@
         line.style.animationDelay=`${Math.random()*-4}s`;
         layer.appendChild(line);
       }
-      layer.style.transform=`rotate(${windDir}deg)`;
+      layer.style.transform=`rotate(${displayAngle(windDir)}deg)`;
     }
 
     function update(){
       const d=calculateImpact();
       el("carHeadingVal").textContent=d.heading;el("windDirectionVal").textContent=d.windDir;el("windSpeedVal").textContent=d.windKmh;el("carSpeedVal").textContent=d.speedKmh;
-      // Norte siempre queda arriba; solo rota el vehículo según rumbo GPS.\n      el("vehicleRotor").style.transform=`rotate(${d.heading}deg)`;
-      el("headingHuman").textContent=`${degToCardinal(d.heading)} · ${d.heading}°`;
+      // Norte siempre queda arriba; solo rota el vehículo según rumbo GPS.\n      const carDisplayHeading=displayAngle(d.heading);
+      el("vehicleRotor").style.transform=`rotate(${carDisplayHeading}deg)`;
+      const rose=el("compassRose");
+      if(rose) rose.style.transform=`rotate(${-((hasCompass&&Number.isFinite(deviceHeading))?deviceHeading:0)}deg)`;
+      el("headingHuman").textContent=`${degToCardinal(d.heading)} · ${d.heading}°${hasCompass?"":" · N fijo"}`;
       el("windSpeedMetric").textContent=(!customMode && !hasRealWeather) ? "--" : d.windKmh;el("windDirHuman").textContent=(!customMode && !hasRealWeather) ? "--" : `${degToCardinal(d.windFrom)}`;
       el("relativeAngle").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : Math.round(d.angle);el("carSpeedMetric").textContent=(!customMode && !hasRealGps) ? "--" : d.speedKmh;
       const rounded=Math.round(d.impact);
