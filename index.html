@@ -754,43 +754,47 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
     };
   }
 
-  // Paso 1: ángulo relativo entre el rumbo del vehículo y la dirección DESDE donde sopla.
-  // Se normaliza a 0..180°: 0° = viento frontal puro, 180° = viento de cola puro.
-  let angleDiff = Math.abs((Number(heading) || 0) - (Number(windFrom) || 0));
-  if(angleDiff > 180) angleDiff = 360 - angleDiff;
-  const rad = angleDiff * Math.PI / 180;
+  // Velocidad relativa del aire (descomposición vectorial real).
+  // beta usa directamente heading - windFrom: si ambos coinciden, cos(0)=1
+  // y el viento se interpreta como frontal puro; a 180° se interpreta como cola.
+  const beta = ((Number(heading) || 0) - (Number(windFrom) || 0)) * Math.PI / 180;
 
-  // Paso 2: descomposición del viento.
-  // v_headwind positivo suma contra la nariz; negativo representa viento de cola.
-  const v_headwind = wind_ms * Math.cos(rad);
-  const v_crosswind = Math.abs(wind_ms * Math.sin(rad));
+  // v_headwind: positivo es viento de frente, negativo es viento de cola.
+  const v_headwind = wind_ms * Math.cos(beta);
+  const v_crosswind = Math.abs(wind_ms * Math.sin(beta));
 
-  // Paso 3: velocidad frontal efectiva del aire. Evita arrastre frontal negativo si hay
-  // un viento de cola más rápido que el vehículo.
-  const v_air_frontal = Math.max(0, v_car_ms + v_headwind);
+  // Velocidad frontal efectiva del aire. No puede ser menor que 0.
+  const vAir_ms = Math.max(0, v_car_ms + v_headwind);
 
-  // Paso 4: aerodinámica. Fd = 0.5 * rho * Cd * A * V², usando EXCLUSIVAMENTE
-  // v_air_frontal como V; la potencia se calcula contra la velocidad de avance del auto.
-  const fDragBase = 0.5 * rho * cd * area * v_car_ms * v_car_ms;
-  const fDragWind = 0.5 * rho * cd * area * v_air_frontal * v_air_frontal;
-  const pAeroBaseKw = (fDragBase * v_car_ms) / 1000;
-  const pAeroWindKw = (fDragWind * v_car_ms) / 1000;
-  const factorAero = pAeroBaseKw > 0 ? pAeroWindKw / pAeroBaseKw : 1;
+  // Fuerzas de arrastre: base sin viento vs. condición con viento frontal efectivo.
+  const fd_base = 0.5 * rho * cd * area * (v_car_ms * v_car_ms);
+  const fd_wind = 0.5 * rho * cd * area * (vAir_ms * vAir_ms);
 
-  // Paso 5: penalización lateral por micro-correcciones de dirección y pérdidas de neumático.
-  // Crece con el ratio viento lateral / velocidad del vehículo, limitada a 15%.
-  const lateralPenalty = v_crosswind > 0
-    ? Math.min(0.15, (v_crosswind / v_car_ms) * 0.12)
-    : 0;
-  const factorLateral = 1 + lateralPenalty;
+  // Potencia aerodinámica en ruedas (kW). Se conserva para trazabilidad del modelo.
+  const p_aero_base = (fd_base * v_car_ms) / 1000;
+  const p_aero_wind = (fd_wind * v_car_ms) / 1000;
 
-  // Paso 6: consumo mixto. Sólo el 65% aerodinámico se escala con el viento frontal;
-  // el 35% de rodadura/auxiliares se mantiene estable, y luego se aplica la corrección lateral.
-  const AERO_SHARE = 0.65;
-  const FIXED_SHARE = 0.35;
-  const consumoEst = consumoBase100 * (FIXED_SHARE + AERO_SHARE * factorAero) * factorLateral;
-  const autonomiaEst = consumoEst > 0 ? Math.max(0, Math.round((bateria / consumoEst) * 100)) : 0;
+  // Penalización por viento lateral: esfuerzo de dirección y fricción de neumáticos.
+  let penalizacionLateral = 0;
+  if(v_car_ms > 0 && v_crosswind > 0){
+    penalizacionLateral = Math.min(0.15, (v_crosswind / v_car_ms) * 0.12);
+  }
 
+  // Consumo WLTP base (kWh/km) y consumo real ajustado.
+  const consumo_wltp = bateria / wltp_km;
+
+  // Integramos la penalización lateral directamente al factor de resistencia.
+  const factor = v_car_ms > 0 ? (vAir_ms / v_car_ms) * (1 + penalizacionLateral) : 1;
+  const consumo_real = consumo_wltp * (factor * factor) * 0.8;
+
+  // Autonomía estimada con margen de seguridad (km).
+  const autonomia_real = consumo_real > 0
+    ? Math.round((bateria / consumo_real) * 0.95)
+    : wltp_km;
+
+  // Salidas explícitas solicitadas: consumoEst en kWh/100km y autonomía en km.
+  const consumoEst = consumo_real * 100;
+  const autonomiaEst = autonomia_real;
   // Métricas derivadas conservadas para la UI actual.
   const efficiency = Math.max(60, Math.min(120, Math.round((consumoBase100 / consumoEst) * 100)));
   const consumDelta = ((consumoEst / consumoBase100) - 1) * 100;
@@ -798,7 +802,7 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, _vehicleKey){
   return {
     consumoEst,
     autonomiaEst,
-    vAirKmh: v_air_frontal * 3.6,
+    vAirKmh: vAir_ms * 3.6,
     efficiency,
     impact: efficiency - 100,
     relText,
