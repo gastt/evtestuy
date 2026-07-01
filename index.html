@@ -1302,15 +1302,20 @@ setInterval(()=>{
 },250);
 
 // ─── resize & init ────────────────────────────────────────────────────────
-window.addEventListener("resize",()=>{resize();});
-new ResizeObserver(()=>{resize();}).observe($("compassCanvas").parentElement);
+window.addEventListener("resize",()=>{ resize(); });
+new ResizeObserver(()=>{ resize(); }).observe($("compassCanvas").parentElement);
 
-// Boot
-resize();
-state={heading:35,windFrom:225,windKmh:28,speedKmh:80,vehiculoKey:""};
-smooth.heading=35; smooth.windFrom=225; smooth.windKmh=28; smooth.speedKmh=80;
-animate();
-loadVehiculos(); // fetch ./vehiculos.csv — mismo directorio que el HTML
+// Boot — todo dentro de rAF para garantizar que el canvas tiene dimensiones reales
+requestAnimationFrame(()=>{
+  resize();
+  // Inicializar state sin reemplazar el objeto (para no romper referencias)
+  state.heading=35; state.windFrom=225; state.windKmh=28; state.speedKmh=80;
+  state._bodyType="suv";
+  smooth.heading=35; smooth.windFrom=225; smooth.windKmh=28; smooth.speedKmh=80;
+  // Arrancar el loop — rAF pasa ts automáticamente, no llamar con ()
+  requestAnimationFrame(animate);
+  loadVehiculos();
+});
 </script>
 </body>
 </html>
