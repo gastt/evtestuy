@@ -807,7 +807,7 @@
   <script>
     const el=id=>document.getElementById(id);
     const carHeading=el("carHeading"),windDirection=el("windDirection"),windSpeed=el("windSpeed"),carSpeed=el("carSpeed"),vehicleType=el("vehicleType");
-    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false,hasRealSpeed=false,currentTemp=null,deviceHeading=null,hasCompass=false;
+    let watchId=null,lastPosition=null,lastWeatherAt=0,customMode=false,hasRealGps=false,hasRealWeather=false,hasRealSpeed=false,currentTemp=null,deviceHeading=null,hasCompass=false,lastLat=null,lastLon=null;
     const vehicleParams={hatch:{mass:1450,cdA:.60,crr:.010,aux:.8},sedan:{mass:1700,cdA:.56,crr:.010,aux:.8},suv:{mass:1900,cdA:.72,crr:.011,aux:.9},pickup:{mass:2250,cdA:.95,crr:.012,aux:1.0}};
     const vehicleStyles={
       hatch:{src:"assets/vehiculos/hatchback_top_view_200x200.png",width:132,height:132},
@@ -869,8 +869,9 @@
         update();
       }catch(e){
         hasRealWeather=false,currentTemp=null;
-        el("weatherStatus").innerHTML="<span class='status-warn'>Clima: error</span>";
-        showToast("No se pudo consultar viento. Podés usar los controles manuales.");
+        console.warn("Error consultando Open-Meteo:", e);
+        el("weatherStatus").innerHTML="<span class='status-warn'>Clima: error API</span>";
+        showToast("GPS activo, pero no se pudo consultar Open-Meteo. Reintentá o revisá conexión.");
       }
     }
 
@@ -913,9 +914,10 @@
 
     function startGps(){
       if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
-      showToast("Solicitando permiso de ubicación y brújula…");
-      startCompass();
+      showToast("Solicitando permiso de ubicación…");
+      startCompass().catch(()=>{hasCompass=false;});
       el("gpsStatus").innerHTML="<span class='status-warn'>GPS: solicitando…</span>";
+      if(lastLat!==null && lastLon!==null) fetchWeather(lastLat,lastLon,true);
       if(watchId!==null)navigator.geolocation.clearWatch(watchId);
       watchId=navigator.geolocation.watchPosition(pos=>{
         const c=pos.coords;
@@ -950,6 +952,8 @@
           if(meters>=3) carHeading.value=Math.round(bearingBetween(lastPosition.lat,lastPosition.lon,c.latitude,c.longitude));
         }
 
+        lastLat=c.latitude;
+        lastLon=c.longitude;
         lastPosition={lat:c.latitude,lon:c.longitude,t:nowMs};
         fetchWeather(c.latitude,c.longitude);
         update();
@@ -1062,7 +1066,7 @@
       el("vehicleRotor").style.transform=`rotate(${carDisplayHeading}deg)`;
       const rose=el("compassRose");
       if(rose) rose.style.transform=`rotate(${-((hasCompass&&Number.isFinite(deviceHeading))?deviceHeading:0)}deg)`;
-      el("headingHuman").textContent=`${degToCardinal(d.heading)} · ${d.heading}°${hasCompass?"":" · N fijo"}`;
+      el("headingHuman").textContent=`${degToCardinal(d.heading)} · ${d.heading}°${hasCompass?"":" · sin brújula"}`;
       el("windSpeedMetric").textContent=(!customMode && !hasRealWeather) ? "--" : d.windKmh;el("windDirHuman").textContent=(!customMode && !hasRealWeather) ? "--" : `${degToCardinal(d.windFrom)}`;
       el("relativeAngle").textContent=(!customMode && (!hasRealGps || !hasRealWeather)) ? "--" : Math.round(d.angle);el("carSpeedMetric").textContent=(!customMode && !hasRealGps) ? "--" : d.speedKmh;
       const rounded=Math.round(d.impact);
