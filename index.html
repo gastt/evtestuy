@@ -919,10 +919,12 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     // Las líneas de viento se dibujan en la dirección windFrom (en coordenadas de la rosa)
     // windFrom es absoluto (geográfico). En la rosa rotada, windFrom ya está mapeado.
     const windTo=normDeg(windFrom+180);
-    const windCanvasAngle=(windTo-90)*Math.PI/180; // hacia dónde se mueve el viento en la rosa
+    // El bloque ya está rotado por roseAngle=-heading. Para que las líneas apunten
+    // hacia windTo en pantalla, necesitamos compensar: rotate = (windTo - 90 + heading)°
+    const windCanvasAngle=(windTo - 90 + heading)*Math.PI/180;
 
     ctx.save();
-    ctx.rotate(windCanvasAngle); // dentro del bloque ya rotado de la rosa
+    ctx.rotate(windCanvasAngle);
 
     const count=Math.min(20,Math.max(6,Math.round(windKmh/3.5)));
     const alpha=Math.min(.75,windKmh/60+.2);
