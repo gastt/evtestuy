@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>EVUruguay — Brújula EV</title>
+  <meta name="theme-color" content="#06120d"/>
+  <style>
+  /* ══════════════════════════════════════════════════════════════
+     TOKENS — instrumento de a bordo: negro verdoso profundo,
+     acentos teal (eficiencia) y celeste (viento), numerales en
+     monoespaciada tabular como un panel digital de cabina.
+     ══════════════════════════════════════════════════════════════ */
+  :root{
+    --bg:#040f0b;
+    --surface:#0a2118;
+    --panel:rgba(10,28,21,.72);
+    --panel-2:rgba(14,36,27,.85);
+    --border:rgba(45,212,167,.16);
+    --border-hi:rgba(45,212,167,.46);
+    --text:#eafbf3;
+    --muted:#74e3bd;
+    --dim:rgba(116,227,189,.52);
+    --teal:#2ee6ab;
+    --green:#17c98a;
+    --forest:#0a8f66;
+    --amber:#f5a524;
+    --red:#fb5a72;
+    --blue:#4fc9ff;
+    --shadow:0 26px 70px rgba(0,0,0,.5);
+    --shadow-sm:0 10px 26px rgba(0,0,0,.32);
+    --r-xl:26px;
+    --r-lg:20px;
+    --r-md:15px;
+    --r-sm:11px;
+    --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,sans-serif;
+    --font-mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  [data-theme=light]{
+    --bg:#eef7f2;
+    --surface:#ffffff;
+    --panel:rgba(255,255,255,.86);
+    --panel-2:rgba(255,255,255,.96);
+    --border:rgba(6,95,70,.16);
+    --border-hi:rgba(6,95,70,.4);
+    --text:#0c2118;
+    --muted:#0a6b4c;
+    --dim:rgba(10,107,76,.5);
+    --teal:#0a9268;
+    --green:#0a7a55;
+    --forest:#0a5f42;
+    --amber:#c07a0a;
+    --red:#d3324a;
+    --blue:#0284c7;
+    --shadow:0 20px 46px rgba(6,95,70,.12);
+    --shadow-sm:0 8px 20px rgba(6,95,70,.1);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-display);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background:
+      radial-gradient(ellipse 62% 40% at 18% 4%,rgba(46,230,171,.14),transparent 60%),
+      radial-gradient(ellipse 55% 45% at 88% 96%,rgba(79,201,255,.09),transparent 60%),
+      var(--bg);
+    pointer-events:none;
+  }
+  ::selection{background:rgba(46,230,171,.3)}
+
+  .app{
+    position:relative;
+    z-index:1;
+    width:100%;
+    height:100svh;
+    max-width:480px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    padding:
+      calc(12px + env(safe-area-inset-top))
+      14px
+      calc(10px + env(safe-area-inset-bottom));
+    gap:9px;
+    overflow:hidden;
+  }
+
+  /* ─── topbar ──────────────────────────────────────────────────── */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    height:46px;
+    flex:0 0 auto;
+  }
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .brand-logo{
+    width:38px;height:38px;border-radius:12px;
+    background:linear-gradient(140deg,var(--teal) 0%,var(--forest) 100%);
+    display:grid;place-items:center;
+    font-weight:800;font-size:.78rem;letter-spacing:-.02em;
+    color:#022b1c;flex-shrink:0;
+    box-shadow:0 6px 18px rgba(46,230,171,.32), inset 0 1px rgba(255,255,255,.35);
+  }
+  .brand-name{font-size:1rem;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.05}
+  .brand-sub{
+    font-size:.58rem;font-weight:700;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.14em;margin-top:2px;
+  }
+  .top-right{display:flex;gap:8px;align-items:center}
+  .icon-btn{
+    height:38px;min-width:38px;padding:0 10px;border-radius:13px;
+    border:1px solid var(--border);
+    background:linear-gradient(155deg,rgba(255,255,255,.06),rgba(255,255,255,.01));
+    color:var(--muted);font-size:.86rem;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(10px);
+    box-shadow:inset 0 1px rgba(255,255,255,.06);
+    transition:border-color .18s,transform .15s;
+    text-decoration:none;
+  }
+  .icon-btn:active{transform:scale(.94)}
+
+  /* ─── start / engage toggle ──────────────────────────────────── */
+  .start-btn{
+    flex:0 0 auto;
+    width:100%;
+    height:60px;
+    border:1px solid rgba(46,230,171,.3);
+    border-radius:var(--r-lg);
+    background:
+      radial-gradient(circle at 90% 50%,rgba(79,201,255,.22),transparent 55%),
+      linear-gradient(105deg,#1fdb9c 0%,#0a9a71 52%,#063a2b 100%);
+    color:#04150f;
+    cursor:pointer;
+    display:flex;align-items:center;
+    padding:0 8px 0 8px;
+    gap:12px;
+    box-shadow:0 16px 34px rgba(10,60,42,.4), inset 0 1px rgba(255,255,255,.22);
+    transition:transform .15s, box-shadow .15s;
+    position:relative;
+    overflow:hidden;
+  }
+  .start-btn:active{transform:scale(.985)}
+  .start-icon{
+    width:42px;height:42px;border-radius:12px;flex:0 0 auto;
+    background:rgba(4,21,15,.16);
+    display:grid;place-items:center;
+    font-size:1.15rem;color:#04150f;
+    box-shadow:inset 0 0 0 1px rgba(4,21,15,.18);
+  }
+  .start-copy{display:flex;flex-direction:column;align-items:flex-start;line-height:1.22;min-width:0}
+  .start-title{font-size:.86rem;font-weight:800;letter-spacing:-.01em;color:#04150f}
+  .start-sub{font-size:.63rem;font-weight:600;color:rgba(4,21,15,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .start-btn::after{
+    content:"";
+    margin-left:auto;flex:0 0 auto;
+    width:34px;height:34px;border-radius:50%;
+    background:rgba(4,21,15,.14);
+    box-shadow:inset 0 0 0 1.5px rgba(4,21,15,.3);
+  }
+  .start-btn svg{display:none}
+
+  /* ─── vehicle selects ─────────────────────────────────────────── */
+  .controls-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    flex:0 0 auto;
+  }
+  .vehicle-select{
+    height:42px;border-radius:13px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    color:var(--text);
+    font-family:var(--font-display);
+    font-size:.82rem;font-weight:700;
+    padding:0 12px;
+    backdrop-filter:blur(10px);
+    outline:none;cursor:pointer;
+    box-shadow:inset 0 1px rgba(255,255,255,.04);
+    appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+    background-position:calc(100% - 16px) center,calc(100% - 11px) center;
+    background-size:5px 5px,5px 5px;
+    background-repeat:no-repeat;
+  }
+  .mode-btn{
+    height:42px;padding:0 14px;border-radius:13px;
+    border:1px solid var(--border);background:var(--panel);
+    color:var(--muted);font-size:.78rem;font-weight:700;cursor:pointer;
+    backdrop-filter:blur(10px);white-space:nowrap;
+  }
+  .mode-btn.active{background:rgba(46,230,171,.14);color:var(--teal);border-color:var(--border-hi)}
+  #csvStatusRow{flex:0 0 auto;min-height:0;display:flex;align-items:center}
+  #csvStatusRow .status-badge{font-size:.6rem;padding:4px 10px}
+
+  /* ─── compass card (hero instrument) ─────────────────────────── */
+  .compass-card{
+    flex:1 1 auto;
+    min-height:0;
+    border-radius:var(--r-xl);
+    background:linear-gradient(165deg,var(--panel-2),var(--panel));
+    border:1px solid var(--border);
+    box-shadow:var(--shadow), inset 0 1px rgba(255,255,255,.05);
+    backdrop-filter:blur(16px);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .metrics-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    flex:0 0 auto;
+    border-bottom:1px solid var(--border);
+  }
+  .metric{
+    padding:11px 6px 9px;
+    display:flex;flex-direction:column;gap:3px;
+    position:relative;
+    min-width:0;
+  }
+  .metric+.metric::before{
+    content:"";position:absolute;left:0;top:14%;bottom:14%;width:1px;
+    background:var(--border);
+  }
+  .metric-label{
+    font-size:.53rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--dim);
+  }
+  .metric-value{
+    font-family:var(--font-mono);
+    font-variant-numeric:tabular-nums;
+    font-size:1.3rem;font-weight:700;letter-spacing:-.02em;line-height:1.05;
+    color:var(--text);
+    transition:color .3s;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .metric-value.good{color:var(--teal)}
+  .metric-value.warn{color:var(--amber)}
+  .metric-value.bad{color:var(--red)}
+  .metric-sub{
+    font-size:.58rem;font-weight:600;color:var(--muted);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .metric-sub.good{color:var(--green)}
+  .metric-sub.warn{color:var(--amber)}
+  .metric-sub.bad{color:var(--red)}
+  .eff-progress{
+    width:100%;max-width:56px;height:3px;border-radius:999px;
+    background:rgba(255,255,255,.08);overflow:hidden;margin:1px 0 2px;
+  }
+  .eff-progress-fill{
+    display:block;height:100%;border-radius:inherit;
+    background:linear-gradient(90deg,var(--amber),var(--teal));
+    transition:width .4s ease;
+  }
+
+  /* compass canvas area — the signature instrument dial */
+  .compass-wrap{
+    flex:1 1 auto;
+    min-height:120px;
+    position:relative;
+    background:
+      radial-gradient(circle at 50% 46%,rgba(46,230,171,.07),transparent 55%),
+      radial-gradient(rgba(46,230,171,.09) 1px,transparent 1px);
+    background-size:auto,16px 16px;
+  }
+  canvas#compassCanvas{position:absolute;inset:0;width:100%;height:100%}
+
+  .heading-pill{
+    position:absolute;
+    bottom:12px;left:50%;transform:translateX(-50%);
+    display:inline-flex;align-items:center;gap:8px;
+    padding:7px 16px;border-radius:999px;
+    border:1px solid var(--border-hi);
+    background:rgba(4,15,11,.7);
+    backdrop-filter:blur(12px);
+    box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.08);
+    white-space:nowrap;pointer-events:none;
+  }
+  [data-theme=light] .heading-pill{background:rgba(255,255,255,.86)}
+  .heading-pill span{font-size:.68rem;font-weight:700;color:var(--muted);font-family:var(--font-mono)}
+  .heading-pill strong{
+    font-family:var(--font-mono);font-variant-numeric:tabular-nums;
+    color:var(--teal);font-weight:700;font-size:.72rem;
+  }
+
+  /* ─── readout ─────────────────────────────────────────────────── */
+  .readout{
+    flex:0 0 auto;
+    border-radius:var(--r-lg);
+    background:linear-gradient(165deg,var(--panel-2),var(--panel));
+    border:1px solid var(--border);
+    box-shadow:var(--shadow-sm), inset 0 1px rgba(255,255,255,.05);
+    backdrop-filter:blur(14px);
+    padding:12px 14px;
+    display:flex;flex-direction:column;gap:7px;
+  }
+  .readout-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .readout-label{
+    font-size:.58rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:.14em;color:var(--teal);
+    display:flex;align-items:center;gap:6px;
+  }
+  .readout-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal)}
+  .readout-status{display:flex;gap:6px}
+  .status-badge{
+    font-size:.6rem;font-weight:700;padding:4px 9px;border-radius:999px;
+    background:rgba(255,255,255,.04);color:var(--dim);
+    border:1px solid var(--border);
+    font-family:var(--font-mono);
+  }
+  .status-badge.ok{background:rgba(46,230,171,.13);color:var(--teal);border-color:rgba(46,230,171,.32)}
+  .status-badge.warn{background:rgba(245,165,36,.12);color:var(--amber);border-color:rgba(245,165,36,.32)}
+  .readout-text{font-size:.79rem;line-height:1.42;color:var(--muted);font-weight:500}
+
+  /* ─── custom panel (kept for state compatibility, unused in UI) ── */
+  .custom-panel{display:none}
+
+  /* ─── toast ───────────────────────────────────────────────────── */
+  .toast{
+    position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));
+    transform:translateX(-50%) translateY(10px);
+    width:min(420px,calc(100% - 28px));
+    padding:12px 18px;border-radius:14px;
+    background:linear-gradient(135deg,var(--teal),var(--forest));
+    color:#04150f;font-size:.78rem;font-weight:700;text-align:center;
+    opacity:0;pointer-events:none;
+    transition:opacity .22s, transform .22s;
+    z-index:100;
+    box-shadow:0 16px 40px rgba(0,0,0,.35);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ─── hidden manual-state inputs (GPS/custom compatibility) ───── */
+  .manual-inputs-hidden{display:none!important}
+
+  /* ─── compact-height fallback ─────────────────────────────────── */
+  @media(max-height:700px){
+    .app{gap:7px}
+    .topbar{height:40px}
+    .start-btn{height:52px}
+    .start-icon{width:36px;height:36px;font-size:1rem}
+    .start-title{font-size:.8rem}
+    .start-sub{font-size:.58rem}
+    .vehicle-select,.mode-btn{height:38px}
+    .metric{padding:8px 6px 7px}
+    .metric-value{font-size:1.1rem}
+    .compass-wrap{min-height:100px}
+    .readout{padding:10px 12px}
+    .readout-text{font-size:.74rem}
+  }
+  @media(max-height:620px){
+    .readout-text{display:none}
+    .heading-pill{bottom:8px;padding:5px 12px}
+  }
+  @media(max-width:360px){
+    .metric-value{font-size:1.08rem}
+    .metric-label{font-size:.5rem}
+    .start-sub{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- topbar -->
+  <header class="topbar">
+    <a class="brand" href="https://evuruguay.com">
+      <div class="brand-logo">EV</div>
+      <div>
+        <div class="brand-name">EVUruguay</div>
+        <div class="brand-sub">Brújula de eficiencia</div>
+      </div>
+    </a>
+    <div class="top-right">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Tema">🌙</button>
+      <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
+    </div>
+  </header>
+
+  <!-- start -->
+  <button class="start-btn" id="startBtn" type="button">
+    <span class="start-icon">⌖</span>
+    <span class="start-copy">
+      <span class="start-title">GPS + Brújula + Viento real</span>
+      <span class="start-sub" id="startSub">Datos actualizados hace 1 min</span>
+    </span>
+  </button>
+
+  <!-- vehicle + mode -->
+  <div class="controls-row vehicle-row">
+    <select id="marcaSelect" class="vehicle-select" aria-label="Marca">
+      <option value="">Cargando...</option>
+    </select>
+    <select id="modeloSelect" class="vehicle-select" aria-label="Modelo">
+      <option value="">Modelo</option>
+    </select>
+  </div>
+  <div id="csvStatusRow" style="min-height:18px;display:flex;align-items:center">
+    <span class="status-badge" id="csvStatus" style="font-size:.58rem;padding:2px 8px">Cargando vehículos…</span>
+  </div>
+
+  <!-- compass card -->
+  <div class="compass-card">
+    <!-- metrics strip -->
+    <div class="metrics-strip">
+      <div class="metric">
+        <div class="metric-label">Eficiencia</div>
+        <div class="metric-value" id="effValue">--%</div>
+        <div class="eff-progress"><span class="eff-progress-fill" id="effProgress"></span></div>
+        <div class="metric-sub" id="effLabel">Esperando</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Viento</div>
+        <div class="metric-value" id="windValue">-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span></div>
+        <div class="metric-sub" id="windLabel">sin datos</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Temperatura</div>
+        <div class="metric-value" id="tempValue">-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span></div>
+        <div class="metric-sub" id="tempLabel">sin datos</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Autonomía</div>
+        <div class="metric-value good" id="autonomyValue">-- <span style="font-size:.7rem;font-weight:700;color:var(--teal)">km</span></div>
+        <div class="metric-sub" id="autonomyLabel">Estimada</div>
+      </div>
+    </div>
+
+    <!-- canvas compass -->
+    <div class="compass-wrap">
+      <canvas id="compassCanvas"></canvas>
+      <div class="heading-pill">
+        <span id="headingHuman">Norte · 0°</span>
+        <strong id="speedHuman">-- km/h</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- readout -->
+  <div class="readout">
+    <div class="readout-head">
+      <span class="readout-label">Lectura</span>
+      <div class="readout-status">
+        <span class="status-badge" id="gpsStatus">GPS: --</span>
+        <span class="status-badge" id="weatherStatus">Clima: --</span>
+      </div>
+    </div>
+    <div class="readout-text" id="explanation">Tocá el botón de arriba para activar GPS y viento real. Se calcularán rumbo, velocidad y eficiencia aerodinámica en tiempo real.</div>
+  </div>
+
+  <!-- hidden state controls retained for GPS/custom state compatibility; no manual sliders exposed -->
+  <div class="manual-inputs-hidden" aria-hidden="true">
+    <input id="carHeading" type="hidden" value="35"/>
+    <input id="windDirection" type="hidden" value="225"/>
+    <input id="windSpeed" type="hidden" value="28"/>
+    <input id="carSpeed" type="hidden" value="80"/>
+    <b id="carHeadingVal">35</b><b id="windDirectionVal">225</b><b id="windSpeedVal">28</b><b id="carSpeedVal">80</b>
+  </div>
+
+</div><!-- .app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── helpers ─────────────────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const carHeadingEl=$("carHeading"),windDirEl=$("windDirection"),windSpeedEl=$("windSpeed"),carSpeedEl=$("carSpeed");
+
+function normDeg(d){return((d%360)+360)%360}
+function shortAngle(a,b){let d=Math.abs(normDeg(a)-normDeg(b))%360;return d>180?360-d:d}
+function toCardinal(deg){return["N","NE","E","SE","S","SO","O","NO"][Math.round(normDeg(deg)/45)%8]}
+function bearingBetween(la1,lo1,la2,lo2){
+  const r=d=>d*Math.PI/180,D=r=>r*180/Math.PI;
+  const y=Math.sin(r(lo2-lo1))*Math.cos(r(la2)),x=Math.cos(r(la1))*Math.sin(r(la2))-Math.sin(r(la1))*Math.cos(r(la2))*Math.cos(r(lo2-lo1));
+  return normDeg(D(Math.atan2(y,x)));
+}
+function distMeters(la1,lo1,la2,lo2){
+  const R=6371000,r=d=>d*Math.PI/180,dLa=r(la2-la1),dLo=r(lo2-lo1);
+  const a=Math.sin(dLa/2)**2+Math.cos(r(la1))*Math.cos(r(la2))*Math.sin(dLo/2)**2;
+  return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function showToast(msg){
+  const t=$("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3800);
+}
+
+// ─── wake lock (evita que la pantalla se bloquee mientras se usa) ────────
+let wakeLock=null;
+async function requestWakeLock(){
+  if(!("wakeLock" in navigator))return; // no soportado: se ignora en silencio
+  try{
+    wakeLock=await navigator.wakeLock.request("screen");
+    wakeLock.addEventListener("release",()=>{ wakeLock=null; });
+  }catch(e){
+    wakeLock=null; // permiso denegado o pestaña no visible; se reintenta luego
+  }
+}
+function releaseWakeLock(){
+  if(wakeLock){ wakeLock.release().catch(()=>{}); wakeLock=null; }
+}
+// El navegador libera el wake lock automáticamente al cambiar de pestaña;
+// lo volvemos a pedir apenas la página vuelve a estar visible, sólo si el
+// tracking sigue activo.
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible" && (hasGps||customMode) && !wakeLock){
+    requestWakeLock();
+  }
+});
+
+// ─── state ────────────────────────────────────────────────────────────────
+let watchId=null,lastPos=null,lastWeatherAt=0;
+let customMode=false,hasGps=false,hasWeather=false;
+let currentTemp=null,deviceHeading=null,hasCompass=false;
+let lastLat=null,lastLon=null;
+
+// Internal state (used for canvas draw and computation)
+let state={heading:35,windFrom:225,windKmh:0,speedKmh:0,vehicle:"suv"};
+
+// ─── vehicle images ───────────────────────────────────────────────────────
+const vehicleImgSrc={
+  hatch:"assets/vehiculos/hatchback_top_view_200x200.png",
+  sedan:"assets/vehiculos/sedan_top_view_200x200.png",
+  suv:  "assets/vehiculos/suv_top_view_200x200.png",
+  pickup:"assets/vehiculos/pickup_top_view_200x200.png"
+};
+const vehicleImgSize={
+  hatch:{w:132,h:132},sedan:{w:136,h:136},suv:{w:142,h:142},pickup:{w:148,h:148}
+};
+let vehicleImg=new Image();
+function loadVehicleImg(key){
+  state._bodyType = key || "suv";
+  const img=new Image();
+  img.onload=()=>{vehicleImg=img};
+  img.onerror=()=>{vehicleImg=null};
+  img.src=vehicleImgSrc[key]||vehicleImgSrc.suv;
+}
+loadVehicleImg("suv");
+
+// ─── vehicle data (loaded from CSV) ──────────────────────────────────────
+let vehiculosDB = []; // [{marca, modelo, bateria_kwh, wltp_km}]
+let vehiculoActual = null; // vehículo seleccionado
+
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim() !== '');
+  if(lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  return lines.slice(1).map(line => {
+    const parts = line.split(',');
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (parts[i] || '').trim(); });
+    return obj;
+  }).filter(r => r.marca && r.marca !== '' && r.modelo && r.modelo !== '');
+}
+
+async function loadVehiculos(){
+  const statusEl = $("csvStatus");
+  const rowEl    = $("csvStatusRow");
+
+  // Try XHR first (works on file:// in some browsers), then fetch
+  function xhrGet(url){
+    return new Promise((resolve, reject)=>{
+      const x = new XMLHttpRequest();
+      x.open("GET", url);
+      x.onload  = ()=> x.status < 400 ? resolve(x.responseText) : reject(new Error("XHR HTTP "+x.status));
+      x.onerror = ()=> reject(new Error("XHR network error"));
+      x.send();
+    });
+  }
+
+  async function getText(url){
+    // Try XHR first, then fetch as fallback
+    try{ return await xhrGet(url); }
+    catch(e1){
+      const res = await fetch(url, {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      return await res.text();
+    }
+  }
+
+  try{
+    if(statusEl) statusEl.textContent = "Cargando vehículos…";
+    const text = await getText('./vehiculos.csv');
+    vehiculosDB = parseCSV(text);
+    if(vehiculosDB.length === 0) throw new Error("CSV vacío o sin filas válidas");
+    if(rowEl) rowEl.remove();
+    buildMarcaSelect();
+  }catch(e){
+    console.warn("vehiculos.csv:", e.message);
+    if(statusEl){
+      statusEl.textContent = "⚠️ vehiculos.csv no cargó: "+e.message;
+      statusEl.className = "status-badge warn";
+    }
+    vehiculoActual = {bateria_kwh:60, wltp_km:400};
+    $("marcaSelect").innerHTML = '<option>Sin datos</option>';
+    $("modeloSelect").innerHTML = '<option>—</option>';
+    updateUI();
+  }
+}
+
+function buildMarcaSelect(){
+  const marcas = [...new Set(vehiculosDB.map(v=>v.marca))].sort();
+  const sel = $('marcaSelect');
+  sel.innerHTML = '<option value="">— Marca —</option>' +
+    marcas.map(m=>`<option value="${m}">${m}</option>`).join('');
+  // Default a BYD si existe
+  const defaultMarca = marcas.includes('BYD') ? 'BYD' : marcas[0];
+  if(defaultMarca){ sel.value = defaultMarca; buildModeloSelect(defaultMarca); }
+}
+
+function buildModeloSelect(marca){
+  const modelos = vehiculosDB.filter(v=>v.marca===marca);
+  const sel = $('modeloSelect');
+  sel.innerHTML = modelos.map(v=>`<option value="${v.modelo}">${v.modelo}</option>`).join('');
+  // Pick first
+  if(modelos.length>0){
+    vehiculoActual = modelos[0];
+    state.vehiculoKey = marca+'|'+modelos[0].modelo;
+    loadVehicleImg(modelos[0].tipo || guessBodyType(modelos[0].modelo, marca));
+    updateUI();
+  }
+}
+
+function guessBodyType(modelo, marca){
+  const m = (modelo+' '+marca).toLowerCase();
+  if(/deliver|sprinter|tunland|wonder box|toano|e-toano|cargo van|van|minibus|cabina/i.test(m)) return 'pickup';
+  if(/pick.?up|terron|ridder|foton e wonder pick|hilux|ranger/i.test(m)) return 'pickup';
+  if(/suv|4x4|crossover|song|yuan|ev5|g6|g9|sealion|tang|aion v|captiva|equinox|blazer|euniq|countryman|c11|c16|c10|s7|b10|hyptec|horizon|zeekr x|zeekr 7|aion ut|leapmotor b|leapmotor c|geely ex5|geely geometry c|lynk|omoda|chery eq7|jaecoo|smart #1|smart #3|jeep|riddara|gac|jmev gse|dongfeng mage|fiat 600|geely ex5/i.test(m)) return 'suv';
+  if(/seal$|seal 4wd|eqe|eqs|eqa|eqb|i4|i5|i7|zeekr 001|deepal s5|gac aion es/i.test(m)) return 'sedan';
+  return 'hatch';
+}
+
+// ─── physics ───────────────────────────────────────────────────────────
+function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wltpKmOverride){
+  /*
+    Cálculo EVUruguay v2 (corregido):
+    1) Parte de la autonomía WLTP del vehículo.
+    2) Separa la penalización real-vs-WLTP a esa velocidad en dos partes:
+       - un "overhead" FIJO (accesorios, clima, manejo real) que NO depende del viento.
+       - un componente AERODINÁMICO, que sí depende del viento y escala con
+         el cuadrado de la velocidad relativa del aire (v_aire²), como la física real.
+    3) Con viento de cola fuerte, v_aire cae bastante por debajo de la velocidad del
+       auto, así que el componente aerodinámico se reduce y la eficiencia PUEDE
+       superar el 100% de verdad (no hay techo artificial).
+       Con viento de frente fuerte, v_aire sube por encima de la velocidad del auto,
+       el componente aerodinámico crece sin techo y la eficiencia cae en consecuencia.
+  */
+
+  const bateriaParam = Number(bateriaKwhOverride);
+  const wltpParam = Number(wltpKmOverride);
+  const bateriaCsv = vehiculoActual ? Number(vehiculoActual.bateria_kwh) : NaN;
+  const wltpCsv = vehiculoActual ? Number(vehiculoActual.wltp_km) : NaN;
+
+  const bateria = bateriaParam > 0 ? bateriaParam : (bateriaCsv > 0 ? bateriaCsv : 60);
+  const wltp_km = wltpParam > 0 ? wltpParam : (wltpCsv > 0 ? wltpCsv : 400);
+
+  const speed = Math.max(0, Number(speedKmh) || 0);
+  const wind = Math.max(0, Number(windKmh) || 0);
+  const carHeading = normDeg(Number(heading) || 0);
+  const windFromDeg = normDeg(Number(windFrom) || 0);
+  const windTo = normDeg(windFromDeg + 180);
+
+  const consumoWltp100 = bateria > 0 && wltp_km > 0 ? (bateria / wltp_km) * 100 : 15;
+
+  // Penalización real-vs-WLTP a esa velocidad, de referencia (sin viento).
+  function speedPenaltyPercent(v){
+    if(v < 50) return 5;
+    if(v < 90) return 10;
+    if(v < 100) return 15;
+    if(v < 110) return 20;
+    if(v < 120) return 25;
+    if(v < 130) return 30;
+    if(v < 135) return 35;
+    if(v < 140) return 40;
+    if(v < 145) return 45;
+    return 50;
+  }
+
+  // Parte fija (no aerodinámica) del overhead: clima, accesorios, manejo real.
+  // El resto de la penalización de velocidad SÍ es aerodinámico y por lo tanto
+  // depende del viento.
+  const FLAT_OVERHEAD_PCT = 5;
+  function aeroOverheadPercent(v){
+    return Math.max(0, speedPenaltyPercent(v) - FLAT_OVERHEAD_PCT);
+  }
+
+  const absRel = shortAngle(carHeading, windTo);
+  let relText;
+  if(absRel < 30)       relText = "Viento de cola";
+  else if(absRel < 75)  relText = "Cola lateral";
+  else if(absRel < 115) relText = "Viento lateral";
+  else if(absRel < 150) relText = "Frontal oblicuo";
+  else                  relText = "Viento frontal";
+
+  // Sin velocidad útil, no forzamos cálculo aerodinámico.
+  if(speed < 5){
+    return {
+      consumoEst: consumoWltp100,
+      autonomiaEst: Math.round(wltp_km),
+      vAirKmh: 0,
+      efficiency: 100,
+      impact: 0,
+      relText,
+      windTo,
+      consumDelta: 0,
+      autonomiaKm: Math.round(wltp_km),
+      wltpKm: wltp_km
+    };
+  }
+
+  // Componente del viento sobre el eje de marcha.
+  // Positivo = viento de cola; negativo = viento frontal.
+  const delta = ((windTo - carHeading + 540) % 360) - 180;
+  const tailwindComponent = wind * Math.cos(delta * Math.PI / 180);
+
+  // Velocidad relativa del aire contra el vehículo (no se clampea hacia arriba;
+  // sólo se evita que sea negativa).
+  const vAirKmh = Math.max(0, speed - tailwindComponent);
+
+  // Factor aerodinámico: proporcional a (v_aire / v_auto)^2, física real de arrastre.
+  const aeroRatio = speed > 0 ? (vAirKmh / speed) : 1;
+  const aeroFactor = aeroRatio * aeroRatio; // <1 con cola fuerte, >1 con frente fuerte
+
+  // Factor total de consumo respecto al WLTP puro:
+  // 1 (base WLTP) + overhead fijo + overhead aerodinámico ajustado por el viento.
+  const totalFactor = 1
+    + (FLAT_OVERHEAD_PCT / 100)
+    + (aeroOverheadPercent(speed) / 100) * aeroFactor;
+
+  const autonomiaEst = Math.round(wltp_km / totalFactor);
+  const consumoEst = consumoWltp100 * totalFactor;
+
+  // Eficiencia: porcentaje de autonomía estimada contra WLTP.
+  const efficiency = Math.round((1 / totalFactor) * 100);
+  const consumDelta = (totalFactor - 1) * 100;
+
+  return {
+    consumoEst,
+    autonomiaEst,
+    vAirKmh,
+    efficiency,
+    impact: efficiency - 100,
+    relText,
+    windTo,
+    consumDelta,
+    autonomiaKm: autonomiaEst,
+    wltpKm: wltp_km,
+    basePenalty: speedPenaltyPercent(speed)
+  };
+}
+
+function calcThermal(temp){
+  if(!Number.isFinite(temp))return{score:null,label:"sin temp.",cls:"warn"};
+  if(temp>=18&&temp<=28) return{score:100,label:"Temp. óptima",cls:"good"};
+  if(temp>=12&&temp<18)  return{score:96, label:"Leve frío",cls:"warn"};
+  if(temp>=5&&temp<12)   return{score:91, label:"Frío mod.",cls:"warn"};
+  if(temp>=0&&temp<5)    return{score:86, label:"Frío",cls:"bad"};
+  if(temp<0)             return{score:78, label:"Frío ext.",cls:"bad"};
+  if(temp>28&&temp<=34)  return{score:96, label:"Calor leve",cls:"warn"};
+  if(temp>34&&temp<=40)  return{score:90, label:"Calor",cls:"warn"};
+  return{score:84,label:"Calor ext.",cls:"bad"};
+}
+
+// ─── canvas compass ────────────────────────────────────────────────────────
+const canvas=$("compassCanvas");
+const ctx=canvas.getContext("2d");
+let animId=null;
+let windAnimOffset=0;
+let roadOffset=0; // fase de scroll de la carretera, avanza con la velocidad
+
+function resize(){
+  const wrap=canvas.parentElement;
+  const w=wrap.clientWidth,h=wrap.clientHeight;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=w*dpr;
+  canvas.height=h*dpr;
+  canvas.style.width=w+"px";
+  canvas.style.height=h+"px";
+  ctx.scale(dpr,dpr);
+}
+
+function getColors(){
+  const s=getComputedStyle(document.documentElement);
+  return{
+    teal:s.getPropertyValue("--teal").trim()||"#34d399",
+    muted:s.getPropertyValue("--muted").trim()||"#6ee7b7",
+    dim:s.getPropertyValue("--dim").trim()||"rgba(110,231,183,.5)",
+    text:s.getPropertyValue("--text").trim()||"#dff5eb",
+    amber:s.getPropertyValue("--amber").trim()||"#f59e0b",
+    red:s.getPropertyValue("--red").trim()||"#f43f5e",
+    bg:s.getPropertyValue("--surface").trim()||"#0d2018",
+    forest:s.getPropertyValue("--forest").trim()||"#059669",
+  };
+}
+
+// Color del viento según su intensidad: azul (calma) → teal → ámbar → rojo (fuerte).
+function windColorForSpeed(kmh){
+  const stops=[
+    {t:0,  c:[79,201,255]},  // calma — azul
+    {t:18, c:[46,230,171]},  // moderado — teal (color de marca)
+    {t:38, c:[245,165,36]},  // fuerte — ámbar
+    {t:60, c:[251,90,114]},  // muy fuerte — rojo
+  ];
+  const v=Math.max(0,Math.min(60,kmh));
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i],b=stops[i+1];
+    if(v>=a.t&&v<=b.t){
+      const f=(v-a.t)/(b.t-a.t);
+      return[
+        Math.round(a.c[0]+(b.c[0]-a.c[0])*f),
+        Math.round(a.c[1]+(b.c[1]-a.c[1])*f),
+        Math.round(a.c[2]+(b.c[2]-a.c[2])*f),
+      ];
+    }
+  }
+  return stops[stops.length-1].c;
+}
+
+// Carretera de fondo: vista cenital tipo "juego de autos", con carriles que
+// se desplazan hacia abajo en función de la velocidad real (roadOffset).
+// Se dibuja SIN rotar (el auto siempre apunta arriba, así que la ruta bajo
+// él siempre es "recta hacia adelante"), por eso va antes del bloque rotado
+// de la rosa.
+function drawRoad(w,h,cx,cy,R,isDark){
+  // Ancho de ruta atado al ancho real del canvas (no al radio de la rosa),
+  // para que los 3 carriles sean lo bastante anchos y el auto quede
+  // cómodo en el carril central sin pisar las líneas.
+  const roadHalfW=Math.min(w*0.46,R*1.15);
+  const left=cx-roadHalfW,right=cx+roadHalfW;
+
+  // asfalto
+  const asphaltGrad=ctx.createLinearGradient(0,0,0,h);
+  if(isDark){
+    asphaltGrad.addColorStop(0,"#0b1a15");
+    asphaltGrad.addColorStop(.5,"#0e2019");
+    asphaltGrad.addColorStop(1,"#0b1a15");
+  }else{
+    asphaltGrad.addColorStop(0,"#33403a");
+    asphaltGrad.addColorStop(.5,"#3c4a43");
+    asphaltGrad.addColorStop(1,"#33403a");
+  }
+  ctx.fillStyle=asphaltGrad;
+  ctx.fillRect(0,0,w,h);
+
+  // banquinas (borde de ruta) con leve acento de marca
+  ctx.strokeStyle=isDark?"rgba(46,230,171,.28)":"rgba(255,255,255,.35)";
+  ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(left,0);ctx.lineTo(left,h);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(right,0);ctx.lineTo(right,h);ctx.stroke();
+
+  // 3 carriles: el vehículo va centrado en el carril del medio,
+  // con una línea discontinua divisoria a cada lado (no una sola
+  // línea partiendo el auto al medio).
+  const laneW=(roadHalfW*2)/3;
+  const lane1X=left+laneW;    // divisoria carril izq. / carril central
+  const lane2X=left+laneW*2;  // divisoria carril central / carril der.
+
+  const dashLen=24,gapLen=20,period=dashLen+gapLen;
+  const phase=((roadOffset%period)+period)%period;
+  ctx.strokeStyle="rgba(238,247,238,.7)";
+  ctx.lineWidth=3;
+  ctx.lineCap="round";
+  ctx.setLineDash([dashLen,gapLen]);
+  ctx.lineDashOffset=-phase;
+  [lane1X,lane2X].forEach(x=>{
+    ctx.beginPath();
+    ctx.moveTo(x,-period);
+    ctx.lineTo(x,h+period);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // marcas cortas en las banquinas (rumble strip), también animadas
+  const tickLen=10,tickGap=34,tickPeriod=tickLen+tickGap;
+  const tPhase=((roadOffset%tickPeriod)+tickPeriod)%tickPeriod;
+  ctx.strokeStyle=isDark?"rgba(238,247,238,.22)":"rgba(255,255,255,.3)";
+  ctx.lineWidth=3;
+  ctx.setLineDash([tickLen,tickGap]);
+  ctx.lineDashOffset=-tPhase;
+  [left+8,right-8].forEach(x=>{
+    ctx.beginPath();
+    ctx.moveTo(x,-tickPeriod);
+    ctx.lineTo(x,h+tickPeriod);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // viñeta suave para integrar la ruta con el resto del panel
+  const vignette=ctx.createRadialGradient(cx,cy,R*0.2,cx,cy,Math.max(w,h)*0.72);
+  vignette.addColorStop(0,"rgba(0,0,0,0)");
+  vignette.addColorStop(1,isDark?"rgba(2,8,6,.55)":"rgba(10,20,16,.18)");
+  ctx.fillStyle=vignette;
+  ctx.fillRect(0,0,w,h);
+}
+
+function drawCompass(heading,windFrom,windKmh,speedKmh){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(w===0||h===0)return;
+  ctx.clearRect(0,0,w,h);
+
+  const cx=w/2,cy=h/2;
+  const R=Math.min(w,h)*0.42;
+  const C=getColors();
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+
+  // ─────────────────────────────────────────────────────────────────
+  // LÓGICA: el vehículo siempre apunta hacia ARRIBA (hacia la pantalla).
+  // La ROSA (ticks, cardinales, viento) GIRA el ángulo -heading para
+  // que el norte quede en la posición que le corresponde respecto al auto.
+  // Así: si el auto va al norte → la N queda arriba.
+  //       si el auto va al este  → la N queda a la izquierda.
+  // ─────────────────────────────────────────────────────────────────
+  const roseAngle = -heading * Math.PI / 180; // rotación de la rosa
+
+  // ── FONDO FIJO: carretera animada (scroll ligado a la velocidad real) ──
+  drawRoad(w,h,cx,cy,R,isDark);
+
+  // ── BLOQUE ROTADO: todo lo que pertenece a la rosa, ahora como
+  //    referencia tipo "marca de agua" sobre la carretera ──
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(roseAngle);
+  ctx.globalAlpha=0.4; // marca de agua: la rosa queda de referencia, no protagonista
+
+  // outer ring (círculo, no se ve diferente rotado pero lo mantenemos en bloque)
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.strokeStyle=isDark?"rgba(52,211,153,.35)":"rgba(5,150,105,.3)";
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+
+  // inner rings dashed
+  [.68,.38].forEach(f=>{
+    ctx.beginPath();
+    ctx.arc(0,0,R*f,0,Math.PI*2);
+    ctx.setLineDash([4,6]);
+    ctx.strokeStyle=isDark?"rgba(52,211,153,.2)":"rgba(5,150,105,.22)";
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // ticks de grados (rotan con la rosa)
+  for(let i=0;i<360;i+=10){
+    const major=i%90===0;
+    const mid=i%30===0;
+    const a=(i-90)*Math.PI/180; // 0° = N = arriba en coordenadas de la rosa
+    const r1=major?R-16:mid?R-10:R-6;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*r1,Math.sin(a)*r1);
+    ctx.lineTo(Math.cos(a)*R,Math.sin(a)*R);
+    ctx.strokeStyle=major?C.teal:mid?C.dim:"rgba(52,211,153,.28)";
+    ctx.lineWidth=major?1.5:1;
+    ctx.stroke();
+  }
+
+  // cardinales (rotan con la rosa — así N va a donde corresponde)
+  [["N",0],["E",90],["S",180],["O",270]].forEach(([lbl,deg])=>{
+    const a=(deg-90)*Math.PI/180;
+    const rL=R-30;
+    ctx.save();
+    ctx.translate(Math.cos(a)*rL,Math.sin(a)*rL);
+    ctx.rotate(-roseAngle); // contra-rotar el texto para que siempre sea legible
+    ctx.font=`700 ${lbl==="N"?13:11}px -apple-system,sans-serif`;
+    ctx.fillStyle=lbl==="N"?C.teal:C.muted;
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(lbl,0,0);
+    ctx.restore();
+  });
+
+  ctx.globalAlpha=1; // a partir de acá el viento vuelve a full opacidad
+
+  // ── viento (dentro del bloque rotado de la rosa) ──
+  if(windKmh>1){
+    // Las líneas de viento pertenecen a la rosa, por eso NO compensan el heading.
+    // Como todo este bloque ya está rotado por roseAngle=-heading, usar sólo windTo
+    // hace que el viento acompañe visualmente el giro de la brújula y quede relativo
+    // al vehículo (que siempre apunta hacia arriba en pantalla).
+    const windTo=normDeg(windFrom+180);
+    const windCanvasAngle=(windTo - 90)*Math.PI/180;
+
+    ctx.save();
+    ctx.rotate(windCanvasAngle);
+
+    const count=Math.min(20,Math.max(6,Math.round(windKmh/3.5)));
+    const alpha=Math.min(.75,windKmh/60+.2);
+    windAnimOffset=(windAnimOffset+windKmh/2000)%1;
+
+    // color dinámico según la potencia del viento: azul (calma) → rojo (fuerte)
+    const wc=windColorForSpeed(windKmh).join(",");
+
+    for(let i=0;i<count;i++){
+      const spread=R*.85;
+      const xOff=(((i+.5)/count)-.5)*spread*2;
+      if(Math.abs(xOff)>R*.88)continue;
+      const phase=((i/count)+windAnimOffset)%1;
+      const lineLen=R*(.45+windKmh/120);
+      const startY=-R*.98+(phase*R*1.96);
+
+      const g=ctx.createLinearGradient(xOff,startY,xOff,startY+lineLen);
+      g.addColorStop(0,"transparent");
+      g.addColorStop(.3,`rgba(${wc},${alpha*.7})`);
+      g.addColorStop(.85,`rgba(${wc},${alpha})`);
+      g.addColorStop(1,"transparent");
+      ctx.beginPath();
+      ctx.moveTo(xOff,startY);
+      ctx.lineTo(xOff,startY+lineLen);
+      ctx.strokeStyle=g;
+      ctx.lineWidth=windKmh>30?2:1.5;
+      ctx.stroke();
+
+      const ay=startY+lineLen*.75;
+      ctx.beginPath();
+      ctx.moveTo(xOff,ay+8);
+      ctx.lineTo(xOff-4,ay);
+      ctx.lineTo(xOff+4,ay);
+      ctx.closePath();
+      ctx.fillStyle=`rgba(${wc},${alpha*.8})`;
+      ctx.fill();
+    }
+    ctx.restore();
+
+  }
+
+  ctx.restore(); // fin bloque rotado de la rosa
+
+  // ── BLOQUE FIJO: vehículo siempre apunta arriba ──
+  ctx.save();
+  ctx.translate(cx,cy);
+  // sin rotación — el vehículo apunta hacia arriba (norte de pantalla = dirección de marcha)
+  const imgSize=vehicleImgSize[state._bodyType||"suv"]||{w:142,h:142};
+  if(vehicleImg&&vehicleImg.complete&&vehicleImg.naturalWidth>0){
+    ctx.drawImage(vehicleImg,-imgSize.w/2,-imgSize.h/2,imgSize.w,imgSize.h);
+  }
+  ctx.restore();
+
+  // ── BLOQUE FIJO: triángulo de "frente" siempre arriba ──
+  ctx.save();
+  ctx.translate(cx,cy);
+  const fR=R*.93;
+  ctx.beginPath();
+  ctx.moveTo(0,-fR);
+  ctx.lineTo(-5,-fR+10);
+  ctx.lineTo(5,-fR+10);
+  ctx.closePath();
+  ctx.fillStyle=C.teal;
+  ctx.fill();
+  ctx.restore();
+
+  // ── efficiency arc (fijo, siempre arranca arriba) ──
+  if(speedKmh>=5){
+    const d=calcImpact(heading,windFrom,windKmh,speedKmh,"");
+    const eff=d.efficiency;
+    const arcColor=eff>=100?C.teal:eff>=90?C.amber:C.red;
+    const arcR=R*.54;
+    const arcEnd=-Math.PI/2+(2*Math.PI*(Math.min(eff,115)/115));
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.beginPath();
+    ctx.arc(0,0,arcR,0,Math.PI*2);
+    ctx.strokeStyle=isDark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+    ctx.lineWidth=5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0,0,arcR,-Math.PI/2,arcEnd);
+    ctx.strokeStyle=arcColor;
+    ctx.lineWidth=5;
+    ctx.lineCap="round";
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+// ─── smooth interpolation ─────────────────────────────────────────────────
+// Separate "display" values that lag behind the target state via lerp
+const smooth={heading:35,windFrom:225,windKmh:0,speedKmh:0};
+
+// Shortest-path lerp for angles (handles 359->1 correctly)
+function lerpAngle(cur,target,t){
+  let diff=((target-cur+540)%360)-180;
+  return cur+diff*t;
+}
+function lerpVal(cur,target,t){
+  return cur+(target-cur)*t;
+}
+
+let lastTs=null;
+function animate(ts){
+  if(lastTs===null)lastTs=ts;
+  const dt=Math.min(ts-lastTs,100); // cap at 100ms to avoid jumps after tab switch
+  lastTs=ts;
+
+  // Frame-rate independent lerp: base=0.004 gives ~180ms settling time
+  const k=1-Math.pow(0.004,dt/1000);
+
+  smooth.heading  = lerpAngle(smooth.heading,  state.heading,  k);
+  smooth.windFrom = lerpAngle(smooth.windFrom, state.windFrom, k);
+  smooth.windKmh  = lerpVal(smooth.windKmh,   state.windKmh,  k);
+  smooth.speedKmh = lerpVal(smooth.speedKmh,  state.speedKmh, k);
+
+  // La ruta avanza proporcional a la velocidad real (px/seg ~ km/h * factor).
+  // A 0 km/h la ruta queda quieta; a más velocidad, scroll más rápido.
+  roadOffset += smooth.speedKmh * 1.9 * (dt/1000);
+
+  drawCompass(smooth.heading, smooth.windFrom, smooth.windKmh, smooth.speedKmh);
+  animId=requestAnimationFrame(animate);
+}
+
+// ─── metrics update ───────────────────────────────────────────────────────
+function updateUI(){
+  const s=state;
+  const waiting=!customMode&&!hasGps&&!hasWeather;
+  const d=calcImpact(s.heading,s.windFrom,s.windKmh,s.speedKmh,s.vehicle);
+  const thermal=calcThermal(currentTemp);
+
+  // efficiency metric
+  const effEl=$("effValue");
+  if(waiting||s.speedKmh<5){
+    effEl.textContent="--";
+    effEl.className="metric-value";
+    $("effProgress").style.width="0%";
+    $("effLabel").textContent=s.speedKmh<5&&(customMode||hasGps)?"<12 km/h":"Esperando";
+    $("effLabel").className="metric-sub warn";
+    $("autonomyValue").innerHTML='-- <span style="font-size:.7rem;font-weight:700;color:var(--teal)">km</span>';
+    $("autonomyLabel").textContent="Estimada";
+  }else{
+    effEl.textContent=d.efficiency+"%";
+    const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
+    effEl.className="metric-value "+cls;
+    $("effProgress").style.width=Math.max(6,Math.min(100,d.efficiency)) + "%";
+    $("effLabel").textContent=d.relText;
+    $("effLabel").className="metric-sub "+cls;
+    $("autonomyValue").innerHTML=`~${d.autonomiaKm} <span style="font-size:.7rem;font-weight:700;color:var(--teal)">km</span>`;
+    $("autonomyLabel").textContent="▰ Estimada";
+  }
+
+  // wind metric
+  if(!customMode&&!hasWeather){
+    $("windValue").innerHTML='-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span>';
+    $("windLabel").textContent="sin datos";
+    $("windLabel").className="metric-sub";
+  }else{
+    // wColor unused but calculated for future use
+    $("windValue").innerHTML=`${Math.round(s.windKmh)} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span>`;
+    $("windLabel").textContent=`${toCardinal(s.windFrom)} · ${Math.round(s.windFrom)}°`;
+    $("windLabel").className="metric-sub";
+  }
+
+  // temp metric
+  if(!customMode&&!hasWeather||currentTemp===null){
+    $("tempValue").innerHTML='-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>';
+    $("tempLabel").textContent="sin datos";
+    $("tempLabel").className="metric-sub";
+  }else{
+    $("tempValue").innerHTML=`${currentTemp} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>`;
+    $("tempLabel").textContent=thermal.label;
+    $("tempLabel").className="metric-sub "+thermal.cls;
+  }
+
+  // heading pill
+  $("headingHuman").textContent=`${toCardinal(s.heading)} · ${Math.round(s.heading)}°`;
+  $("speedHuman").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)} km/h`:"-- km/h";
+
+  // explanation
+  let exp="";
+  if(!customMode&&!hasGps&&!hasWeather){
+    exp="Tocá el botón para activar GPS y viento real. La brújula calculará eficiencia aerodinámica según tu rumbo, velocidad y el viento local.";
+  }else if(!customMode&&!hasGps){
+    exp="GPS solicitado. Permití ubicación y movete unos metros para que el sistema calcule rumbo y velocidad real.";
+  }else if(!customMode&&!hasWeather){
+    exp="GPS activo. Consultando clima en Open-Meteo, reintentá si demora.";
+  }else if(s.speedKmh<12){
+    exp="Velocidad muy baja. Movete más rápido para que el GPS calcule rumbo real con precisión.";
+  }else if(d.efficiency>=105){
+    exp=`${d.relText}: el viento te favorece. Consumo estimado ${d.consumDelta<0?Math.round(Math.abs(d.consumDelta))+"% menos":"+"+Math.round(d.consumDelta)+"%"}, autonomía ~${d.autonomiaKm} km.${currentTemp!==null&&thermal.score!==null&&thermal.score<97?" "+thermal.label+": "+currentTemp+"°C puede afectar batería.":""}`;
+  }else if(d.efficiency>=98){
+    exp=`${d.relText}: impacto casi neutro. Eficiencia estimada ${d.efficiency}%.`;
+  }else if(d.efficiency<85){
+    exp=`⚠️ ${d.relText}: viento muy desfavorable. Eficiencia ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%. Bajar velocidad ayuda mucho (la resistencia crece con el cuadrado de la velocidad del aire).`;
+  }else{
+    exp=`${d.relText}. Eficiencia estimada ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%.`;
+  }
+  $("explanation").textContent=exp;
+}
+
+// ─── GPS + weather ────────────────────────────────────────────────────────
+async function fetchWeather(lat,lon,force=false){
+  const now=Date.now();
+  if(!force&&now-lastWeatherAt<5*60*1000)return;
+  lastWeatherAt=now;
+  $("weatherStatus").textContent="Clima: …";
+  $("weatherStatus").className="status-badge";
+  const url=new URL("https://api.open-meteo.com/v1/forecast");
+  url.searchParams.set("latitude",lat);
+  url.searchParams.set("longitude",lon);
+  url.searchParams.set("current","wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m");
+  url.searchParams.set("wind_speed_unit","kmh");
+  url.searchParams.set("timezone","auto");
+  try{
+    const res=await fetch(url.toString(),{cache:"no-store"});
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const data=await res.json();
+    const c=data.current||{};
+    const spd=Number(c.wind_speed_10m);
+    const from=Number(c.wind_direction_10m); // Open-Meteo gives direction wind is coming FROM
+    const gust=Number(c.wind_gusts_10m);
+    const temp=Number(c.temperature_2m);
+    if(Number.isFinite(spd)){
+      windSpeedEl.value=Math.round(spd);
+      state.windKmh=Math.round(spd);
+    }
+    if(Number.isFinite(from)){
+      // Open-Meteo wind_direction_10m = direction FROM which wind blows
+      windDirEl.value=Math.round(normDeg(from)); // store as "from"
+      state.windFrom=Math.round(normDeg(from));
+    }
+    if(Number.isFinite(temp))currentTemp=Math.round(temp);
+    hasWeather=true;
+    $("weatherStatus").textContent=`Clima: ${Math.round(spd)} km/h${Number.isFinite(gust)?" · r "+Math.round(gust):""}`;
+    $("weatherStatus").className="status-badge ok";
+    updateUI();
+  }catch(e){
+    hasWeather=false;currentTemp=null;
+    $("weatherStatus").textContent="Clima: error";
+    $("weatherStatus").className="status-badge warn";
+    showToast("No se pudo consultar Open-Meteo. Verificá conexión.");
+  }
+}
+
+async function startCompass(){
+  try{
+    if(typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientationEvent.requestPermission==="function"){
+      const perm=await DeviceOrientationEvent.requestPermission();
+      if(perm!=="granted"){hasCompass=false;return}
+    }
+    window.addEventListener("deviceorientation",ev=>{
+      let h=null;
+      if(typeof ev.webkitCompassHeading==="number"&&Number.isFinite(ev.webkitCompassHeading)){
+        h=ev.webkitCompassHeading;
+      }else if(typeof ev.alpha==="number"&&Number.isFinite(ev.alpha)){
+        h=360-ev.alpha;
+      }
+      if(h!==null){deviceHeading=normDeg(h);hasCompass=true;}
+    },true);
+  }catch(e){hasCompass=false}
+}
+
+function startGps(){
+  if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
+  showToast("Solicitando GPS y brújula…");
+  requestWakeLock();
+  startCompass().catch(()=>{hasCompass=false});
+  $("gpsStatus").textContent="GPS: solicitando…";
+  $("gpsStatus").className="status-badge warn";
+  if(lastLat!==null&&lastLon!==null)fetchWeather(lastLat,lastLon,true);
+  if(watchId!==null)navigator.geolocation.clearWatch(watchId);
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    const c=pos.coords;
+    hasGps=true;
+    $("gpsStatus").textContent=`GPS: ±${Math.round(c.accuracy||0)}m`;
+    $("gpsStatus").className="status-badge ok";
+    const nowMs=Date.now();
+    let kmh=null;
+    if(typeof c.speed==="number"&&Number.isFinite(c.speed)){
+      kmh=Math.max(0,Math.round(c.speed*3.6));
+    }else if(lastPos){
+      const m=distMeters(lastPos.lat,lastPos.lon,c.latitude,c.longitude);
+      const sec=Math.max(.5,(nowMs-lastPos.t)/1000);
+      const est=Math.round((m/sec)*3.6);
+      if(Number.isFinite(est))kmh=Math.max(0,Math.min(140,est));
+    }
+    if(kmh!==null){
+      carSpeedEl.value=String(Math.min(140,kmh));
+      state.speedKmh=Math.min(140,kmh);
+    }else{
+      state.speedKmh=0;
+    }
+    if(kmh!==null&&kmh>=3){
+      if(typeof c.heading==="number"&&Number.isFinite(c.heading)&&c.heading>=0){
+        const h=Math.round(c.heading);
+        carHeadingEl.value=h;
+        state.heading=h;
+      }else if(lastPos){
+        const m=distMeters(lastPos.lat,lastPos.lon,c.latitude,c.longitude);
+        if(m>=3){
+          const h=Math.round(bearingBetween(lastPos.lat,lastPos.lon,c.latitude,c.longitude));
+          carHeadingEl.value=h;
+          state.heading=h;
+        }
+      }
+    }
+    lastLat=c.latitude;lastLon=c.longitude;
+    lastPos={lat:c.latitude,lon:c.longitude,t:nowMs};
+    fetchWeather(c.latitude,c.longitude);
+    updateUI();
+  },err=>{
+    hasGps=false;
+    $("gpsStatus").textContent="GPS: sin permiso";
+    $("gpsStatus").className="status-badge warn";
+    showToast("No se pudo acceder al GPS: "+err.message);
+  },{enableHighAccuracy:true,maximumAge:1500,timeout:14000});
+}
+
+// ─── event listeners ──────────────────────────────────────────────────────
+$("startBtn").addEventListener("click",startGps);
+
+$("themeBtn").addEventListener("click",()=>{
+  const root=document.documentElement;
+  const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
+  root.setAttribute("data-theme",next);
+  $("themeBtn").textContent=next==="dark"?"🌙":"☀️";
+  document.querySelector("meta[name=theme-color]").setAttribute("content",next==="dark"?"#06120d":"#edf7f2");
+});
+
+$("marcaSelect").addEventListener("change",()=>{
+  const marca = $("marcaSelect").value;
+  if(marca) buildModeloSelect(marca);
+});
+
+$("modeloSelect").addEventListener("change",()=>{
+  const marca  = $("marcaSelect").value;
+  const modelo = $("modeloSelect").value;
+  const v = vehiculosDB.find(x=>x.marca===marca && x.modelo===modelo);
+  if(v){
+    vehiculoActual = v;
+    state.vehiculoKey = marca+'|'+modelo;
+    loadVehicleImg(v.tipo || guessBodyType(v.modelo, v.marca));
+    updateUI();
+  }
+});
+
+// sliders (custom mode)
+function onSlider(){
+  if(!customMode)return;
+  state.heading=Number(carHeadingEl.value);
+  state.windFrom=Number(windDirEl.value);
+  state.windKmh=Number(windSpeedEl.value);
+  state.speedKmh=Number(carSpeedEl.value);
+  $("carHeadingVal").textContent=Math.round(state.heading);
+  $("windDirectionVal").textContent=Math.round(state.windFrom);
+  $("windSpeedVal").textContent=Math.round(state.windKmh);
+  $("carSpeedVal").textContent=Math.round(state.speedKmh);
+  updateUI();
+}
+[carHeadingEl,windDirEl,windSpeedEl,carSpeedEl].forEach(el=>{
+  el.addEventListener("input",onSlider);
+  el.addEventListener("change",onSlider);
+});
+
+// compass heading from device
+setInterval(()=>{
+  if(hasCompass&&Number.isFinite(deviceHeading)&&!customMode&&hasGps){
+    // deviceHeading = direction device faces. For car heading, GPS heading is more accurate.
+    // We use device compass only if GPS heading unavailable (low speed).
+    if(state.speedKmh<8){
+      state.heading=normDeg(deviceHeading);
+    }
+  }
+},250);
+
+// ─── resize & init ────────────────────────────────────────────────────────
+window.addEventListener("resize",()=>{ resize(); });
+new ResizeObserver(()=>{ resize(); }).observe($("compassCanvas").parentElement);
+
+// Boot — todo dentro de rAF para garantizar que el canvas tiene dimensiones reales
+requestAnimationFrame(()=>{
+  resize();
+  // Inicializar state sin reemplazar el objeto (para no romper referencias)
+  state.heading=35; state.windFrom=225; state.windKmh=28; state.speedKmh=80;
+  state._bodyType="suv";
+  smooth.heading=35; smooth.windFrom=225; smooth.windKmh=28; smooth.speedKmh=80;
+  // Arrancar el loop — rAF pasa ts automáticamente, no llamar con ()
+  requestAnimationFrame(animate);
+  loadVehiculos();
+});
+</script>
+</body>
+</html>
