@@ -499,6 +499,29 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove("show"),3800);
 }
 
+// ─── wake lock (evita que la pantalla se bloquee mientras se usa) ────────
+let wakeLock=null;
+async function requestWakeLock(){
+  if(!("wakeLock" in navigator))return; // no soportado: se ignora en silencio
+  try{
+    wakeLock=await navigator.wakeLock.request("screen");
+    wakeLock.addEventListener("release",()=>{ wakeLock=null; });
+  }catch(e){
+    wakeLock=null; // permiso denegado o pestaña no visible; se reintenta luego
+  }
+}
+function releaseWakeLock(){
+  if(wakeLock){ wakeLock.release().catch(()=>{}); wakeLock=null; }
+}
+// El navegador libera el wake lock automáticamente al cambiar de pestaña;
+// lo volvemos a pedir apenas la página vuelve a estar visible, sólo si el
+// tracking sigue activo.
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible" && (hasGps||customMode) && !wakeLock){
+    requestWakeLock();
+  }
+});
+
 // ─── state ────────────────────────────────────────────────────────────────
 let watchId=null,lastPos=null,lastWeatherAt=0;
 let customMode=false,hasGps=false,hasWeather=false;
@@ -757,6 +780,7 @@ const canvas=$("compassCanvas");
 const ctx=canvas.getContext("2d");
 let animId=null;
 let windAnimOffset=0;
+let roadOffset=0; // fase de scroll de la carretera, avanza con la velocidad
 
 function resize(){
   const wrap=canvas.parentElement;
@@ -783,6 +807,106 @@ function getColors(){
   };
 }
 
+// Color del viento según su intensidad: azul (calma) → teal → ámbar → rojo (fuerte).
+function windColorForSpeed(kmh){
+  const stops=[
+    {t:0,  c:[79,201,255]},  // calma — azul
+    {t:18, c:[46,230,171]},  // moderado — teal (color de marca)
+    {t:38, c:[245,165,36]},  // fuerte — ámbar
+    {t:60, c:[251,90,114]},  // muy fuerte — rojo
+  ];
+  const v=Math.max(0,Math.min(60,kmh));
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i],b=stops[i+1];
+    if(v>=a.t&&v<=b.t){
+      const f=(v-a.t)/(b.t-a.t);
+      return[
+        Math.round(a.c[0]+(b.c[0]-a.c[0])*f),
+        Math.round(a.c[1]+(b.c[1]-a.c[1])*f),
+        Math.round(a.c[2]+(b.c[2]-a.c[2])*f),
+      ];
+    }
+  }
+  return stops[stops.length-1].c;
+}
+
+// Carretera de fondo: vista cenital tipo "juego de autos", con carriles que
+// se desplazan hacia abajo en función de la velocidad real (roadOffset).
+// Se dibuja SIN rotar (el auto siempre apunta arriba, así que la ruta bajo
+// él siempre es "recta hacia adelante"), por eso va antes del bloque rotado
+// de la rosa.
+function drawRoad(w,h,cx,cy,R,isDark){
+  // Ancho de ruta atado al ancho real del canvas (no al radio de la rosa),
+  // para que los 3 carriles sean lo bastante anchos y el auto quede
+  // cómodo en el carril central sin pisar las líneas.
+  const roadHalfW=Math.min(w*0.46,R*1.15);
+  const left=cx-roadHalfW,right=cx+roadHalfW;
+
+  // asfalto
+  const asphaltGrad=ctx.createLinearGradient(0,0,0,h);
+  if(isDark){
+    asphaltGrad.addColorStop(0,"#0b1a15");
+    asphaltGrad.addColorStop(.5,"#0e2019");
+    asphaltGrad.addColorStop(1,"#0b1a15");
+  }else{
+    asphaltGrad.addColorStop(0,"#33403a");
+    asphaltGrad.addColorStop(.5,"#3c4a43");
+    asphaltGrad.addColorStop(1,"#33403a");
+  }
+  ctx.fillStyle=asphaltGrad;
+  ctx.fillRect(0,0,w,h);
+
+  // banquinas (borde de ruta) con leve acento de marca
+  ctx.strokeStyle=isDark?"rgba(46,230,171,.28)":"rgba(255,255,255,.35)";
+  ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(left,0);ctx.lineTo(left,h);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(right,0);ctx.lineTo(right,h);ctx.stroke();
+
+  // 3 carriles: el vehículo va centrado en el carril del medio,
+  // con una línea discontinua divisoria a cada lado (no una sola
+  // línea partiendo el auto al medio).
+  const laneW=(roadHalfW*2)/3;
+  const lane1X=left+laneW;    // divisoria carril izq. / carril central
+  const lane2X=left+laneW*2;  // divisoria carril central / carril der.
+
+  const dashLen=24,gapLen=20,period=dashLen+gapLen;
+  const phase=((roadOffset%period)+period)%period;
+  ctx.strokeStyle="rgba(238,247,238,.7)";
+  ctx.lineWidth=3;
+  ctx.lineCap="round";
+  ctx.setLineDash([dashLen,gapLen]);
+  ctx.lineDashOffset=-phase;
+  [lane1X,lane2X].forEach(x=>{
+    ctx.beginPath();
+    ctx.moveTo(x,-period);
+    ctx.lineTo(x,h+period);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // marcas cortas en las banquinas (rumble strip), también animadas
+  const tickLen=10,tickGap=34,tickPeriod=tickLen+tickGap;
+  const tPhase=((roadOffset%tickPeriod)+tickPeriod)%tickPeriod;
+  ctx.strokeStyle=isDark?"rgba(238,247,238,.22)":"rgba(255,255,255,.3)";
+  ctx.lineWidth=3;
+  ctx.setLineDash([tickLen,tickGap]);
+  ctx.lineDashOffset=-tPhase;
+  [left+8,right-8].forEach(x=>{
+    ctx.beginPath();
+    ctx.moveTo(x,-tickPeriod);
+    ctx.lineTo(x,h+tickPeriod);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // viñeta suave para integrar la ruta con el resto del panel
+  const vignette=ctx.createRadialGradient(cx,cy,R*0.2,cx,cy,Math.max(w,h)*0.72);
+  vignette.addColorStop(0,"rgba(0,0,0,0)");
+  vignette.addColorStop(1,isDark?"rgba(2,8,6,.55)":"rgba(10,20,16,.18)");
+  ctx.fillStyle=vignette;
+  ctx.fillRect(0,0,w,h);
+}
+
 function drawCompass(heading,windFrom,windKmh,speedKmh){
   const w=canvas.clientWidth,h=canvas.clientHeight;
   if(w===0||h===0)return;
@@ -802,15 +926,20 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   // ─────────────────────────────────────────────────────────────────
   const roseAngle = -heading * Math.PI / 180; // rotación de la rosa
 
-  // ── BLOQUE ROTADO: todo lo que pertenece a la rosa ──
+  // ── FONDO FIJO: carretera animada (scroll ligado a la velocidad real) ──
+  drawRoad(w,h,cx,cy,R,isDark);
+
+  // ── BLOQUE ROTADO: todo lo que pertenece a la rosa, ahora como
+  //    referencia tipo "marca de agua" sobre la carretera ──
   ctx.save();
   ctx.translate(cx,cy);
   ctx.rotate(roseAngle);
+  ctx.globalAlpha=0.4; // marca de agua: la rosa queda de referencia, no protagonista
 
   // outer ring (círculo, no se ve diferente rotado pero lo mantenemos en bloque)
   ctx.beginPath();
   ctx.arc(0,0,R,0,Math.PI*2);
-  ctx.strokeStyle=isDark?"rgba(52,211,153,.22)":"rgba(5,150,105,.2)";
+  ctx.strokeStyle=isDark?"rgba(52,211,153,.35)":"rgba(5,150,105,.3)";
   ctx.lineWidth=1.5;
   ctx.stroke();
 
@@ -819,7 +948,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     ctx.beginPath();
     ctx.arc(0,0,R*f,0,Math.PI*2);
     ctx.setLineDash([4,6]);
-    ctx.strokeStyle=isDark?"rgba(52,211,153,.12)":"rgba(5,150,105,.14)";
+    ctx.strokeStyle=isDark?"rgba(52,211,153,.2)":"rgba(5,150,105,.22)";
     ctx.lineWidth=1;
     ctx.stroke();
     ctx.setLineDash([]);
@@ -834,7 +963,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     ctx.beginPath();
     ctx.moveTo(Math.cos(a)*r1,Math.sin(a)*r1);
     ctx.lineTo(Math.cos(a)*R,Math.sin(a)*R);
-    ctx.strokeStyle=major?C.teal:mid?C.dim:"rgba(52,211,153,.18)";
+    ctx.strokeStyle=major?C.teal:mid?C.dim:"rgba(52,211,153,.28)";
     ctx.lineWidth=major?1.5:1;
     ctx.stroke();
   }
@@ -854,6 +983,8 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     ctx.restore();
   });
 
+  ctx.globalAlpha=1; // a partir de acá el viento vuelve a full opacidad
+
   // ── viento (dentro del bloque rotado de la rosa) ──
   if(windKmh>1){
     // Las líneas de viento pertenecen a la rosa, por eso NO compensan el heading.
@@ -870,6 +1001,9 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     const alpha=Math.min(.75,windKmh/60+.2);
     windAnimOffset=(windAnimOffset+windKmh/2000)%1;
 
+    // color dinámico según la potencia del viento: azul (calma) → rojo (fuerte)
+    const wc=windColorForSpeed(windKmh).join(",");
+
     for(let i=0;i<count;i++){
       const spread=R*.85;
       const xOff=(((i+.5)/count)-.5)*spread*2;
@@ -880,8 +1014,8 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
 
       const g=ctx.createLinearGradient(xOff,startY,xOff,startY+lineLen);
       g.addColorStop(0,"transparent");
-      g.addColorStop(.3,`rgba(52,211,153,${alpha*.7})`);
-      g.addColorStop(.85,`rgba(52,211,153,${alpha})`);
+      g.addColorStop(.3,`rgba(${wc},${alpha*.7})`);
+      g.addColorStop(.85,`rgba(${wc},${alpha})`);
       g.addColorStop(1,"transparent");
       ctx.beginPath();
       ctx.moveTo(xOff,startY);
@@ -896,7 +1030,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
       ctx.lineTo(xOff-4,ay);
       ctx.lineTo(xOff+4,ay);
       ctx.closePath();
-      ctx.fillStyle=`rgba(52,211,153,${alpha*.8})`;
+      ctx.fillStyle=`rgba(${wc},${alpha*.8})`;
       ctx.fill();
     }
     ctx.restore();
@@ -978,6 +1112,10 @@ function animate(ts){
   smooth.windFrom = lerpAngle(smooth.windFrom, state.windFrom, k);
   smooth.windKmh  = lerpVal(smooth.windKmh,   state.windKmh,  k);
   smooth.speedKmh = lerpVal(smooth.speedKmh,  state.speedKmh, k);
+
+  // La ruta avanza proporcional a la velocidad real (px/seg ~ km/h * factor).
+  // A 0 km/h la ruta queda quieta; a más velocidad, scroll más rápido.
+  roadOffset += smooth.speedKmh * 1.9 * (dt/1000);
 
   drawCompass(smooth.heading, smooth.windFrom, smooth.windKmh, smooth.speedKmh);
   animId=requestAnimationFrame(animate);
@@ -1125,6 +1263,7 @@ async function startCompass(){
 function startGps(){
   if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
   showToast("Solicitando GPS y brújula…");
+  requestWakeLock();
   startCompass().catch(()=>{hasCompass=false});
   $("gpsStatus").textContent="GPS: solicitando…";
   $("gpsStatus").className="status-badge warn";
