@@ -161,7 +161,7 @@
     box-shadow:inset 0 0 0 1px rgba(4,21,15,.18);
   }
   .start-copy{display:flex;flex-direction:column;align-items:flex-start;line-height:1.22;min-width:0}
-  .start-title{font-size:.86rem;font-weight:800;letter-spacing:-.01em;color:#04150f}
+  .start-title{font-size:.86rem;font-weight:800;letter-spacing:-.01em;color:#04150f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .start-sub{font-size:.63rem;font-weight:600;color:rgba(4,21,15,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .start-btn::after{
     content:"";
@@ -298,6 +298,37 @@
     color:var(--teal);font-weight:700;font-size:.72rem;
   }
 
+  /* ─── speed sign (cartel de velocidad) ───────────────────────── */
+  .speed-sign{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    width:90px;height:90px;
+    border-radius:50%;
+    background:#ffffff;
+    border:9px solid #e0182e;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 24px rgba(0,0,0,.4), inset 0 1px 2px rgba(0,0,0,.06);
+    z-index:2;
+  }
+  .speed-sign-num{
+    font-family:var(--font-mono);
+    font-variant-numeric:tabular-nums;
+    font-weight:800;
+    font-size:1.92rem;
+    letter-spacing:-.03em;
+    color:#0a0a0a;
+    line-height:1;
+  }
+  @media(max-height:700px){
+    .speed-sign{width:75px;height:75px;border-width:7.5px;right:10px;bottom:10px}
+    .speed-sign-num{font-size:1.58rem}
+  }
+  @media(max-width:360px){
+    .speed-sign{width:69px;height:69px;border-width:6.8px}
+    .speed-sign-num{font-size:1.43rem}
+  }
+
   /* ─── readout ─────────────────────────────────────────────────── */
   .readout{
     flex:0 0 auto;
@@ -396,8 +427,8 @@
   <button class="start-btn" id="startBtn" type="button">
     <span class="start-icon">⌖</span>
     <span class="start-copy">
-      <span class="start-title">GPS + Brújula + Viento real</span>
-      <span class="start-sub" id="startSub">Datos actualizados hace 1 min</span>
+      <span class="start-title">Presioná aquí para sincronizar</span>
+      <span class="start-sub" id="startSub">GPS y brújula en tiempo real</span>
     </span>
   </button>
 
@@ -447,6 +478,9 @@
       <div class="heading-pill">
         <span id="headingHuman">Norte · 0°</span>
         <strong id="speedHuman">-- km/h</strong>
+      </div>
+      <div class="speed-sign" id="speedSign" aria-label="Velocidad actual">
+        <span class="speed-sign-num" id="speedSignNum">--</span>
       </div>
     </div>
   </div>
@@ -987,12 +1021,18 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
 
   // ── viento (dentro del bloque rotado de la rosa) ──
   if(windKmh>1){
-    // Las líneas de viento pertenecen a la rosa, por eso NO compensan el heading.
-    // Como todo este bloque ya está rotado por roseAngle=-heading, usar sólo windTo
-    // hace que el viento acompañe visualmente el giro de la brújula y quede relativo
-    // al vehículo (que siempre apunta hacia arriba en pantalla).
+    // Las flechas de viento apuntan "hacia abajo" en su coordenada local
+    // (así están dibujadas: la animación fluye de arriba hacia abajo y la
+    // punta de flecha mira hacia abajo, ver más adelante). Eso equivale a
+    // un ángulo local de +90°. Para que terminen apuntando, en pantalla,
+    // hacia el rumbo absoluto real windTo (misma convención que usan los
+    // ticks: ánguloPantalla = rumbo - 90 + roseAngle), la rotación extra
+    // que hay que aplicar dentro de este bloque —que YA está rotado por
+    // roseAngle— es simplemente windFrom (en radianes). Antes se usaba
+    // (windTo-90), que quedaba desfasado 90° y hacía que el viento no
+    // girara en sintonía con la rosa al cambiar de rumbo.
     const windTo=normDeg(windFrom+180);
-    const windCanvasAngle=(windTo - 90)*Math.PI/180;
+    const windCanvasAngle=windFrom*Math.PI/180;
 
     ctx.save();
     ctx.rotate(windCanvasAngle);
@@ -1127,6 +1167,11 @@ function updateUI(){
   const waiting=!customMode&&!hasGps&&!hasWeather;
   const d=calcImpact(s.heading,s.windFrom,s.windKmh,s.speedKmh,s.vehicle);
   const thermal=calcThermal(currentTemp);
+  // Con rumbo + viento disponibles ya podemos mostrar la relación del
+  // viento (frontal, frontal oblicuo, lateral, cola oblicua, de cola)
+  // aunque el vehículo esté detenido — no hace falta velocidad para eso,
+  // sólo para estimar el impacto real en consumo/autonomía.
+  const hasOrientation = customMode || (hasGps && hasWeather);
 
   // efficiency metric
   const effEl=$("effValue");
@@ -1134,8 +1179,13 @@ function updateUI(){
     effEl.textContent="--";
     effEl.className="metric-value";
     $("effProgress").style.width="0%";
-    $("effLabel").textContent=s.speedKmh<5&&(customMode||hasGps)?"<12 km/h":"Esperando";
-    $("effLabel").className="metric-sub warn";
+    if(hasOrientation){
+      $("effLabel").textContent=d.relText;
+      $("effLabel").className="metric-sub";
+    }else{
+      $("effLabel").textContent=s.speedKmh<5&&(customMode||hasGps)?"<12 km/h":"Esperando";
+      $("effLabel").className="metric-sub warn";
+    }
     $("autonomyValue").innerHTML='-- <span style="font-size:.7rem;font-weight:700;color:var(--teal)">km</span>';
     $("autonomyLabel").textContent="Estimada";
   }else{
@@ -1176,16 +1226,19 @@ function updateUI(){
   $("headingHuman").textContent=`${toCardinal(s.heading)} · ${Math.round(s.heading)}°`;
   $("speedHuman").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)} km/h`:"-- km/h";
 
+  // cartel de velocidad (esquina inferior derecha de la brújula)
+  $("speedSignNum").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)}`:"--";
+
   // explanation
   let exp="";
   if(!customMode&&!hasGps&&!hasWeather){
     exp="Tocá el botón para activar GPS y viento real. La brújula calculará eficiencia aerodinámica según tu rumbo, velocidad y el viento local.";
   }else if(!customMode&&!hasGps){
-    exp="GPS solicitado. Permití ubicación y movete unos metros para que el sistema calcule rumbo y velocidad real.";
+    exp="GPS solicitado. Permití ubicación; el rumbo puede tomarse de la brújula del teléfono aunque estés detenido.";
   }else if(!customMode&&!hasWeather){
     exp="GPS activo. Consultando clima en Open-Meteo, reintentá si demora.";
   }else if(s.speedKmh<12){
-    exp="Velocidad muy baja. Movete más rápido para que el GPS calcule rumbo real con precisión.";
+    exp=`${d.relText}: así viene el viento respecto al auto ahora mismo. Estás detenido/a o a baja velocidad, así que esto es sólo referencia — movete para ver el impacto real en consumo y autonomía.`;
   }else if(d.efficiency>=105){
     exp=`${d.relText}: el viento te favorece. Consumo estimado ${d.consumDelta<0?Math.round(Math.abs(d.consumDelta))+"% menos":"+"+Math.round(d.consumDelta)+"%"}, autonomía ~${d.autonomiaKm} km.${currentTemp!==null&&thermal.score!==null&&thermal.score<97?" "+thermal.label+": "+currentTemp+"°C puede afectar batería.":""}`;
   }else if(d.efficiency>=98){
