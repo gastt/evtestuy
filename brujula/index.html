@@ -575,15 +575,12 @@ const vehicleImgSrc={
 const vehicleImgSize={
   hatch:{w:132,h:132},sedan:{w:136,h:136},suv:{w:142,h:142},pickup:{w:148,h:148}
 };
-
 let vehicleImg=new Image();
-let vehicleImgReady=false;
 function loadVehicleImg(key){
   state._bodyType = key || "suv";
-  vehicleImgReady=false;
   const img=new Image();
-  img.onload=()=>{ vehicleImg=img; vehicleImgReady=true; };
-  img.onerror=()=>{ vehicleImg=null; vehicleImgReady=false; };
+  img.onload=()=>{vehicleImg=img};
+  img.onerror=()=>{vehicleImg=null};
   img.src=vehicleImgSrc[key]||vehicleImgSrc.suv;
 }
 loadVehicleImg("suv");
@@ -1133,7 +1130,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   ctx.translate(cx,cy);
   // sin rotación — el vehículo apunta hacia arriba (norte de pantalla = dirección de marcha)
   const imgSize=vehicleImgSize[state._bodyType||"suv"]||{w:142,h:142};
-  if(vehicleImgReady&&vehicleImg){
+  if(vehicleImg&&vehicleImg.complete&&vehicleImg.naturalWidth>0){
     ctx.drawImage(vehicleImg,-imgSize.w/2,-imgSize.h/2,imgSize.w,imgSize.h);
   }
   ctx.restore();
@@ -1268,7 +1265,7 @@ function updateUI(){
   }else{
     $("tempValue").innerHTML=`${currentTemp} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>`;
     const tempPct=Math.round(d.tempImpactPercent||0);
-    $("tempLabel").textContent=tempPct>=1?`${thermal.label} · +${tempPct}% cons.`:thermal.label;
+    $("tempLabel").textContent=tempPct>=1?`${thermal.label} · -${tempPct}% aut.`:thermal.label;
     $("tempLabel").className="metric-sub "+thermal.cls;
   }
 
@@ -1285,7 +1282,7 @@ function updateUI(){
   function tempClause(){
     const pct=d.tempImpactPercent;
     if(currentTemp===null||!Number.isFinite(pct)||pct<0.5)return"";
-    return ` Además, la temperatura (${currentTemp}°C) aumenta el consumo en aprox. ${Math.round(pct)}% por sí sola.`;
+    return ` Además, la temperatura (${currentTemp}°C) resta aprox. ${Math.round(pct)}% de eficiencia por sí sola.`;
   }
 
   // explanation
