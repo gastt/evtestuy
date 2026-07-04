@@ -153,27 +153,6 @@
     overflow:hidden;
   }
   .start-btn:active{transform:scale(.985)}
-  .start-btn::before{
-    content:"";
-    position:absolute;
-    top:0;left:-45%;
-    width:35%;height:100%;
-    background:linear-gradient(115deg,
-      transparent 0%,
-      rgba(255,255,255,.05) 30%,
-      rgba(255,255,255,.65) 50%,
-      rgba(255,255,255,.05) 70%,
-      transparent 100%);
-    transform:skewX(-18deg);
-    animation:startSweep 2.8s ease-in-out infinite;
-    pointer-events:none;
-  }
-  .start-btn.synced::before{ animation:none; content:none; }
-  @keyframes startSweep{
-    0%   {left:-45%;}
-    55%  {left:130%;}
-    100% {left:130%;}
-  }
   .start-icon{
     width:42px;height:42px;border-radius:12px;flex:0 0 auto;
     background:rgba(4,21,15,.16);
@@ -377,22 +356,7 @@
   }
   .status-badge.ok{background:rgba(46,230,171,.13);color:var(--teal);border-color:rgba(46,230,171,.32)}
   .status-badge.warn{background:rgba(245,165,36,.12);color:var(--amber);border-color:rgba(245,165,36,.32)}
-  .readout-cards{display:flex;flex-direction:column;gap:7px}
-  .r-card{
-    display:flex;align-items:flex-start;gap:9px;
-    padding:9px 11px;
-    border-radius:12px;
-    background:rgba(255,255,255,.035);
-    border:1px solid var(--border);
-    border-left:3px solid var(--dim);
-  }
-  .r-card.good{border-left-color:var(--teal)}
-  .r-card.warn{border-left-color:var(--amber)}
-  .r-card.bad{border-left-color:var(--red)}
-  .r-card-icon{font-size:1rem;line-height:1.3;flex:0 0 auto}
-  .r-card-body{min-width:0}
-  .r-card-title{font-size:.76rem;font-weight:800;color:var(--text);letter-spacing:-.01em}
-  .r-card-text{font-size:.72rem;line-height:1.35;color:var(--muted);font-weight:500;margin-top:1px}
+  .readout-text{font-size:.79rem;line-height:1.42;color:var(--muted);font-weight:500}
 
   /* ─── custom panel (kept for state compatibility, unused in UI) ── */
   .custom-panel{display:none}
@@ -428,11 +392,10 @@
     .metric-value{font-size:1.1rem}
     .compass-wrap{min-height:100px}
     .readout{padding:10px 12px}
-    .r-card-title{font-size:.72rem}
-    .r-card-text{font-size:.68rem}
+    .readout-text{font-size:.74rem}
   }
   @media(max-height:620px){
-    .readout-cards{display:none}
+    .readout-text{display:none}
     .heading-pill{bottom:8px;padding:5px 12px}
   }
   @media(max-width:360px){
@@ -459,6 +422,15 @@
       <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
     </div>
   </header>
+
+  <!-- start -->
+  <button class="start-btn" id="startBtn" type="button">
+    <span class="start-icon">⌖</span>
+    <span class="start-copy">
+      <span class="start-title">Presioná aquí para sincronizar</span>
+      <span class="start-sub" id="startSub">GPS y brújula en tiempo real</span>
+    </span>
+  </button>
 
   <!-- vehicle + mode -->
   <div class="controls-row vehicle-row">
@@ -519,20 +491,11 @@
       <span class="readout-label">Lectura</span>
       <div class="readout-status">
         <span class="status-badge" id="gpsStatus">GPS: --</span>
-        <span class="status-badge" id="weatherStatus" style="cursor:pointer" title="Tocá para reintentar">Clima: --</span>
+        <span class="status-badge" id="weatherStatus">Clima: --</span>
       </div>
     </div>
-    <div class="readout-cards" id="readoutCards"></div>
+    <div class="readout-text" id="explanation">Tocá el botón de arriba para activar GPS y viento real. Se calcularán rumbo, velocidad y eficiencia aerodinámica en tiempo real.</div>
   </div>
-
-  <!-- start (abajo de todo) -->
-  <button class="start-btn" id="startBtn" type="button">
-    <span class="start-icon">⌖</span>
-    <span class="start-copy">
-      <span class="start-title">Presioná aquí para sincronizar</span>
-      <span class="start-sub" id="startSub">GPS y brújula en tiempo real</span>
-    </span>
-  </button>
 
   <!-- hidden state controls retained for GPS/custom state compatibility; no manual sliders exposed -->
   <div class="manual-inputs-hidden" aria-hidden="true">
@@ -594,7 +557,7 @@ document.addEventListener("visibilitychange",()=>{
 });
 
 // ─── state ────────────────────────────────────────────────────────────────
-let watchId=null,lastPos=null,lastWeatherAt=0,lastWeatherFailed=false;
+let watchId=null,lastPos=null,lastWeatherAt=0;
 let customMode=false,hasGps=false,hasWeather=false;
 let currentTemp=null,deviceHeading=null,hasCompass=false;
 let lastLat=null,lastLon=null;
@@ -686,55 +649,25 @@ async function loadVehiculos(){
   }
 }
 
-// ─── preferencia de vehículo (localStorage) ──────────────────────────────
-// El navegador recuerda la última marca/modelo elegidos para no tener que
-// volver a seleccionarlos cada vez que se abre la página.
-const VEHICLE_STORAGE_KEY="evuy_brujula_vehiculo_v1";
-function saveVehiclePreference(marca,modelo){
-  if(!marca||!modelo)return;
-  try{ localStorage.setItem(VEHICLE_STORAGE_KEY, JSON.stringify({marca,modelo})); }
-  catch(e){ /* localStorage no disponible (privado/deshabilitado): se ignora */ }
-}
-function loadVehiclePreference(){
-  try{
-    const raw=localStorage.getItem(VEHICLE_STORAGE_KEY);
-    if(!raw)return null;
-    const obj=JSON.parse(raw);
-    return (obj&&obj.marca&&obj.modelo)?obj:null;
-  }catch(e){ return null; }
-}
-
 function buildMarcaSelect(){
   const marcas = [...new Set(vehiculosDB.map(v=>v.marca))].sort();
   const sel = $('marcaSelect');
   sel.innerHTML = '<option value="">— Marca —</option>' +
     marcas.map(m=>`<option value="${m}">${m}</option>`).join('');
-
-  const saved = loadVehiclePreference();
-  let defaultMarca;
-  if(saved && marcas.includes(saved.marca)){
-    defaultMarca = saved.marca; // el usuario ya había elegido antes
-  }else{
-    defaultMarca = marcas.includes('BYD') ? 'BYD' : marcas[0]; // default a BYD si existe
-  }
-  if(defaultMarca){
-    sel.value = defaultMarca;
-    const preferredModelo = (saved && saved.marca===defaultMarca) ? saved.modelo : null;
-    buildModeloSelect(defaultMarca, preferredModelo);
-  }
+  // Default a BYD si existe
+  const defaultMarca = marcas.includes('BYD') ? 'BYD' : marcas[0];
+  if(defaultMarca){ sel.value = defaultMarca; buildModeloSelect(defaultMarca); }
 }
 
-function buildModeloSelect(marca, preferredModelo){
+function buildModeloSelect(marca){
   const modelos = vehiculosDB.filter(v=>v.marca===marca);
   const sel = $('modeloSelect');
   sel.innerHTML = modelos.map(v=>`<option value="${v.modelo}">${v.modelo}</option>`).join('');
+  // Pick first
   if(modelos.length>0){
-    // Si había un modelo guardado para esta marca, se respeta; si no, el primero.
-    const chosen = (preferredModelo && modelos.find(v=>v.modelo===preferredModelo)) || modelos[0];
-    sel.value = chosen.modelo;
-    vehiculoActual = chosen;
-    state.vehiculoKey = marca+'|'+chosen.modelo;
-    loadVehicleImg(chosen.tipo || guessBodyType(chosen.modelo, marca));
+    vehiculoActual = modelos[0];
+    state.vehiculoKey = marca+'|'+modelos[0].modelo;
+    loadVehicleImg(modelos[0].tipo || guessBodyType(modelos[0].modelo, marca));
     updateUI();
   }
 }
@@ -985,29 +918,12 @@ function windColorForSpeed(kmh){
 // Se dibuja SIN rotar (el auto siempre apunta arriba, así que la ruta bajo
 // él siempre es "recta hacia adelante"), por eso va antes del bloque rotado
 // de la rosa.
-function drawRoad(w,h,cx,cy,R,isDark,curveIntensity){
-  curveIntensity = curveIntensity || 0; // -1 (curva a la izq.) .. +1 (curva a la der.)
-
+function drawRoad(w,h,cx,cy,R,isDark){
   // Ancho de ruta atado al ancho real del canvas (no al radio de la rosa),
   // para que los 3 carriles sean lo bastante anchos y el auto quede
   // cómodo en el carril central sin pisar las líneas.
   const roadHalfW=Math.min(w*0.46,R*1.15);
   const left=cx-roadHalfW,right=cx+roadHalfW;
-
-  // Cuánto se "dobla" la ruta: el vehículo (fijo, mirando arriba) queda
-  // en el vértice de la curva; adelante y atrás de él la ruta se desplaza
-  // hacia el lado contrario al giro, dando la ilusión de estar tomando
-  // una curva sin moverse del centro del canvas.
-  const maxBend=roadHalfW*0.85;
-  const bend=curveIntensity*maxBend;
-
-  // Dibuja una línea vertical "doblada" (curva cuadrática) en x0, con el
-  // vértice de la curva a la altura del vehículo (cy).
-  function curvedPath(x0,yTop,yBot){
-    ctx.beginPath();
-    ctx.moveTo(x0,yTop);
-    ctx.quadraticCurveTo(x0+bend,cy,x0,yBot);
-  }
 
   // asfalto
   const asphaltGrad=ctx.createLinearGradient(0,0,0,h);
@@ -1026,8 +942,8 @@ function drawRoad(w,h,cx,cy,R,isDark,curveIntensity){
   // banquinas (borde de ruta) con leve acento de marca
   ctx.strokeStyle=isDark?"rgba(46,230,171,.28)":"rgba(255,255,255,.35)";
   ctx.lineWidth=2.5;
-  curvedPath(left,0,h);ctx.stroke();
-  curvedPath(right,0,h);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(left,0);ctx.lineTo(left,h);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(right,0);ctx.lineTo(right,h);ctx.stroke();
 
   // 3 carriles: el vehículo va centrado en el carril del medio,
   // con una línea discontinua divisoria a cada lado (no una sola
@@ -1044,7 +960,9 @@ function drawRoad(w,h,cx,cy,R,isDark,curveIntensity){
   ctx.setLineDash([dashLen,gapLen]);
   ctx.lineDashOffset=-phase;
   [lane1X,lane2X].forEach(x=>{
-    curvedPath(x,-period,h+period);
+    ctx.beginPath();
+    ctx.moveTo(x,-period);
+    ctx.lineTo(x,h+period);
     ctx.stroke();
   });
   ctx.setLineDash([]);
@@ -1057,7 +975,9 @@ function drawRoad(w,h,cx,cy,R,isDark,curveIntensity){
   ctx.setLineDash([tickLen,tickGap]);
   ctx.lineDashOffset=-tPhase;
   [left+8,right-8].forEach(x=>{
-    curvedPath(x,-tickPeriod,h+tickPeriod);
+    ctx.beginPath();
+    ctx.moveTo(x,-tickPeriod);
+    ctx.lineTo(x,h+tickPeriod);
     ctx.stroke();
   });
   ctx.setLineDash([]);
@@ -1070,7 +990,7 @@ function drawRoad(w,h,cx,cy,R,isDark,curveIntensity){
   ctx.fillRect(0,0,w,h);
 }
 
-function drawCompass(heading,windFrom,windKmh,speedKmh,curveIntensity){
+function drawCompass(heading,windFrom,windKmh,speedKmh){
   const w=canvas.clientWidth,h=canvas.clientHeight;
   if(w===0||h===0)return;
   ctx.clearRect(0,0,w,h);
@@ -1090,7 +1010,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh,curveIntensity){
   const roseAngle = -heading * Math.PI / 180; // rotación de la rosa
 
   // ── FONDO FIJO: carretera animada (scroll ligado a la velocidad real) ──
-  drawRoad(w,h,cx,cy,R,isDark,curveIntensity);
+  drawRoad(w,h,cx,cy,R,isDark);
 
   // ── BLOQUE ROTADO: todo lo que pertenece a la rosa, ahora como
   //    referencia tipo "marca de agua" sobre la carretera ──
@@ -1257,7 +1177,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh,curveIntensity){
 
 // ─── smooth interpolation ─────────────────────────────────────────────────
 // Separate "display" values that lag behind the target state via lerp
-const smooth={heading:35,windFrom:225,windKmh:0,speedKmh:0,turnRate:0};
+const smooth={heading:35,windFrom:225,windKmh:0,speedKmh:0};
 
 // Shortest-path lerp for angles (handles 359->1 correctly)
 function lerpAngle(cur,target,t){
@@ -1267,19 +1187,6 @@ function lerpAngle(cur,target,t){
 function lerpVal(cur,target,t){
   return cur+(target-cur)*t;
 }
-// Diferencia angular con signo (rango -180..180): positivo = gira a la
-// derecha (en sentido horario), negativo = gira a la izquierda.
-function signedAngleDiff(from,to){
-  return ((to-from+540)%360)-180;
-}
-
-// ── detección de curva vs. recta ──────────────────────────────────────
-// Idea: si el rumbo real (GPS o brújula) cambia rápido mientras el auto
-// se mueve, está tomando una curva; si el rumbo se mantiene estable, va
-// recto. La velocidad de giro (°/seg) nos da intensidad Y sentido del
-// giro con los datos que ya tenemos, sin sensores nuevos.
-let lastHeadingForTurn=null,lastHeadingTs=null;
-let rawTurnRate=0; // °/seg, con signo
 
 let lastTs=null;
 function animate(ts){
@@ -1299,32 +1206,7 @@ function animate(ts){
   // A 0 km/h la ruta queda quieta; a más velocidad, scroll más rápido.
   roadOffset += smooth.speedKmh * 1.9 * (dt/1000);
 
-  // Velocidad de giro real, medida sobre el rumbo SIN suavizar (state.heading)
-  // para no perder la señal real, pero después la suavizamos mucho más lento
-  // que el resto (settling ~1.2s) para que el efecto visual sea prolijo y no
-  // tiemble con el ruido normal del GPS/brújula.
-  if(lastHeadingForTurn===null){
-    lastHeadingForTurn=state.heading;
-    lastHeadingTs=ts;
-  }else{
-    const dtTurn=(ts-lastHeadingTs)/1000;
-    if(dtTurn>0.06){
-      rawTurnRate=signedAngleDiff(lastHeadingForTurn,state.heading)/dtTurn;
-      lastHeadingForTurn=state.heading;
-      lastHeadingTs=ts;
-    }
-  }
-  // Por debajo de ~8 km/h el rumbo no es confiable (ruido de brújula al
-  // estar parado/muy lento), así que apuntamos a "sin giro" en ese caso.
-  const targetTurnRate = smooth.speedKmh>=8 ? rawTurnRate : 0;
-  const kTurn = 1-Math.pow(0.02,dt/1000); // mucho más lento: ~1.2s de asentamiento
-  smooth.turnRate = lerpVal(smooth.turnRate, targetTurnRate, kTurn);
-
-  // Intensidad de curva para el dibujo: ±25°/seg se considera curva cerrada
-  // (intensidad 1). Se clampea para no exagerar con datos ruidosos.
-  const curveIntensity = Math.max(-1,Math.min(1, smooth.turnRate/25));
-
-  drawCompass(smooth.heading, smooth.windFrom, smooth.windKmh, smooth.speedKmh, curveIntensity);
+  drawCompass(smooth.heading, smooth.windFrom, smooth.windKmh, smooth.speedKmh);
   animId=requestAnimationFrame(animate);
 }
 
@@ -1397,55 +1279,41 @@ function updateUI(){
   // cartel de velocidad (esquina inferior derecha de la brújula)
   $("speedSignNum").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)}`:"--";
 
-  // tarjetas de "Lectura": la misma información de antes, separada en
-  // piezas cortas en vez de un párrafo único.
-  const cards=[];
-  function pushCard(icon,title,text,tone){ cards.push({icon,title,text,tone:tone||""}); }
-
-  if(!customMode&&!hasGps&&!hasWeather){
-    pushCard("📡","Activá GPS y viento","Tocá el botón de abajo para calcular tu eficiencia aerodinámica en tiempo real.");
-  }else if(!customMode&&!hasGps){
-    pushCard("📍","Buscando GPS","Permití ubicación; el rumbo puede tomarse de la brújula del teléfono aunque estés detenido.");
-  }else if(!customMode&&!hasWeather){
-    pushCard("🌦️","Cargando clima","Consultando viento y temperatura en Open-Meteo, reintentá si demora.");
-  }else if(s.speedKmh<12){
-    pushCard("🧭",d.relText,"Así viene el viento respecto al auto ahora mismo. Detenido/a o a baja velocidad: es sólo referencia.");
-    if(currentTemp!==null&&d.tempImpactPercent>=0.5){
-      pushCard("🌡️",`${currentTemp}°C`,`Aumenta el consumo en aprox. ${Math.round(d.tempImpactPercent)}% por sí sola.`,"warn");
-    }
-  }else{
-    const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
-    const consumoTxt=d.consumDelta<0
-      ? `${Math.round(Math.abs(d.consumDelta))}% menos de consumo`
-      : `+${Math.round(d.consumDelta)}% de consumo`;
-    pushCard(d.efficiency>=100?"💨":"🍃",d.relText,`${consumoTxt}, autonomía ~${d.autonomiaKm} km.`,cls);
-    if(currentTemp!==null&&d.tempImpactPercent>=0.5){
-      pushCard("🌡️",`${currentTemp}°C`,`Suma aprox. +${Math.round(d.tempImpactPercent)}% de consumo por sí sola.`,"warn");
-    }
-    if(d.efficiency<85){
-      pushCard("⚠️","Viento muy desfavorable","Bajar velocidad ayuda mucho: la resistencia del aire crece con el cuadrado de la velocidad.","bad");
-    }
+  // frase adicional sobre el impacto puntual de la temperatura, para sumar
+  // al texto de lectura (sólo si hay dato de temperatura y el impacto es
+  // apreciable; en el rango óptimo 25-30°C el factor es 1.00 y no suma nada).
+  function tempClause(){
+    const pct=d.tempImpactPercent;
+    if(currentTemp===null||!Number.isFinite(pct)||pct<0.5)return"";
+    return ` Además, la temperatura (${currentTemp}°C) aumenta el consumo en aprox. ${Math.round(pct)}% por sí sola.`;
   }
 
-  $("readoutCards").innerHTML=cards.map(c=>`
-    <div class="r-card ${c.tone}">
-      <span class="r-card-icon">${c.icon}</span>
-      <div class="r-card-body">
-        <div class="r-card-title">${c.title}</div>
-        <div class="r-card-text">${c.text}</div>
-      </div>
-    </div>`).join("");
+  // explanation
+  let exp="";
+  if(!customMode&&!hasGps&&!hasWeather){
+    exp="Tocá el botón para activar GPS y viento real. La brújula calculará eficiencia aerodinámica según tu rumbo, velocidad, el viento local y la temperatura.";
+  }else if(!customMode&&!hasGps){
+    exp="GPS solicitado. Permití ubicación; el rumbo puede tomarse de la brújula del teléfono aunque estés detenido.";
+  }else if(!customMode&&!hasWeather){
+    exp="GPS activo. Consultando clima y temperatura en Open-Meteo, reintentá si demora.";
+  }else if(s.speedKmh<12){
+    exp=`${d.relText}: así viene el viento respecto al auto ahora mismo. Estás detenido/a o a baja velocidad, así que esto es sólo referencia — movete para ver el impacto real en consumo y autonomía.${tempClause()}`;
+  }else if(d.efficiency>=105){
+    exp=`${d.relText}: el viento te favorece. Consumo estimado ${d.consumDelta<0?Math.round(Math.abs(d.consumDelta))+"% menos":"+"+Math.round(d.consumDelta)+"%"}, autonomía ~${d.autonomiaKm} km.${tempClause()}`;
+  }else if(d.efficiency>=98){
+    exp=`${d.relText}: impacto casi neutro. Eficiencia estimada ${d.efficiency}%.${tempClause()}`;
+  }else if(d.efficiency<85){
+    exp=`⚠️ ${d.relText}: viento muy desfavorable. Eficiencia ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%. Bajar velocidad ayuda mucho (la resistencia crece con el cuadrado de la velocidad del aire).${tempClause()}`;
+  }else{
+    exp=`${d.relText}. Eficiencia estimada ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%.${tempClause()}`;
+  }
+  $("explanation").textContent=exp;
 }
 
 // ─── GPS + weather ────────────────────────────────────────────────────────
 async function fetchWeather(lat,lon,force=false){
   const now=Date.now();
-  // Si la última consulta falló (o se colgó), reintentamos mucho antes
-  // (20s) en vez de esperar los 5 minutos normales de caché — si no,
-  // una sola falla puntual (señal débil, etc.) te deja sin clima por
-  // 5 minutos enteros.
-  const cooldown = lastWeatherFailed ? 20*1000 : 5*60*1000;
-  if(!force&&now-lastWeatherAt<cooldown)return;
+  if(!force&&now-lastWeatherAt<5*60*1000)return;
   lastWeatherAt=now;
   $("weatherStatus").textContent="Clima: …";
   $("weatherStatus").className="status-badge";
@@ -1455,16 +1323,8 @@ async function fetchWeather(lat,lon,force=false){
   url.searchParams.set("current","wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m");
   url.searchParams.set("wind_speed_unit","kmh");
   url.searchParams.set("timezone","auto");
-
-  // Timeout manual: fetch() no tiene límite de tiempo por defecto, así
-  // que con señal débil el pedido puede quedar "colgado" para siempre
-  // sin fallar ni tener éxito. Lo cortamos a los 10s.
-  const controller=new AbortController();
-  const timeoutId=setTimeout(()=>controller.abort(),20000);
-
   try{
-    const res=await fetch(url.toString(),{cache:"no-store",signal:controller.signal});
-    clearTimeout(timeoutId);
+    const res=await fetch(url.toString(),{cache:"no-store"});
     if(!res.ok)throw new Error("HTTP "+res.status);
     const data=await res.json();
     const c=data.current||{};
@@ -1483,19 +1343,14 @@ async function fetchWeather(lat,lon,force=false){
     }
     if(Number.isFinite(temp))currentTemp=Math.round(temp);
     hasWeather=true;
-    lastWeatherFailed=false;
     $("weatherStatus").textContent=`Clima: ${Math.round(spd)} km/h${Number.isFinite(gust)?" · r "+Math.round(gust):""}`;
     $("weatherStatus").className="status-badge ok";
     updateUI();
   }catch(e){
-    clearTimeout(timeoutId);
     hasWeather=false;currentTemp=null;
-    lastWeatherFailed=true;
-    const timedOut=e&&e.name==="AbortError";
-    $("weatherStatus").textContent=timedOut?"Clima: sin respuesta":"Clima: error";
+    $("weatherStatus").textContent="Clima: error";
     $("weatherStatus").className="status-badge warn";
-    showToast(timedOut?"Open-Meteo no respondió a tiempo. Reintentando en unos segundos…":"No se pudo consultar Open-Meteo. Reintentando en unos segundos…");
-    updateUI();
+    showToast("No se pudo consultar Open-Meteo. Verificá conexión.");
   }
 }
 
@@ -1519,7 +1374,6 @@ async function startCompass(){
 
 function startGps(){
   if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
-  $("startBtn").classList.add("synced"); // apaga el brillo animado tras el primer toque
   showToast("Solicitando GPS y brújula…");
   requestWakeLock();
   startCompass().catch(()=>{hasCompass=false});
@@ -1577,15 +1431,6 @@ function startGps(){
 // ─── event listeners ──────────────────────────────────────────────────────
 $("startBtn").addEventListener("click",startGps);
 
-$("weatherStatus").addEventListener("click",()=>{
-  if(lastLat===null||lastLon===null){
-    showToast("Todavía no hay ubicación para consultar el clima.");
-    return;
-  }
-  showToast("Reintentando consulta de clima…");
-  fetchWeather(lastLat,lastLon,true); // force=true: salta el enfriamiento y reintenta ya
-});
-
 $("themeBtn").addEventListener("click",()=>{
   const root=document.documentElement;
   const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
@@ -1597,7 +1442,6 @@ $("themeBtn").addEventListener("click",()=>{
 $("marcaSelect").addEventListener("change",()=>{
   const marca = $("marcaSelect").value;
   if(marca) buildModeloSelect(marca);
-  saveVehiclePreference(marca, $("modeloSelect").value);
 });
 
 $("modeloSelect").addEventListener("change",()=>{
@@ -1609,7 +1453,6 @@ $("modeloSelect").addEventListener("change",()=>{
     state.vehiculoKey = marca+'|'+modelo;
     loadVehicleImg(v.tipo || guessBodyType(v.modelo, v.marca));
     updateUI();
-    saveVehiclePreference(marca, modelo);
   }
 });
 
