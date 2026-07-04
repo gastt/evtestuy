@@ -206,6 +206,37 @@
   #csvStatusRow{flex:0 0 auto;min-height:0;display:flex;align-items:center}
   #csvStatusRow .status-badge{font-size:.6rem;padding:4px 10px}
 
+  /* ─── color de carrocería ────────────────────────────────────── */
+  .color-row{
+    flex:0 0 auto;
+    display:flex;align-items:center;gap:10px;
+  }
+  .color-row-label{
+    font-size:.62rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--dim);flex:0 0 auto;
+  }
+  .color-swatches{
+    display:flex;gap:8px;overflow-x:auto;
+    padding:2px 2px;
+    scrollbar-width:none;
+  }
+  .color-swatches::-webkit-scrollbar{display:none}
+  .color-swatch{
+    width:26px;height:26px;border-radius:50%;flex:0 0 auto;
+    border:2px solid var(--border);
+    cursor:pointer;
+    padding:0;
+    box-shadow:inset 0 0 0 2px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.25);
+    transition:transform .15s, border-color .15s;
+  }
+  .color-swatch.active{
+    border-color:var(--teal);
+    transform:scale(1.14);
+    box-shadow:0 0 0 3px rgba(46,230,171,.25), inset 0 0 0 2px rgba(0,0,0,.12);
+  }
+  .color-swatch:active{transform:scale(.92)}
+  .color-swatch.is-white{background:#f2f4f2;border-color:rgba(0,0,0,.18)}
+
   /* ─── compass card (hero instrument) ─────────────────────────── */
   .compass-card{
     flex:1 1 auto;
@@ -423,15 +454,6 @@
     </div>
   </header>
 
-  <!-- start -->
-  <button class="start-btn" id="startBtn" type="button">
-    <span class="start-icon">⌖</span>
-    <span class="start-copy">
-      <span class="start-title">Presioná aquí para sincronizar</span>
-      <span class="start-sub" id="startSub">GPS y brújula en tiempo real</span>
-    </span>
-  </button>
-
   <!-- vehicle + mode -->
   <div class="controls-row vehicle-row">
     <select id="marcaSelect" class="vehicle-select" aria-label="Marca">
@@ -443,6 +465,12 @@
   </div>
   <div id="csvStatusRow" style="min-height:18px;display:flex;align-items:center">
     <span class="status-badge" id="csvStatus" style="font-size:.58rem;padding:2px 8px">Cargando vehículos…</span>
+  </div>
+
+  <!-- color de carrocería -->
+  <div class="color-row" id="colorRow" aria-label="Color del vehículo">
+    <span class="color-row-label">Color</span>
+    <div class="color-swatches" id="colorSwatches"></div>
   </div>
 
   <!-- compass card -->
@@ -494,8 +522,17 @@
         <span class="status-badge" id="weatherStatus">Clima: --</span>
       </div>
     </div>
-    <div class="readout-text" id="explanation">Tocá el botón de arriba para activar GPS y viento real. Se calcularán rumbo, velocidad y eficiencia aerodinámica en tiempo real.</div>
+    <div class="readout-text" id="explanation">Tocá el botón de abajo para activar GPS y viento real. Se calcularán rumbo, velocidad y eficiencia aerodinámica en tiempo real.</div>
   </div>
+
+  <!-- start (abajo de todo) -->
+  <button class="start-btn" id="startBtn" type="button">
+    <span class="start-icon">⌖</span>
+    <span class="start-copy">
+      <span class="start-title">Presioná aquí para sincronizar</span>
+      <span class="start-sub" id="startSub">GPS y brújula en tiempo real</span>
+    </span>
+  </button>
 
   <!-- hidden state controls retained for GPS/custom state compatibility; no manual sliders exposed -->
   <div class="manual-inputs-hidden" aria-hidden="true">
@@ -575,13 +612,62 @@ const vehicleImgSrc={
 const vehicleImgSize={
   hatch:{w:132,h:132},sedan:{w:136,h:136},suv:{w:142,h:142},pickup:{w:148,h:148}
 };
-let vehicleImg=new Image();
+
+// Paleta de colores de carrocería. value=null significa "sin tinte" (se usa
+// el PNG blanco original tal cual).
+const VEHICLE_COLORS=[
+  {name:"Blanco",  value:null},
+  {name:"Negro",   value:"#141517"},
+  {name:"Gris",    value:"#8b929a"},
+  {name:"Rojo",    value:"#d81c33"},
+  {name:"Azul",    value:"#1c5fd6"},
+  {name:"Verde",   value:"#17b884"},
+  {name:"Amarillo",value:"#f2c318"},
+  {name:"Naranja", value:"#ff7a1a"},
+];
+
+let rawVehicleImg=null;   // PNG original tal cual se descargó (blanco, con sombreado)
+let vehicleImgReady=false;
+let vehicleImg=null;      // lo que efectivamente se dibuja: rawVehicleImg o su versión tintada
+let vehicleColor=null;    // color elegido por el usuario (null = original/blanco)
+
 function loadVehicleImg(key){
   state._bodyType = key || "suv";
+  vehicleImgReady=false;
   const img=new Image();
-  img.onload=()=>{vehicleImg=img};
-  img.onerror=()=>{vehicleImg=null};
+  img.onload=()=>{
+    rawVehicleImg=img;
+    vehicleImgReady=true;
+    updateVehicleTint();
+  };
+  img.onerror=()=>{ rawVehicleImg=null; vehicleImgReady=false; vehicleImg=null; };
   img.src=vehicleImgSrc[key]||vehicleImgSrc.suv;
+}
+
+// Recolorea el PNG blanco conservando el sombreado (luces/sombras de la
+// carrocería): se usa el modo de fusión 'color' (toma el matiz+saturación
+// del color elegido pero conserva la luminosidad original de cada píxel,
+// que es justo donde vive el efecto de brillo/sombra del render), y luego
+// 'destination-in' para recortar el resultado exactamente a la silueta
+// original (sin esto, el tinte se "derramaría" fuera del auto).
+function updateVehicleTint(){
+  if(!vehicleImgReady||!rawVehicleImg){ vehicleImg=null; return; }
+  if(!vehicleColor){ vehicleImg=rawVehicleImg; return; } // blanco = imagen tal cual
+
+  const iw=rawVehicleImg.naturalWidth||200, ih=rawVehicleImg.naturalHeight||200;
+  const off=document.createElement("canvas");
+  off.width=iw; off.height=ih;
+  const octx=off.getContext("2d");
+
+  octx.drawImage(rawVehicleImg,0,0,iw,ih);
+  octx.globalCompositeOperation="color";
+  octx.fillStyle=vehicleColor;
+  octx.fillRect(0,0,iw,ih);
+  octx.globalCompositeOperation="destination-in";
+  octx.drawImage(rawVehicleImg,0,0,iw,ih);
+  octx.globalCompositeOperation="source-over";
+
+  vehicleImg=off;
 }
 loadVehicleImg("suv");
 
@@ -915,12 +1001,29 @@ function windColorForSpeed(kmh){
 // Se dibuja SIN rotar (el auto siempre apunta arriba, así que la ruta bajo
 // él siempre es "recta hacia adelante"), por eso va antes del bloque rotado
 // de la rosa.
-function drawRoad(w,h,cx,cy,R,isDark){
+function drawRoad(w,h,cx,cy,R,isDark,curveIntensity){
+  curveIntensity = curveIntensity || 0; // -1 (curva a la izq.) .. +1 (curva a la der.)
+
   // Ancho de ruta atado al ancho real del canvas (no al radio de la rosa),
   // para que los 3 carriles sean lo bastante anchos y el auto quede
   // cómodo en el carril central sin pisar las líneas.
   const roadHalfW=Math.min(w*0.46,R*1.15);
   const left=cx-roadHalfW,right=cx+roadHalfW;
+
+  // Cuánto se "dobla" la ruta: el vehículo (fijo, mirando arriba) queda
+  // en el vértice de la curva; adelante y atrás de él la ruta se desplaza
+  // hacia el lado contrario al giro, dando la ilusión de estar tomando
+  // una curva sin moverse del centro del canvas.
+  const maxBend=roadHalfW*0.85;
+  const bend=curveIntensity*maxBend;
+
+  // Dibuja una línea vertical "doblada" (curva cuadrática) en x0, con el
+  // vértice de la curva a la altura del vehículo (cy).
+  function curvedPath(x0,yTop,yBot){
+    ctx.beginPath();
+    ctx.moveTo(x0,yTop);
+    ctx.quadraticCurveTo(x0+bend,cy,x0,yBot);
+  }
 
   // asfalto
   const asphaltGrad=ctx.createLinearGradient(0,0,0,h);
@@ -939,8 +1042,8 @@ function drawRoad(w,h,cx,cy,R,isDark){
   // banquinas (borde de ruta) con leve acento de marca
   ctx.strokeStyle=isDark?"rgba(46,230,171,.28)":"rgba(255,255,255,.35)";
   ctx.lineWidth=2.5;
-  ctx.beginPath();ctx.moveTo(left,0);ctx.lineTo(left,h);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(right,0);ctx.lineTo(right,h);ctx.stroke();
+  curvedPath(left,0,h);ctx.stroke();
+  curvedPath(right,0,h);ctx.stroke();
 
   // 3 carriles: el vehículo va centrado en el carril del medio,
   // con una línea discontinua divisoria a cada lado (no una sola
@@ -957,9 +1060,7 @@ function drawRoad(w,h,cx,cy,R,isDark){
   ctx.setLineDash([dashLen,gapLen]);
   ctx.lineDashOffset=-phase;
   [lane1X,lane2X].forEach(x=>{
-    ctx.beginPath();
-    ctx.moveTo(x,-period);
-    ctx.lineTo(x,h+period);
+    curvedPath(x,-period,h+period);
     ctx.stroke();
   });
   ctx.setLineDash([]);
@@ -972,9 +1073,7 @@ function drawRoad(w,h,cx,cy,R,isDark){
   ctx.setLineDash([tickLen,tickGap]);
   ctx.lineDashOffset=-tPhase;
   [left+8,right-8].forEach(x=>{
-    ctx.beginPath();
-    ctx.moveTo(x,-tickPeriod);
-    ctx.lineTo(x,h+tickPeriod);
+    curvedPath(x,-tickPeriod,h+tickPeriod);
     ctx.stroke();
   });
   ctx.setLineDash([]);
@@ -987,7 +1086,7 @@ function drawRoad(w,h,cx,cy,R,isDark){
   ctx.fillRect(0,0,w,h);
 }
 
-function drawCompass(heading,windFrom,windKmh,speedKmh){
+function drawCompass(heading,windFrom,windKmh,speedKmh,curveIntensity){
   const w=canvas.clientWidth,h=canvas.clientHeight;
   if(w===0||h===0)return;
   ctx.clearRect(0,0,w,h);
@@ -1007,7 +1106,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   const roseAngle = -heading * Math.PI / 180; // rotación de la rosa
 
   // ── FONDO FIJO: carretera animada (scroll ligado a la velocidad real) ──
-  drawRoad(w,h,cx,cy,R,isDark);
+  drawRoad(w,h,cx,cy,R,isDark,curveIntensity);
 
   // ── BLOQUE ROTADO: todo lo que pertenece a la rosa, ahora como
   //    referencia tipo "marca de agua" sobre la carretera ──
@@ -1130,7 +1229,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   ctx.translate(cx,cy);
   // sin rotación — el vehículo apunta hacia arriba (norte de pantalla = dirección de marcha)
   const imgSize=vehicleImgSize[state._bodyType||"suv"]||{w:142,h:142};
-  if(vehicleImg&&vehicleImg.complete&&vehicleImg.naturalWidth>0){
+  if(vehicleImgReady&&vehicleImg){
     ctx.drawImage(vehicleImg,-imgSize.w/2,-imgSize.h/2,imgSize.w,imgSize.h);
   }
   ctx.restore();
@@ -1174,7 +1273,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
 
 // ─── smooth interpolation ─────────────────────────────────────────────────
 // Separate "display" values that lag behind the target state via lerp
-const smooth={heading:35,windFrom:225,windKmh:0,speedKmh:0};
+const smooth={heading:35,windFrom:225,windKmh:0,speedKmh:0,turnRate:0};
 
 // Shortest-path lerp for angles (handles 359->1 correctly)
 function lerpAngle(cur,target,t){
@@ -1184,6 +1283,19 @@ function lerpAngle(cur,target,t){
 function lerpVal(cur,target,t){
   return cur+(target-cur)*t;
 }
+// Diferencia angular con signo (rango -180..180): positivo = gira a la
+// derecha (en sentido horario), negativo = gira a la izquierda.
+function signedAngleDiff(from,to){
+  return ((to-from+540)%360)-180;
+}
+
+// ── detección de curva vs. recta ──────────────────────────────────────
+// Idea: si el rumbo real (GPS o brújula) cambia rápido mientras el auto
+// se mueve, está tomando una curva; si el rumbo se mantiene estable, va
+// recto. La velocidad de giro (°/seg) nos da intensidad Y sentido del
+// giro con los datos que ya tenemos, sin sensores nuevos.
+let lastHeadingForTurn=null,lastHeadingTs=null;
+let rawTurnRate=0; // °/seg, con signo
 
 let lastTs=null;
 function animate(ts){
@@ -1203,7 +1315,32 @@ function animate(ts){
   // A 0 km/h la ruta queda quieta; a más velocidad, scroll más rápido.
   roadOffset += smooth.speedKmh * 1.9 * (dt/1000);
 
-  drawCompass(smooth.heading, smooth.windFrom, smooth.windKmh, smooth.speedKmh);
+  // Velocidad de giro real, medida sobre el rumbo SIN suavizar (state.heading)
+  // para no perder la señal real, pero después la suavizamos mucho más lento
+  // que el resto (settling ~1.2s) para que el efecto visual sea prolijo y no
+  // tiemble con el ruido normal del GPS/brújula.
+  if(lastHeadingForTurn===null){
+    lastHeadingForTurn=state.heading;
+    lastHeadingTs=ts;
+  }else{
+    const dtTurn=(ts-lastHeadingTs)/1000;
+    if(dtTurn>0.06){
+      rawTurnRate=signedAngleDiff(lastHeadingForTurn,state.heading)/dtTurn;
+      lastHeadingForTurn=state.heading;
+      lastHeadingTs=ts;
+    }
+  }
+  // Por debajo de ~8 km/h el rumbo no es confiable (ruido de brújula al
+  // estar parado/muy lento), así que apuntamos a "sin giro" en ese caso.
+  const targetTurnRate = smooth.speedKmh>=8 ? rawTurnRate : 0;
+  const kTurn = 1-Math.pow(0.02,dt/1000); // mucho más lento: ~1.2s de asentamiento
+  smooth.turnRate = lerpVal(smooth.turnRate, targetTurnRate, kTurn);
+
+  // Intensidad de curva para el dibujo: ±25°/seg se considera curva cerrada
+  // (intensidad 1). Se clampea para no exagerar con datos ruidosos.
+  const curveIntensity = Math.max(-1,Math.min(1, smooth.turnRate/25));
+
+  drawCompass(smooth.heading, smooth.windFrom, smooth.windKmh, smooth.speedKmh, curveIntensity);
   animId=requestAnimationFrame(animate);
 }
 
@@ -1265,7 +1402,7 @@ function updateUI(){
   }else{
     $("tempValue").innerHTML=`${currentTemp} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>`;
     const tempPct=Math.round(d.tempImpactPercent||0);
-    $("tempLabel").textContent=tempPct>=1?`${thermal.label} · -${tempPct}% aut.`:thermal.label;
+    $("tempLabel").textContent=tempPct>=1?`${thermal.label} · +${tempPct}% cons.`:thermal.label;
     $("tempLabel").className="metric-sub "+thermal.cls;
   }
 
@@ -1282,7 +1419,7 @@ function updateUI(){
   function tempClause(){
     const pct=d.tempImpactPercent;
     if(currentTemp===null||!Number.isFinite(pct)||pct<0.5)return"";
-    return ` Además, la temperatura (${currentTemp}°C) resta aprox. ${Math.round(pct)}% de eficiencia por sí sola.`;
+    return ` Además, la temperatura (${currentTemp}°C) aumenta el consumo en aprox. ${Math.round(pct)}% por sí sola.`;
   }
 
   // explanation
@@ -1452,6 +1589,33 @@ $("modeloSelect").addEventListener("change",()=>{
     updateUI();
   }
 });
+
+// ─── color de carrocería ──────────────────────────────────────────────────
+function buildColorSwatches(){
+  const wrap=$("colorSwatches");
+  wrap.innerHTML=VEHICLE_COLORS.map((c,i)=>{
+    const isWhite=c.value===null;
+    const bg=isWhite?"":`background:${c.value}`;
+    const activeCls=(vehicleColor===c.value)?" active":"";
+    return `<button type="button" class="color-swatch${isWhite?" is-white":""}${activeCls}" style="${bg}" data-idx="${i}" aria-label="${c.name}" title="${c.name}"></button>`;
+  }).join("");
+}
+$("colorSwatches").addEventListener("click",(ev)=>{
+  const btn=ev.target.closest(".color-swatch");
+  if(!btn)return;
+  const idx=Number(btn.dataset.idx);
+  const c=VEHICLE_COLORS[idx];
+  if(!c)return;
+  vehicleColor=c.value;
+  updateVehicleTint();
+  wrapSetActiveSwatch(idx);
+});
+function wrapSetActiveSwatch(idx){
+  $("colorSwatches").querySelectorAll(".color-swatch").forEach((el,i)=>{
+    el.classList.toggle("active", i===idx);
+  });
+}
+buildColorSwatches();
 
 // sliders (custom mode)
 function onSlider(){
