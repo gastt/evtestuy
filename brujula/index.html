@@ -169,6 +169,7 @@
     pointer-events:none;
   }
   .start-btn.synced::before{ animation:none; content:none; }
+  .start-btn.done::before{ animation:none; content:none; }
   @keyframes startSweep{
     0%   {left:-45%;}
     55%  {left:130%;}
@@ -192,6 +193,27 @@
     box-shadow:inset 0 0 0 1.5px rgba(4,21,15,.3);
   }
   .start-btn svg{display:none}
+
+  /* ─── estado "ya sincronizado": colores sobrios, deja de resaltar ── */
+  .start-btn.done{
+    border-color:var(--border);
+    background:rgba(255,255,255,.03);
+    box-shadow:var(--shadow-sm), inset 0 1px rgba(255,255,255,.05);
+  }
+  .start-btn.done .start-icon{
+    background:rgba(46,230,171,.12);
+    box-shadow:inset 0 0 0 1px rgba(46,230,171,.25);
+    color:var(--teal);
+  }
+  .start-btn.done .start-title{color:var(--text)}
+  .start-btn.done .start-sub{color:var(--muted)}
+  .start-btn.done::after{
+    content:"✓";
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(46,230,171,.14);
+    box-shadow:inset 0 0 0 1.5px rgba(46,230,171,.4);
+    color:var(--teal);font-size:1rem;font-weight:800;
+  }
 
   /* ─── vehicle selects ─────────────────────────────────────────── */
   .controls-row{
@@ -660,6 +682,14 @@
       <div class="info-section-title">Temperatura</div>
       <p class="info-p">
         Entre 25°C y 30°C la batería trabaja en su rango óptimo (sin penalización). Fuera de ese rango —tanto frío como calor extremo— el consumo aumenta (climatización, química de la batería), según una tabla de referencia interpolada para cualquier temperatura.
+      </p>
+
+      <div class="info-section-title">Por qué los porcentajes no se suman</div>
+      <p class="info-p">
+        Esto es lo que más confunde: si el viento suma <strong>+20% de consumo</strong> y el frío suma <strong>+10% de consumo</strong>, la eficiencia <strong>no</strong> baja a 70% (100 − 20 − 10). El consumo y la eficiencia no se restan entre sí, se <strong>multiplican</strong>.
+      </p>
+      <p class="info-p">
+        Cada factor se aplica sobre el anterior: 1.20 (viento) × 1.10 (frío) = <strong>1.32</strong>, es decir, +32% de consumo total. Y la eficiencia es la <strong>inversa</strong> de ese número: 100 ÷ 1.32 ≈ <strong>76%</strong>. Por eso podés ver "consumo +32%" junto a "eficiencia 76%" y no "24%" — no es un error, es que consumo y eficiencia miden cosas distintas (cuánta energía gastás por km vs. cuánta autonomía te queda), y se relacionan por división, no por resta.
       </p>
 
       <div class="info-section-title">De dónde salen los datos</div>
@@ -1499,6 +1529,21 @@ function updateUI(){
 
   // cartel de velocidad (esquina inferior derecha de la brújula)
   $("speedSignNum").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)}`:"--";
+
+  // botón de sincronizar: una vez que GPS + clima están realmente activos,
+  // pasa a colores sobrios (deja de "gritar") y confirma que todo anduvo.
+  // Si algo se cae después (ej. el clima falla), vuelve al estado original
+  // para que se note que hay que prestar atención de nuevo.
+  const startBtnEl=$("startBtn");
+  if(hasGps&&hasWeather){
+    startBtnEl.classList.add("done");
+    startBtnEl.querySelector(".start-title").textContent="Brújula, GPS y clima sincronizados";
+    $("startSub").textContent="Todo funcionando correctamente";
+  }else{
+    startBtnEl.classList.remove("done");
+    startBtnEl.querySelector(".start-title").textContent="Presioná aquí para sincronizar";
+    $("startSub").textContent="GPS y brújula en tiempo real";
+  }
 
   // tarjetas de lectura: cortas, estilo widget (ícono + línea destacada +
   // etiqueta corta), para leer de un vistazo mientras se maneja.
