@@ -650,6 +650,12 @@ function loadVehicleImg(key){
 // que es justo donde vive el efecto de brillo/sombra del render), y luego
 // 'destination-in' para recortar el resultado exactamente a la silueta
 // original (sin esto, el tinte se "derramaría" fuera del auto).
+// Recolorea el PNG blanco conservando el sombreado (luces/sombras de la
+// carrocería): se usa el modo de fusión 'color' (toma el matiz+saturación
+// del color elegido pero conserva la luminosidad original de cada píxel,
+// que es justo donde vive el efecto de brillo/sombra del render), y luego
+// 'destination-in' para recortar el resultado exactamente a la silueta
+// original (sin esto, el tinte se "derramaría" fuera del auto).
 function updateVehicleTint(){
   if(!vehicleImgReady||!rawVehicleImg){ vehicleImg=null; return; }
   if(!vehicleColor){ vehicleImg=rawVehicleImg; return; } // blanco = imagen tal cual
@@ -659,12 +665,27 @@ function updateVehicleTint(){
   off.width=iw; off.height=ih;
   const octx=off.getContext("2d");
 
+  // 1) base: la imagen original
   octx.drawImage(rawVehicleImg,0,0,iw,ih);
+
+  // 2) el blanco 100% puro (y el negro 100% puro) son "inmunes" al modo
+  //    de fusión 'color': en HSL, en esos extremos de luminosidad el
+  //    matiz no cambia nada visualmente. Como la carrocería es blanco
+  //    puro, bajamos su techo de luminosidad ~15% (con un 'multiply'
+  //    suave) para que después SÍ tome el color elegido; las zonas ya
+  //    oscuras (ruedas, sombras) casi no cambian.
+  octx.globalCompositeOperation="multiply";
+  octx.fillStyle="rgba(0,0,0,0.15)";
+  octx.fillRect(0,0,iw,ih);
+  octx.globalCompositeOperation="destination-in";
+  octx.drawImage(rawVehicleImg,0,0,iw,ih); // recorte tras el multiply
+
+  // 3) tinte real, ahora sí visible también sobre lo que era blanco puro
   octx.globalCompositeOperation="color";
   octx.fillStyle=vehicleColor;
   octx.fillRect(0,0,iw,ih);
   octx.globalCompositeOperation="destination-in";
-  octx.drawImage(rawVehicleImg,0,0,iw,ih);
+  octx.drawImage(rawVehicleImg,0,0,iw,ih); // recorte final a la silueta
   octx.globalCompositeOperation="source-over";
 
   vehicleImg=off;
