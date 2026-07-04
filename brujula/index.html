@@ -153,6 +153,27 @@
     overflow:hidden;
   }
   .start-btn:active{transform:scale(.985)}
+  .start-btn::before{
+    content:"";
+    position:absolute;
+    top:0;left:-45%;
+    width:35%;height:100%;
+    background:linear-gradient(115deg,
+      transparent 0%,
+      rgba(255,255,255,.05) 30%,
+      rgba(255,255,255,.65) 50%,
+      rgba(255,255,255,.05) 70%,
+      transparent 100%);
+    transform:skewX(-18deg);
+    animation:startSweep 2.8s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .start-btn.synced::before{ animation:none; content:none; }
+  @keyframes startSweep{
+    0%   {left:-45%;}
+    55%  {left:130%;}
+    100% {left:130%;}
+  }
   .start-icon{
     width:42px;height:42px;border-radius:12px;flex:0 0 auto;
     background:rgba(4,21,15,.16);
@@ -356,7 +377,22 @@
   }
   .status-badge.ok{background:rgba(46,230,171,.13);color:var(--teal);border-color:rgba(46,230,171,.32)}
   .status-badge.warn{background:rgba(245,165,36,.12);color:var(--amber);border-color:rgba(245,165,36,.32)}
-  .readout-text{font-size:.79rem;line-height:1.42;color:var(--muted);font-weight:500}
+  .readout-cards{display:flex;flex-direction:column;gap:7px}
+  .r-card{
+    display:flex;align-items:flex-start;gap:9px;
+    padding:9px 11px;
+    border-radius:12px;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+    border-left:3px solid var(--dim);
+  }
+  .r-card.good{border-left-color:var(--teal)}
+  .r-card.warn{border-left-color:var(--amber)}
+  .r-card.bad{border-left-color:var(--red)}
+  .r-card-icon{font-size:1rem;line-height:1.3;flex:0 0 auto}
+  .r-card-body{min-width:0}
+  .r-card-title{font-size:.76rem;font-weight:800;color:var(--text);letter-spacing:-.01em}
+  .r-card-text{font-size:.72rem;line-height:1.35;color:var(--muted);font-weight:500;margin-top:1px}
 
   /* ─── custom panel (kept for state compatibility, unused in UI) ── */
   .custom-panel{display:none}
@@ -392,10 +428,11 @@
     .metric-value{font-size:1.1rem}
     .compass-wrap{min-height:100px}
     .readout{padding:10px 12px}
-    .readout-text{font-size:.74rem}
+    .r-card-title{font-size:.72rem}
+    .r-card-text{font-size:.68rem}
   }
   @media(max-height:620px){
-    .readout-text{display:none}
+    .readout-cards{display:none}
     .heading-pill{bottom:8px;padding:5px 12px}
   }
   @media(max-width:360px){
@@ -422,15 +459,6 @@
       <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
     </div>
   </header>
-
-  <!-- start -->
-  <button class="start-btn" id="startBtn" type="button">
-    <span class="start-icon">⌖</span>
-    <span class="start-copy">
-      <span class="start-title">Presioná aquí para sincronizar</span>
-      <span class="start-sub" id="startSub">GPS y brújula en tiempo real</span>
-    </span>
-  </button>
 
   <!-- vehicle + mode -->
   <div class="controls-row vehicle-row">
@@ -485,7 +513,7 @@
     </div>
   </div>
 
-  <!-- readout -->
+  <!-- readout: tarjetas en vez de párrafo, se leen de un vistazo en ruta -->
   <div class="readout">
     <div class="readout-head">
       <span class="readout-label">Lectura</span>
@@ -494,8 +522,17 @@
         <span class="status-badge" id="weatherStatus">Clima: --</span>
       </div>
     </div>
-    <div class="readout-text" id="explanation">Tocá el botón de arriba para activar GPS y viento real. Se calcularán rumbo, velocidad y eficiencia aerodinámica en tiempo real.</div>
+    <div class="readout-cards" id="readoutCards"></div>
   </div>
+
+  <!-- start (abajo de todo) -->
+  <button class="start-btn" id="startBtn" type="button">
+    <span class="start-icon">⌖</span>
+    <span class="start-copy">
+      <span class="start-title">Presioná aquí para sincronizar</span>
+      <span class="start-sub" id="startSub">GPS y brújula en tiempo real</span>
+    </span>
+  </button>
 
   <!-- hidden state controls retained for GPS/custom state compatibility; no manual sliders exposed -->
   <div class="manual-inputs-hidden" aria-hidden="true">
@@ -1279,35 +1316,45 @@ function updateUI(){
   // cartel de velocidad (esquina inferior derecha de la brújula)
   $("speedSignNum").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)}`:"--";
 
-  // frase adicional sobre el impacto puntual de la temperatura, para sumar
-  // al texto de lectura (sólo si hay dato de temperatura y el impacto es
-  // apreciable; en el rango óptimo 25-30°C el factor es 1.00 y no suma nada).
-  function tempClause(){
-    const pct=d.tempImpactPercent;
-    if(currentTemp===null||!Number.isFinite(pct)||pct<0.5)return"";
-    return ` Además, la temperatura (${currentTemp}°C) aumenta el consumo en aprox. ${Math.round(pct)}% por sí sola.`;
+  // tarjetas de "Lectura": la misma información de antes, separada en
+  // piezas cortas y grandes para leer de un vistazo (los números del
+  // párrafo quedaban muy chicos para leer manejando).
+  const cards=[];
+  function pushCard(icon,title,text,tone){ cards.push({icon,title,text,tone:tone||""}); }
+
+  if(!customMode&&!hasGps&&!hasWeather){
+    pushCard("📡","Activá GPS y viento","Tocá el botón de abajo para calcular tu eficiencia aerodinámica en tiempo real.");
+  }else if(!customMode&&!hasGps){
+    pushCard("📍","Buscando GPS","Permití ubicación; el rumbo puede tomarse de la brújula del teléfono aunque estés detenido.");
+  }else if(!customMode&&!hasWeather){
+    pushCard("🌦️","Cargando clima","Consultando viento y temperatura en Open-Meteo, reintentá si demora.");
+  }else if(s.speedKmh<12){
+    pushCard("🧭",d.relText,"Así viene el viento respecto al auto ahora mismo. Detenido/a o a baja velocidad: es sólo referencia.");
+    if(currentTemp!==null&&d.tempImpactPercent>=0.5){
+      pushCard("🌡️",`${currentTemp}°C`,`Aumenta el consumo en aprox. ${Math.round(d.tempImpactPercent)}% por sí sola.`,"warn");
+    }
+  }else{
+    const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
+    const consumoTxt=d.consumDelta<0
+      ? `${Math.round(Math.abs(d.consumDelta))}% menos de consumo`
+      : `+${Math.round(d.consumDelta)}% de consumo`;
+    pushCard(d.efficiency>=100?"💨":"🍃",d.relText,`${consumoTxt}, autonomía ~${d.autonomiaKm} km.`,cls);
+    if(currentTemp!==null&&d.tempImpactPercent>=0.5){
+      pushCard("🌡️",`${currentTemp}°C`,`Suma aprox. +${Math.round(d.tempImpactPercent)}% de consumo por sí sola.`,"warn");
+    }
+    if(d.efficiency<85){
+      pushCard("⚠️","Viento muy desfavorable","Bajar velocidad ayuda mucho: la resistencia del aire crece con el cuadrado de la velocidad.","bad");
+    }
   }
 
-  // explanation
-  let exp="";
-  if(!customMode&&!hasGps&&!hasWeather){
-    exp="Tocá el botón para activar GPS y viento real. La brújula calculará eficiencia aerodinámica según tu rumbo, velocidad, el viento local y la temperatura.";
-  }else if(!customMode&&!hasGps){
-    exp="GPS solicitado. Permití ubicación; el rumbo puede tomarse de la brújula del teléfono aunque estés detenido.";
-  }else if(!customMode&&!hasWeather){
-    exp="GPS activo. Consultando clima y temperatura en Open-Meteo, reintentá si demora.";
-  }else if(s.speedKmh<12){
-    exp=`${d.relText}: así viene el viento respecto al auto ahora mismo. Estás detenido/a o a baja velocidad, así que esto es sólo referencia — movete para ver el impacto real en consumo y autonomía.${tempClause()}`;
-  }else if(d.efficiency>=105){
-    exp=`${d.relText}: el viento te favorece. Consumo estimado ${d.consumDelta<0?Math.round(Math.abs(d.consumDelta))+"% menos":"+"+Math.round(d.consumDelta)+"%"}, autonomía ~${d.autonomiaKm} km.${tempClause()}`;
-  }else if(d.efficiency>=98){
-    exp=`${d.relText}: impacto casi neutro. Eficiencia estimada ${d.efficiency}%.${tempClause()}`;
-  }else if(d.efficiency<85){
-    exp=`⚠️ ${d.relText}: viento muy desfavorable. Eficiencia ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%. Bajar velocidad ayuda mucho (la resistencia crece con el cuadrado de la velocidad del aire).${tempClause()}`;
-  }else{
-    exp=`${d.relText}. Eficiencia estimada ${d.efficiency}%, consumo +${Math.round(d.consumDelta)}%.${tempClause()}`;
-  }
-  $("explanation").textContent=exp;
+  $("readoutCards").innerHTML=cards.map(c=>`
+    <div class="r-card ${c.tone}">
+      <span class="r-card-icon">${c.icon}</span>
+      <div class="r-card-body">
+        <div class="r-card-title">${c.title}</div>
+        <div class="r-card-text">${c.text}</div>
+      </div>
+    </div>`).join("");
 }
 
 // ─── GPS + weather ────────────────────────────────────────────────────────
@@ -1374,6 +1421,7 @@ async function startCompass(){
 
 function startGps(){
   if(!navigator.geolocation){showToast("Este navegador no soporta geolocalización.");return}
+  $("startBtn").classList.add("synced"); // apaga el brillo animado tras el primer toque
   showToast("Solicitando GPS y brújula…");
   requestWakeLock();
   startCompass().catch(()=>{hasCompass=false});
