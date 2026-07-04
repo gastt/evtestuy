@@ -594,7 +594,7 @@ document.addEventListener("visibilitychange",()=>{
 });
 
 // ─── state ────────────────────────────────────────────────────────────────
-let watchId=null,lastPos=null,lastWeatherAt=0;
+let watchId=null,lastPos=null,lastWeatherAt=0,lastWeatherFailed=false;
 let customMode=false,hasGps=false,hasWeather=false;
 let currentTemp=null,deviceHeading=null,hasCompass=false;
 let lastLat=null,lastLon=null;
@@ -1440,7 +1440,12 @@ function updateUI(){
 // ─── GPS + weather ────────────────────────────────────────────────────────
 async function fetchWeather(lat,lon,force=false){
   const now=Date.now();
-  if(!force&&now-lastWeatherAt<5*60*1000)return;
+  // Si la última consulta falló (o se colgó), reintentamos mucho antes
+  // (20s) en vez de esperar los 5 minutos normales de caché — si no,
+  // una sola falla puntual (señal débil, etc.) te deja sin clima por
+  // 5 minutos enteros.
+  const cooldown = lastWeatherFailed ? 20*1000 : 5*60*1000;
+  if(!force&&now-lastWeatherAt<cooldown)return;
   lastWeatherAt=now;
   $("weatherStatus").textContent="Clima: …";
   $("weatherStatus").className="status-badge";
@@ -1450,8 +1455,16 @@ async function fetchWeather(lat,lon,force=false){
   url.searchParams.set("current","wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m");
   url.searchParams.set("wind_speed_unit","kmh");
   url.searchParams.set("timezone","auto");
+
+  // Timeout manual: fetch() no tiene límite de tiempo por defecto, así
+  // que con señal débil el pedido puede quedar "colgado" para siempre
+  // sin fallar ni tener éxito. Lo cortamos a los 10s.
+  const controller=new AbortController();
+  const timeoutId=setTimeout(()=>controller.abort(),10000);
+
   try{
-    const res=await fetch(url.toString(),{cache:"no-store"});
+    const res=await fetch(url.toString(),{cache:"no-store",signal:controller.signal});
+    clearTimeout(timeoutId);
     if(!res.ok)throw new Error("HTTP "+res.status);
     const data=await res.json();
     const c=data.current||{};
@@ -1470,14 +1483,19 @@ async function fetchWeather(lat,lon,force=false){
     }
     if(Number.isFinite(temp))currentTemp=Math.round(temp);
     hasWeather=true;
+    lastWeatherFailed=false;
     $("weatherStatus").textContent=`Clima: ${Math.round(spd)} km/h${Number.isFinite(gust)?" · r "+Math.round(gust):""}`;
     $("weatherStatus").className="status-badge ok";
     updateUI();
   }catch(e){
+    clearTimeout(timeoutId);
     hasWeather=false;currentTemp=null;
-    $("weatherStatus").textContent="Clima: error";
+    lastWeatherFailed=true;
+    const timedOut=e&&e.name==="AbortError";
+    $("weatherStatus").textContent=timedOut?"Clima: sin respuesta":"Clima: error";
     $("weatherStatus").className="status-badge warn";
-    showToast("No se pudo consultar Open-Meteo. Verificá conexión.");
+    showToast(timedOut?"Open-Meteo no respondió a tiempo. Reintentando en unos segundos…":"No se pudo consultar Open-Meteo. Reintentando en unos segundos…");
+    updateUI();
   }
 }
 
