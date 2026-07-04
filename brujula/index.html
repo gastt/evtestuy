@@ -519,7 +519,7 @@
       <span class="readout-label">Lectura</span>
       <div class="readout-status">
         <span class="status-badge" id="gpsStatus">GPS: --</span>
-        <span class="status-badge" id="weatherStatus">Clima: --</span>
+        <span class="status-badge" id="weatherStatus" style="cursor:pointer" title="Tocá para reintentar">Clima: --</span>
       </div>
     </div>
     <div class="readout-cards" id="readoutCards"></div>
@@ -1460,7 +1460,7 @@ async function fetchWeather(lat,lon,force=false){
   // que con señal débil el pedido puede quedar "colgado" para siempre
   // sin fallar ni tener éxito. Lo cortamos a los 10s.
   const controller=new AbortController();
-  const timeoutId=setTimeout(()=>controller.abort(),10000);
+  const timeoutId=setTimeout(()=>controller.abort(),20000);
 
   try{
     const res=await fetch(url.toString(),{cache:"no-store",signal:controller.signal});
@@ -1576,6 +1576,15 @@ function startGps(){
 
 // ─── event listeners ──────────────────────────────────────────────────────
 $("startBtn").addEventListener("click",startGps);
+
+$("weatherStatus").addEventListener("click",()=>{
+  if(lastLat===null||lastLon===null){
+    showToast("Todavía no hay ubicación para consultar el clima.");
+    return;
+  }
+  showToast("Reintentando consulta de clima…");
+  fetchWeather(lastLat,lastLon,true); // force=true: salta el enfriamiento y reintenta ya
+});
 
 $("themeBtn").addEventListener("click",()=>{
   const root=document.documentElement;
