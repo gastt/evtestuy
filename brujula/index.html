@@ -241,53 +241,80 @@
     flex-direction:column;
   }
 
-  .metrics-strip{
+  /* ─── widgets superiores (viento/temp/autonomía) ─────────────────── */
+  .widget-row{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+    padding:8px 8px 0;
     flex:0 0 auto;
-    border-bottom:1px solid var(--border);
   }
-  .metric{
-    padding:11px 6px 9px;
-    display:flex;flex-direction:column;gap:3px;
-    position:relative;
+  .widget-card{
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:8px 8px 7px;
+    display:flex;flex-direction:column;gap:4px;
     min-width:0;
   }
-  .metric+.metric::before{
-    content:"";position:absolute;left:0;top:14%;bottom:14%;width:1px;
-    background:var(--border);
-  }
-  .metric-label{
-    font-size:.53rem;font-weight:800;text-transform:uppercase;
-    letter-spacing:.1em;color:var(--dim);
-  }
-  .metric-value{
-    font-family:var(--font-mono);
-    font-variant-numeric:tabular-nums;
-    font-size:1.3rem;font-weight:700;letter-spacing:-.02em;line-height:1.05;
-    color:var(--text);
-    transition:color .3s;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
-  .metric-value.good{color:var(--teal)}
-  .metric-value.warn{color:var(--amber)}
-  .metric-value.bad{color:var(--red)}
-  .metric-sub{
-    font-size:.58rem;font-weight:600;color:var(--muted);
+  .widget-icon{width:16px;height:16px;flex:0 0 auto;display:block}
+  .widget-icon svg{width:100%;height:100%}
+  .widget-icon.wind{color:var(--teal)}
+  .widget-icon.temp{color:var(--amber)}
+  .widget-icon.battery{color:var(--teal)}
+  .widget-value{
+    font-family:var(--font-mono);font-variant-numeric:tabular-nums;
+    font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:-.02em;
+    display:flex;align-items:baseline;gap:3px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .metric-sub.good{color:var(--green)}
-  .metric-sub.warn{color:var(--amber)}
-  .metric-sub.bad{color:var(--red)}
-  .eff-progress{
-    width:100%;max-width:56px;height:3px;border-radius:999px;
-    background:rgba(255,255,255,.08);overflow:hidden;margin:1px 0 2px;
+  .widget-unit{font-size:.56rem;font-weight:700;color:var(--dim)}
+  .widget-label{
+    font-size:.52rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:.08em;color:var(--dim);
   }
-  .eff-progress-fill{
-    display:block;height:100%;border-radius:inherit;
-    background:linear-gradient(90deg,var(--amber),var(--teal));
-    transition:width .4s ease;
+
+  /* ─── widget grande: eficiencia actual (anillo + tendencia) ──────── */
+  .eff-widget{
+    display:flex;align-items:center;gap:10px;
+    flex:0 0 auto;
+    padding:8px 12px;
+    border-radius:var(--r-md);
+    background:linear-gradient(165deg,var(--panel-2),var(--panel));
+    border:1px solid var(--border);
+    box-shadow:var(--shadow-sm), inset 0 1px rgba(255,255,255,.05);
+    backdrop-filter:blur(14px);
   }
+  .eff-ring-wrap{position:relative;width:46px;height:46px;flex:0 0 auto}
+  .eff-ring{width:100%;height:100%;transform:rotate(-90deg);display:block}
+  .eff-ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:9}
+  .eff-ring-fg{
+    fill:none;stroke-width:9;stroke-linecap:round;
+    stroke:var(--dim);
+    transition:stroke-dashoffset .5s ease, stroke .3s;
+  }
+  .eff-ring-fg.good{stroke:var(--teal)}
+  .eff-ring-fg.warn{stroke:var(--amber)}
+  .eff-ring-fg.bad{stroke:var(--red)}
+  .eff-ring-value{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-variant-numeric:tabular-nums;
+    font-size:.72rem;font-weight:800;color:var(--text);
+  }
+  .eff-info{flex:1 1 auto;min-width:0}
+  .eff-info-label{
+    font-size:.54rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:.08em;color:var(--dim);margin-bottom:1px;
+  }
+  .eff-info-sub{
+    font-size:.78rem;font-weight:800;color:var(--muted);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .eff-info-sub.good{color:var(--teal)}
+  .eff-info-sub.warn{color:var(--amber)}
+  .eff-info-sub.bad{color:var(--red)}
+  .eff-spark{width:58px;height:28px;flex:0 0 auto}
+  .eff-spark svg{width:100%;height:100%;display:block}
 
   /* compass canvas area — the signature instrument dial */
   .compass-wrap{
@@ -412,20 +439,67 @@
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+  /* ─── modal de info (cómo se calcula) ────────────────────────────── */
+  .info-modal{
+    display:none;
+    position:fixed;inset:0;z-index:200;
+    background:rgba(2,8,6,.72);
+    backdrop-filter:blur(4px);
+    align-items:flex-end;
+    justify-content:center;
+    padding:0;
+  }
+  .info-modal.show{display:flex}
+  .info-modal-card{
+    width:100%;max-width:480px;
+    max-height:82vh;
+    background:linear-gradient(165deg,var(--panel-2),var(--panel));
+    border:1px solid var(--border);
+    border-top-left-radius:24px;border-top-right-radius:24px;
+    box-shadow:0 -20px 60px rgba(0,0,0,.5);
+    display:flex;flex-direction:column;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .info-modal-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 16px 10px;
+    flex:0 0 auto;
+    border-bottom:1px solid var(--border);
+  }
+  .info-modal-title{font-size:1rem;font-weight:800;color:var(--text);letter-spacing:-.01em}
+  .info-modal-body{
+    padding:14px 18px 22px;
+    overflow-y:auto;
+    flex:1 1 auto;
+  }
+  .info-section-title{
+    font-size:.68rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--teal);
+    margin:16px 0 6px;
+  }
+  .info-section-title:first-of-type{margin-top:4px}
+  .info-p{font-size:.83rem;line-height:1.5;color:var(--muted);font-weight:500}
+  .info-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px}
+  .info-list li{font-size:.8rem;line-height:1.45;color:var(--muted);font-weight:500}
+
   /* ─── hidden manual-state inputs (GPS/custom compatibility) ───── */
   .manual-inputs-hidden{display:none!important}
 
   /* ─── compact-height fallback ─────────────────────────────────── */
   @media(max-height:700px){
-    .app{gap:7px}
+    .app{gap:6px}
     .topbar{height:40px}
     .start-btn{height:52px}
     .start-icon{width:36px;height:36px;font-size:1rem}
     .start-title{font-size:.8rem}
     .start-sub{font-size:.58rem}
     .vehicle-select,.mode-btn{height:38px}
-    .metric{padding:8px 6px 7px}
-    .metric-value{font-size:1.1rem}
+    .widget-row{padding:6px 6px 0}
+    .widget-card{padding:6px 6px 5px}
+    .widget-value{font-size:.92rem}
+    .eff-widget{padding:6px 10px}
+    .eff-ring-wrap{width:38px;height:38px}
+    .eff-spark{width:46px;height:22px}
     .compass-wrap{min-height:100px}
     .readout{padding:10px 12px}
     .r-card-title{font-size:.72rem}
@@ -436,8 +510,9 @@
     .heading-pill{bottom:8px;padding:5px 12px}
   }
   @media(max-width:360px){
-    .metric-value{font-size:1.08rem}
-    .metric-label{font-size:.5rem}
+    .widget-value{font-size:.95rem}
+    .widget-label{font-size:.48rem}
+    .eff-spark{display:none}
     .start-sub{display:none}
   }
 </style>
@@ -455,6 +530,7 @@
       </div>
     </a>
     <div class="top-right">
+      <button class="icon-btn" id="infoBtn" type="button" aria-label="Cómo se calcula">ⓘ</button>
       <button class="icon-btn" id="themeBtn" type="button" aria-label="Tema">🌙</button>
       <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
     </div>
@@ -475,28 +551,38 @@
 
   <!-- compass card -->
   <div class="compass-card">
-    <!-- metrics strip -->
-    <div class="metrics-strip">
-      <div class="metric">
-        <div class="metric-label">Eficiencia</div>
-        <div class="metric-value" id="effValue">--%</div>
-        <div class="eff-progress"><span class="eff-progress-fill" id="effProgress"></span></div>
-        <div class="metric-sub" id="effLabel">Esperando</div>
+    <!-- widgets superiores: viento / temp / autonomía -->
+    <div class="widget-row">
+      <div class="widget-card">
+        <span class="widget-icon wind">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+            <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+            <path d="M17.7 7.7A2.5 2.5 0 1 1 19.5 12H2"/>
+          </svg>
+        </span>
+        <div class="widget-value" id="windValue">-- <span class="widget-unit">km/h</span></div>
+        <div class="widget-label">Viento</div>
       </div>
-      <div class="metric">
-        <div class="metric-label">Viento</div>
-        <div class="metric-value" id="windValue">-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span></div>
-        <div class="metric-sub" id="windLabel">sin datos</div>
+      <div class="widget-card">
+        <span class="widget-icon temp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+          </svg>
+        </span>
+        <div class="widget-value" id="tempValue">-- <span class="widget-unit">°C</span></div>
+        <div class="widget-label">Temp.</div>
       </div>
-      <div class="metric">
-        <div class="metric-label">Temperatura</div>
-        <div class="metric-value" id="tempValue">-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span></div>
-        <div class="metric-sub" id="tempLabel">sin datos</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Autonomía</div>
-        <div class="metric-value good" id="autonomyValue">-- <span style="font-size:.7rem;font-weight:700;color:var(--teal)">km</span></div>
-        <div class="metric-sub" id="autonomyLabel">Estimada</div>
+      <div class="widget-card">
+        <span class="widget-icon battery">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1.5" y="7" width="17" height="10" rx="2.5"/>
+            <line x1="22.5" y1="10.5" x2="22.5" y2="13.5"/>
+            <rect x="3.5" y="9" width="9" height="6" rx="1" fill="currentColor" stroke="none" opacity=".85"/>
+          </svg>
+        </span>
+        <div class="widget-value" id="autonomyValue">-- <span class="widget-unit">km</span></div>
+        <div class="widget-label">Autonomía</div>
       </div>
     </div>
 
@@ -511,6 +597,22 @@
         <span class="speed-sign-num" id="speedSignNum">--</span>
       </div>
     </div>
+  </div>
+
+  <!-- widget grande: eficiencia actual (anillo + tendencia), su propia tarjeta -->
+  <div class="eff-widget">
+    <div class="eff-ring-wrap">
+      <svg class="eff-ring" viewBox="0 0 100 100">
+        <circle class="eff-ring-bg" cx="50" cy="50" r="42"/>
+        <circle class="eff-ring-fg" id="effRingFg" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9"/>
+      </svg>
+      <div class="eff-ring-value" id="effValue">--%</div>
+    </div>
+    <div class="eff-info">
+      <div class="eff-info-label">Eficiencia actual</div>
+      <div class="eff-info-sub" id="effLabel">Esperando</div>
+    </div>
+    <div class="eff-spark"><svg id="effSparkSvg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg></div>
   </div>
 
   <!-- readout: tarjetas en vez de párrafo, se leen de un vistazo en ruta -->
@@ -546,6 +648,45 @@
 </div><!-- .app -->
 
 <div class="toast" id="toast"></div>
+
+<div class="info-modal" id="infoModal">
+  <div class="info-modal-card">
+    <div class="info-modal-head">
+      <span class="info-modal-title">¿Cómo se calcula esto?</span>
+      <button class="icon-btn" id="infoModalClose" type="button" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="info-modal-body">
+      <p class="info-p">
+        La <strong>eficiencia</strong> compara la autonomía estimada en este momento contra la autonomía WLTP declarada por el fabricante de tu vehículo. 100% = igual al WLTP; menos de 100% = estás gastando más energía por km de lo declarado.
+      </p>
+
+      <div class="info-section-title">Viento</div>
+      <p class="info-p">
+        Se calcula la velocidad real del aire contra el auto (tu velocidad menos el componente del viento a favor o en contra, según el ángulo). La resistencia aerodinámica crece con el <strong>cuadrado</strong> de esa velocidad relativa: por eso un viento de frente fuerte castiga mucho más que uno flojo, y uno de cola puede hacerte superar el 100%.
+      </p>
+
+      <div class="info-section-title">Temperatura</div>
+      <p class="info-p">
+        Entre 25°C y 30°C la batería trabaja en su rango óptimo (sin penalización). Fuera de ese rango —tanto frío como calor extremo— el consumo aumenta (climatización, química de la batería), según una tabla de referencia interpolada para cualquier temperatura.
+      </p>
+
+      <div class="info-section-title">De dónde salen los datos</div>
+      <p class="info-p">
+        Rumbo y velocidad: GPS y brújula de tu teléfono. Viento y temperatura: pronóstico de <strong>Open-Meteo</strong> para tu ubicación (no es una medición exacta del punto donde estás parado).
+      </p>
+
+      <div class="info-section-title">Disclaimers</div>
+      <ul class="info-list">
+        <li>Es una <strong>estimación orientativa</strong>, no reemplaza el computador de a bordo de tu vehículo.</li>
+        <li>No contempla pendientes/elevación, tráfico, estilo de manejo, presión de neumáticos, carga, ni el estado real de la batería (degradación).</li>
+        <li>No sabe si tenés el aire acondicionado o la calefacción prendidos — sólo modela el efecto "típico" de la temperatura ambiente.</li>
+        <li>El GPS y la brújula tienen margen de error, sobre todo a baja velocidad o detenido.</li>
+        <li>La ruta/carretera animada es decorativa: se infiere de cómo cambia tu rumbo, no representa el trazado real de la calle.</li>
+        <li>Los datos de batería y autonomía WLTP son los declarados por el fabricante; el consumo real de tu unidad puede variar.</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 <script>
 // ─── helpers ─────────────────────────────────────────────────────────────
@@ -686,25 +827,55 @@ async function loadVehiculos(){
   }
 }
 
+// ─── preferencia de vehículo (localStorage) ──────────────────────────────
+// El navegador recuerda la última marca/modelo elegidos para no tener que
+// volver a seleccionarlos cada vez que se abre la página.
+const VEHICLE_STORAGE_KEY="evuy_brujula_vehiculo_v1";
+function saveVehiclePreference(marca,modelo){
+  if(!marca||!modelo)return;
+  try{ localStorage.setItem(VEHICLE_STORAGE_KEY, JSON.stringify({marca,modelo})); }
+  catch(e){ /* localStorage no disponible (privado/deshabilitado): se ignora */ }
+}
+function loadVehiclePreference(){
+  try{
+    const raw=localStorage.getItem(VEHICLE_STORAGE_KEY);
+    if(!raw)return null;
+    const obj=JSON.parse(raw);
+    return (obj&&obj.marca&&obj.modelo)?obj:null;
+  }catch(e){ return null; }
+}
+
 function buildMarcaSelect(){
   const marcas = [...new Set(vehiculosDB.map(v=>v.marca))].sort();
   const sel = $('marcaSelect');
   sel.innerHTML = '<option value="">— Marca —</option>' +
     marcas.map(m=>`<option value="${m}">${m}</option>`).join('');
-  // Default a BYD si existe
-  const defaultMarca = marcas.includes('BYD') ? 'BYD' : marcas[0];
-  if(defaultMarca){ sel.value = defaultMarca; buildModeloSelect(defaultMarca); }
+
+  const saved = loadVehiclePreference();
+  let defaultMarca;
+  if(saved && marcas.includes(saved.marca)){
+    defaultMarca = saved.marca; // el usuario ya había elegido antes
+  }else{
+    defaultMarca = marcas.includes('BYD') ? 'BYD' : marcas[0]; // default a BYD si existe
+  }
+  if(defaultMarca){
+    sel.value = defaultMarca;
+    const preferredModelo = (saved && saved.marca===defaultMarca) ? saved.modelo : null;
+    buildModeloSelect(defaultMarca, preferredModelo);
+  }
 }
 
-function buildModeloSelect(marca){
+function buildModeloSelect(marca, preferredModelo){
   const modelos = vehiculosDB.filter(v=>v.marca===marca);
   const sel = $('modeloSelect');
   sel.innerHTML = modelos.map(v=>`<option value="${v.modelo}">${v.modelo}</option>`).join('');
-  // Pick first
   if(modelos.length>0){
-    vehiculoActual = modelos[0];
-    state.vehiculoKey = marca+'|'+modelos[0].modelo;
-    loadVehicleImg(modelos[0].tipo || guessBodyType(modelos[0].modelo, marca));
+    // Si había un modelo guardado para esta marca, se respeta; si no, el primero.
+    const chosen = (preferredModelo && modelos.find(v=>v.modelo===preferredModelo)) || modelos[0];
+    sel.value = chosen.modelo;
+    vehiculoActual = chosen;
+    state.vehiculoKey = marca+'|'+chosen.modelo;
+    loadVehicleImg(chosen.tipo || guessBodyType(chosen.modelo, marca));
     updateUI();
   }
 }
@@ -901,6 +1072,29 @@ const ctx=canvas.getContext("2d");
 let animId=null;
 let windAnimOffset=0;
 let roadOffset=0; // fase de scroll de la carretera, avanza con la velocidad
+
+// historial de eficiencia real (mientras se maneja) para el mini-gráfico
+// de tendencia del widget grande de "Eficiencia actual"
+let effHistory=[];
+const EFF_HISTORY_MAX=30;
+function renderEffSparkline(cls){
+  const svg=$("effSparkSvg");
+  if(effHistory.length<2){ svg.innerHTML=""; return; }
+  const w=100,h=40,pad=3;
+  const vals=effHistory;
+  const min=Math.min(...vals), max=Math.max(...vals);
+  const range=(max-min)||1;
+  const stepX=(w-pad*2)/(vals.length-1);
+  const pts=vals.map((v,i)=>{
+    const x=pad+i*stepX;
+    const y=pad+(h-pad*2)*(1-(v-min)/range);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const lastXY=pts[pts.length-1].split(",");
+  const C=getColors();
+  const color=cls==="good"?C.teal:cls==="warn"?C.amber:cls==="bad"?C.red:C.dim;
+  svg.innerHTML=`<polyline points="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${lastXY[0]}" cy="${lastXY[1]}" r="3.2" fill="${color}"/>`;
+}
 
 function resize(){
   const wrap=canvas.parentElement;
@@ -1259,54 +1453,52 @@ function updateUI(){
   // sólo para estimar el impacto real en consumo/autonomía.
   const hasOrientation = customMode || (hasGps && hasWeather);
 
-  // efficiency metric
+  // ── anillo de eficiencia + tendencia ──────────────────────────────
   const effEl=$("effValue");
+  const ringFg=$("effRingFg");
+  const RING_CIRC=263.9; // 2*π*42 (r=42 del círculo del SVG)
+
   if(waiting||s.speedKmh<5){
     effEl.textContent="--";
-    effEl.className="metric-value";
-    $("effProgress").style.width="0%";
+    ringFg.style.strokeDashoffset=RING_CIRC;
+    ringFg.setAttribute("class","eff-ring-fg");
     if(hasOrientation){
       $("effLabel").textContent=d.relText;
-      $("effLabel").className="metric-sub";
+      $("effLabel").className="eff-info-sub";
     }else{
       $("effLabel").textContent=s.speedKmh<5&&(customMode||hasGps)?"<12 km/h":"Esperando";
-      $("effLabel").className="metric-sub warn";
+      $("effLabel").className="eff-info-sub warn";
     }
-    $("autonomyValue").innerHTML='-- <span style="font-size:.7rem;font-weight:700;color:var(--teal)">km</span>';
-    $("autonomyLabel").textContent="Estimada";
+    $("autonomyValue").innerHTML='-- <span class="widget-unit">km</span>';
   }else{
     effEl.textContent=d.efficiency+"%";
     const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
-    effEl.className="metric-value "+cls;
-    $("effProgress").style.width=Math.max(6,Math.min(100,d.efficiency)) + "%";
+    const fillFrac=Math.max(0,Math.min(1,d.efficiency/100)); // el anillo se llena hasta 100%; más que eso, círculo completo
+    ringFg.style.strokeDashoffset=RING_CIRC*(1-fillFrac);
+    ringFg.setAttribute("class","eff-ring-fg "+cls);
     $("effLabel").textContent=d.relText;
-    $("effLabel").className="metric-sub "+cls;
-    $("autonomyValue").innerHTML=`~${d.autonomiaKm} <span style="font-size:.7rem;font-weight:700;color:var(--teal)">km</span>`;
-    $("autonomyLabel").textContent="▰ Estimada";
+    $("effLabel").className="eff-info-sub "+cls;
+    $("autonomyValue").innerHTML=`~${d.autonomiaKm} <span class="widget-unit">km</span>`;
+
+    // guardamos el historial de eficiencia real (sólo mientras se maneja
+    // de verdad) para el mini-gráfico de tendencia del widget grande
+    effHistory.push(d.efficiency);
+    if(effHistory.length>EFF_HISTORY_MAX)effHistory.shift();
+    renderEffSparkline(cls);
   }
 
-  // wind metric
+  // wind widget
   if(!customMode&&!hasWeather){
-    $("windValue").innerHTML='-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span>';
-    $("windLabel").textContent="sin datos";
-    $("windLabel").className="metric-sub";
+    $("windValue").innerHTML='-- <span class="widget-unit">km/h</span>';
   }else{
-    // wColor unused but calculated for future use
-    $("windValue").innerHTML=`${Math.round(s.windKmh)} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">km/h</span>`;
-    $("windLabel").textContent=`${toCardinal(s.windFrom)} · ${Math.round(s.windFrom)}°`;
-    $("windLabel").className="metric-sub";
+    $("windValue").innerHTML=`${Math.round(s.windKmh)} <span class="widget-unit">km/h</span>`;
   }
 
-  // temp metric
+  // temp widget
   if(!customMode&&!hasWeather||currentTemp===null){
-    $("tempValue").innerHTML='-- <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>';
-    $("tempLabel").textContent="sin datos";
-    $("tempLabel").className="metric-sub";
+    $("tempValue").innerHTML='-- <span class="widget-unit">°C</span>';
   }else{
-    $("tempValue").innerHTML=`${currentTemp} <span style="font-size:.7rem;font-weight:600;color:var(--dim)">°C</span>`;
-    const tempPct=Math.round(d.tempImpactPercent||0);
-    $("tempLabel").textContent=tempPct>=1?`${thermal.label} · +${tempPct}% cons.`:thermal.label;
-    $("tempLabel").className="metric-sub "+thermal.cls;
+    $("tempValue").innerHTML=`${currentTemp} <span class="widget-unit">°C</span>`;
   }
 
   // heading pill
@@ -1487,9 +1679,20 @@ $("themeBtn").addEventListener("click",()=>{
   document.querySelector("meta[name=theme-color]").setAttribute("content",next==="dark"?"#06120d":"#edf7f2");
 });
 
+$("infoBtn").addEventListener("click",()=>{
+  $("infoModal").classList.add("show");
+});
+$("infoModalClose").addEventListener("click",()=>{
+  $("infoModal").classList.remove("show");
+});
+$("infoModal").addEventListener("click",(ev)=>{
+  if(ev.target.id==="infoModal")$("infoModal").classList.remove("show"); // tocar afuera de la tarjeta cierra
+});
+
 $("marcaSelect").addEventListener("change",()=>{
   const marca = $("marcaSelect").value;
   if(marca) buildModeloSelect(marca);
+  saveVehiclePreference(marca, $("modeloSelect").value);
 });
 
 $("modeloSelect").addEventListener("change",()=>{
@@ -1501,6 +1704,7 @@ $("modeloSelect").addEventListener("change",()=>{
     state.vehiculoKey = marca+'|'+modelo;
     loadVehicleImg(v.tipo || guessBodyType(v.modelo, v.marca));
     updateUI();
+    saveVehiclePreference(marca, modelo);
   }
 });
 
