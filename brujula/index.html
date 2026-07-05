@@ -1026,7 +1026,9 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wl
       autonomiaKm: autonomiaTemp,
       wltpKm: wltp_km,
       tempFactor,
-      tempImpactPercent
+      tempImpactPercent,
+      windEffectPercent: 0, // sin velocidad no hay arrastre aerodinámico que medir
+      windConsumPercent: 0
     };
   }
 
@@ -1042,6 +1044,20 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wl
   // Factor aerodinámico: proporcional a (v_aire / v_auto)^2, física real de arrastre.
   const aeroRatio = speed > 0 ? (vAirKmh / speed) : 1;
   const aeroFactor = aeroRatio * aeroRatio; // <1 con cola fuerte, >1 con frente fuerte
+
+  // Efecto del viento AISLADO: cuánto cambia el arrastre aerodinámico
+  // respecto a un día sin viento (aeroFactor=1), sin mezclar temperatura
+  // ni el overhead fijo. Sirve para juzgar si el viento en sí ayuda o
+  // perjudica, sin que un frío/calor fuerte "le eche la culpa" al viento
+  // cuando en realidad el viento es débil o incluso favorable.
+  const windEffectPercent = (aeroFactor - 1) * 100;
+
+  // Aporte del viento al consumo TOTAL (en puntos porcentuales), aislado
+  // de la temperatura: cuánto cambiaría el consumo general si sólo
+  // existiera el viento (comparado contra un día sin viento). Con vientos
+  // débiles a alta velocidad esto da un número chico aunque el cambio
+  // relativo del arrastre (windEffectPercent) parezca grande.
+  const windConsumPercent = aeroOverheadPercent(speed) * (aeroFactor - 1);
 
   // Factor total de consumo respecto al WLTP puro:
   // (1 base + overhead fijo + overhead aerodinámico ajustado por el viento)
@@ -1072,8 +1088,21 @@ function calcImpact(heading, windFrom, windKmh, speedKmh, bateriaKwhOverride, wl
     wltpKm: wltp_km,
     basePenalty: speedPenaltyPercent(speed),
     tempFactor,
-    tempImpactPercent
+    tempImpactPercent,
+    windEffectPercent,
+    windConsumPercent
   };
+}
+
+// Traduce el efecto AISLADO del viento (windEffectPercent) a un tono de
+// color. Con esto el "Viento de cola/lateral/frontal" se colorea según si
+// el viento en sí ayuda o perjudica, no según la eficiencia total (que
+// puede estar dominada por el frío/calor y no por el viento).
+function windTone(pct){
+  if(!Number.isFinite(pct))return"";
+  if(pct<=-3)return"good"; // el viento te está ayudando de forma apreciable
+  if(pct>=3) return"bad";  // el viento te está perjudicando de forma apreciable
+  return"warn";            // efecto casi neutro (viento débil o de costado)
 }
 
 function calcThermal(temp){
@@ -1495,11 +1524,12 @@ function updateUI(){
   }else{
     effEl.textContent=d.efficiency+"%";
     const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
+    const windCls=windTone(d.windEffectPercent);
     const fillFrac=Math.max(0,Math.min(1,d.efficiency/100)); // el anillo se llena hasta 100%; más que eso, círculo completo
     ringFg.style.strokeDashoffset=RING_CIRC*(1-fillFrac);
-    ringFg.setAttribute("class","eff-ring-fg "+cls);
+    ringFg.setAttribute("class","eff-ring-fg "+cls); // el anillo sí representa la eficiencia total
     $("effLabel").textContent=d.relText;
-    $("effLabel").className="eff-info-sub "+cls;
+    $("effLabel").className="eff-info-sub "+windCls; // pero la etiqueta de viento se colorea sólo por el viento
     $("autonomyValue").innerHTML=`~${d.autonomiaKm} <span class="widget-unit">km</span>`;
 
     // guardamos el historial de eficiencia real (sólo mientras se maneja
@@ -1563,16 +1593,25 @@ function updateUI(){
       pushCard("🌡️",`+${Math.round(d.tempImpactPercent)}%`,dir,"warn");
     }
   }else{
-    const cls=d.efficiency>=100?"good":d.efficiency>=90?"warn":"bad";
-    const consumoTxt=d.consumDelta<0
-      ? `${Math.round(Math.abs(d.consumDelta))}% menos`
-      : `+${Math.round(d.consumDelta)}%`;
-    pushCard(d.efficiency>=100?"💨":"🍃",d.relText,`${consumoTxt} consumo`,cls);
+    const windCls=windTone(d.windEffectPercent);
+    // Mostramos el aporte PROPIO del viento (aislado de temperatura), no
+    // el consumo total mezclado — si no, un viento de cola bueno (tono
+    // verde) quedaría al lado de un "+18% consumo" que en realidad es
+    // sobre todo culpa del frío, y vuelve a verse contradictorio.
+    const windConsumTxt = Math.abs(d.windConsumPercent)<1
+      ? "Efecto mínimo"
+      : (d.windConsumPercent<0
+          ? `${Math.round(Math.abs(d.windConsumPercent))}% menos consumo`
+          : `+${Math.round(d.windConsumPercent)}% consumo`);
+    pushCard(windCls==="good"?"💨":"🍃",d.relText,windConsumTxt,windCls);
     if(currentTemp!==null&&d.tempImpactPercent>=0.5){
       const dir=currentTemp<25?"por frío":"por calor";
       pushCard("🌡️",`+${Math.round(d.tempImpactPercent)}%`,dir,"warn");
     }
-    if(d.efficiency<85){
+    // Alerta específica de viento: sólo si el viento EN SÍ es
+    // apreciablemente desfavorable, no cuando la eficiencia total está
+    // baja por otra causa (frío/calor) con un viento débil o de cola.
+    if(d.windEffectPercent>=10){
       pushCard("⚠️","Viento","desfavorable","bad");
     }
   }
