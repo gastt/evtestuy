@@ -788,6 +788,15 @@ function loadVehicleImg(key){
 }
 loadVehicleImg("suv");
 
+// ─── imagen del anillo de la brújula (diseño propio) ──────────────────────
+// Si no carga (ej. el archivo todavía no está subido al hosting), se usa
+// automáticamente el dibujo por canvas como respaldo — ver drawCompass().
+let ringImg=new Image();
+let ringImgReady=false;
+ringImg.onload=()=>{ ringImgReady=true; };
+ringImg.onerror=()=>{ ringImgReady=false; };
+ringImg.src="assets/anillo.png";
+
 // ─── vehicle data (loaded from CSV) ──────────────────────────────────────
 let vehiculosDB = []; // [{marca, modelo, bateria_kwh, wltp_km}]
 let vehiculoActual = null; // vehículo seleccionado
@@ -1290,67 +1299,18 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   //       si el auto va al este  → la N queda a la izquierda.
   // ─────────────────────────────────────────────────────────────────
   const roseAngle = -heading * Math.PI / 180; // rotación de la rosa
+  const ringOuterR = R;
+  const ringInnerR = R*0.808; // banda 20% más fina que antes (era R*0.76)
 
   // ── FONDO FIJO: carretera animada (scroll ligado a la velocidad real) ──
   drawRoad(w,h,cx,cy,R,isDark);
 
-  // ── BLOQUE ROTADO: todo lo que pertenece a la rosa, ahora como
-  //    referencia tipo "marca de agua" sobre la carretera ──
+  // ── BLOQUE ROTADO: viento primero (queda "adentro" del dial) ──
   ctx.save();
   ctx.translate(cx,cy);
   ctx.rotate(roseAngle);
-  ctx.globalAlpha=0.4; // marca de agua: la rosa queda de referencia, no protagonista
 
-  // outer ring (círculo, no se ve diferente rotado pero lo mantenemos en bloque)
-  ctx.beginPath();
-  ctx.arc(0,0,R,0,Math.PI*2);
-  ctx.strokeStyle=isDark?"rgba(52,211,153,.35)":"rgba(5,150,105,.3)";
-  ctx.lineWidth=1.5;
-  ctx.stroke();
-
-  // inner rings dashed
-  [.68,.38].forEach(f=>{
-    ctx.beginPath();
-    ctx.arc(0,0,R*f,0,Math.PI*2);
-    ctx.setLineDash([4,6]);
-    ctx.strokeStyle=isDark?"rgba(52,211,153,.2)":"rgba(5,150,105,.22)";
-    ctx.lineWidth=1;
-    ctx.stroke();
-    ctx.setLineDash([]);
-  });
-
-  // ticks de grados (rotan con la rosa)
-  for(let i=0;i<360;i+=10){
-    const major=i%90===0;
-    const mid=i%30===0;
-    const a=(i-90)*Math.PI/180; // 0° = N = arriba en coordenadas de la rosa
-    const r1=major?R-16:mid?R-10:R-6;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a)*r1,Math.sin(a)*r1);
-    ctx.lineTo(Math.cos(a)*R,Math.sin(a)*R);
-    ctx.strokeStyle=major?C.teal:mid?C.dim:"rgba(52,211,153,.28)";
-    ctx.lineWidth=major?1.5:1;
-    ctx.stroke();
-  }
-
-  // cardinales (rotan con la rosa — así N va a donde corresponde)
-  [["N",0],["E",90],["S",180],["O",270]].forEach(([lbl,deg])=>{
-    const a=(deg-90)*Math.PI/180;
-    const rL=R-30;
-    ctx.save();
-    ctx.translate(Math.cos(a)*rL,Math.sin(a)*rL);
-    ctx.rotate(-roseAngle); // contra-rotar el texto para que siempre sea legible
-    ctx.font=`700 ${lbl==="N"?13:11}px -apple-system,sans-serif`;
-    ctx.fillStyle=lbl==="N"?C.teal:C.muted;
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.fillText(lbl,0,0);
-    ctx.restore();
-  });
-
-  ctx.globalAlpha=1; // a partir de acá el viento vuelve a full opacidad
-
-  // ── viento (dentro del bloque rotado de la rosa) ──
+  // ── viento (confinado al área interna, bajo el anillo de la brújula) ──
   if(windKmh>1){
     // Las flechas de viento apuntan "hacia abajo" en su coordenada local
     // (así están dibujadas: la animación fluye de arriba hacia abajo y la
@@ -1359,10 +1319,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     // hacia el rumbo absoluto real windTo (misma convención que usan los
     // ticks: ánguloPantalla = rumbo - 90 + roseAngle), la rotación extra
     // que hay que aplicar dentro de este bloque —que YA está rotado por
-    // roseAngle— es simplemente windFrom (en radianes). Antes se usaba
-    // (windTo-90), que quedaba desfasado 90° y hacía que el viento no
-    // girara en sintonía con la rosa al cambiar de rumbo.
-    const windTo=normDeg(windFrom+180);
+    // roseAngle— es simplemente windFrom (en radianes).
     const windCanvasAngle=windFrom*Math.PI/180;
 
     ctx.save();
@@ -1376,12 +1333,12 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     const wc=windColorForSpeed(windKmh).join(",");
 
     for(let i=0;i<count;i++){
-      const spread=R*.85;
+      const spread=ringInnerR*.85;
       const xOff=(((i+.5)/count)-.5)*spread*2;
-      if(Math.abs(xOff)>R*.88)continue;
+      if(Math.abs(xOff)>ringInnerR*.88)continue;
       const phase=((i/count)+windAnimOffset)%1;
-      const lineLen=R*(.45+windKmh/120);
-      const startY=-R*.98+(phase*R*1.96);
+      const lineLen=ringInnerR*(.45+windKmh/120);
+      const startY=-ringInnerR*.98+(phase*ringInnerR*1.96);
 
       const g=ctx.createLinearGradient(xOff,startY,xOff,startY+lineLen);
       g.addColorStop(0,"transparent");
@@ -1405,7 +1362,88 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
       ctx.fill();
     }
     ctx.restore();
+  }
 
+  // ── anillo de brújula: se usa la imagen (diseño propio) si ya cargó;
+  //    si no, se dibuja el mismo anillo a mano por canvas como respaldo
+  //    automático (por ejemplo si todavía no subiste assets/anillo.png
+  //    al hosting, o falló la descarga).
+  if(ringImgReady){
+    const ringImgSize=ringOuterR*2;
+    ctx.drawImage(ringImg,-ringImgSize/2,-ringImgSize/2,ringImgSize,ringImgSize);
+  }else{
+    const RING_BG="#f4efe2";
+    const RING_TICK="#e8622c";
+    const RING_TEXT="#171310";
+    const RING_BORDER="rgba(20,15,10,.4)";
+
+    // banda del anillo (relleno, "even-odd" para dejar el centro hueco)
+    ctx.beginPath();
+    ctx.arc(0,0,ringOuterR,0,Math.PI*2);
+    ctx.moveTo(ringInnerR,0);
+    ctx.arc(0,0,ringInnerR,0,Math.PI*2,true);
+    ctx.closePath();
+    ctx.fillStyle=RING_BG;
+    ctx.fill("evenodd");
+
+    ctx.lineWidth=1.4;
+    ctx.strokeStyle=RING_BORDER;
+    ctx.beginPath();ctx.arc(0,0,ringOuterR,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.arc(0,0,ringInnerR,0,Math.PI*2);ctx.stroke();
+
+    // ticks finos cada 2°, medios cada 10°, mayores (con numeral) cada 30° —
+    // con un hueco donde van las letras cardinales (ahí no va ninguna marca)
+    for(let i=0;i<360;i+=2){
+      if(shortAngle(i,0)<=13||shortAngle(i,90)<=13||shortAngle(i,180)<=13||shortAngle(i,270)<=13)continue;
+      const major=i%30===0;
+      const mid=i%10===0;
+      const a=(i-90)*Math.PI/180;
+      const rOut=ringOuterR-2;
+      const rIn=major?ringOuterR-15:mid?ringOuterR-10:ringOuterR-6;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*rOut,Math.sin(a)*rOut);
+      ctx.lineTo(Math.cos(a)*rIn,Math.sin(a)*rIn);
+      ctx.strokeStyle=RING_TICK;
+      ctx.lineWidth=major?2.2:mid?1.4:.8;
+      ctx.stroke();
+    }
+
+    // numerales cada 30° (salvo en los 4 cardinales, que llevan letra),
+    // contra-rotados para quedar siempre legibles
+    for(let i=0;i<360;i+=30){
+      if(i%90===0)continue;
+      const a=(i-90)*Math.PI/180;
+      const rNum=ringOuterR-23;
+      ctx.save();
+      ctx.translate(Math.cos(a)*rNum,Math.sin(a)*rNum);
+      ctx.rotate(-roseAngle);
+      ctx.font="700 10px ui-monospace,'SF Mono',monospace";
+      ctx.fillStyle=RING_TEXT;
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillText(String(i),0,0);
+      ctx.restore();
+    }
+
+    // cardinales: centrados en el ancho de la banda (no pegados al borde
+    // interior), más grandes, y SIN contra-rotar — así acompañan la
+    // curvatura del anillo (la curva es su renglón), igual que en la
+    // referencia, en vez de quedar siempre verticales.
+    const ringWidth=ringOuterR-ringInnerR;
+    const cardMidR=(ringOuterR+ringInnerR)/2;
+    const cardFontSize=ringWidth*0.72;
+    [["N",0],["E",90],["S",180],["O",270]].forEach(([lbl,deg])=>{
+      const a=(deg-90)*Math.PI/180;
+      ctx.save();
+      ctx.translate(Math.cos(a)*cardMidR,Math.sin(a)*cardMidR);
+      ctx.rotate(a+Math.PI/2); // orienta la letra "parada" sobre el radio, siguiendo la curva
+      ctx.font=`900 ${lbl==="N"?cardFontSize*1.12:cardFontSize}px -apple-system,sans-serif`;
+      ctx.fillStyle=lbl==="N"?RING_TICK:RING_TEXT;
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillText(lbl,0,0);
+      ctx.restore();
+    });
   }
 
   ctx.restore(); // fin bloque rotado de la rosa
@@ -1420,16 +1458,17 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   }
   ctx.restore();
 
-  // ── BLOQUE FIJO: triángulo de "frente" siempre arriba ──
+  // ── BLOQUE FIJO: puntero de "frente" siempre arriba (estilo lubber
+  //    line de brújula analógica, apoyado sobre la banda del anillo) ──
   ctx.save();
   ctx.translate(cx,cy);
-  const fR=R*.93;
+  const fR=R*.94;
   ctx.beginPath();
   ctx.moveTo(0,-fR);
-  ctx.lineTo(-5,-fR+10);
-  ctx.lineTo(5,-fR+10);
+  ctx.lineTo(-6,-fR+11);
+  ctx.lineTo(6,-fR+11);
   ctx.closePath();
-  ctx.fillStyle=C.teal;
+  ctx.fillStyle="#e8622c";
   ctx.fill();
   ctx.restore();
 
