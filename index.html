@@ -892,7 +892,7 @@
           </div>
         </div>
 
-        <!-- Valores de referencia -->
+        <!-- Valores de referencia: tarifa hogareña UTE -->
         <div class="collapsible" id="panelPliego" data-open="false" style="margin-top:12px;">
           <div class="ev-card-title card-title" style="margin-bottom:0;cursor:pointer;">
             <span style="font-size:0.78rem;">Valores de referencia según pliego tarifario de UTE a enero de 2026</span>
@@ -908,6 +908,26 @@
             </table>
             <p class="ev-note" style="margin-top:6px;">
               Los valores muestran solo el <strong>cargo por energía</strong>. No se incluyen cargos fijos ni potencia contratada.
+            </p>
+          </div>
+        </div>
+
+        <!-- Valores de referencia: cargadores públicos de UTE -->
+        <div class="collapsible" id="panelPliegoUte" data-open="false" style="margin-top:12px;display:none;">
+          <div class="ev-card-title card-title" style="margin-bottom:0;cursor:pointer;">
+            <span style="font-size:0.78rem;">Tarifario de cargadores públicos de UTE</span>
+            <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelPliegoUte">
+              <span class="collapse-btn-label">Mostrar</span>
+              <span class="ev-collapse-icon collapse-btn-icon">▼</span>
+            </button>
+          </div>
+          <div class="collapsible-body">
+            <table class="ev-table tarifa-table">
+              <thead><tr><th>Cargador</th><th>Cargo fijo ($U)</th><th>$/kWh</th></tr></thead>
+              <tbody id="tarifaUteTableBody"><tr><td colspan="3">Cargando cargadores…</td></tr></tbody>
+            </table>
+            <p class="ev-note" style="margin-top:6px;">
+              En algunos predios privados se cobra, además, una <strong>tarifa extra por uso del espacio de $U 66,4</strong>, según el operador del predio.
             </p>
           </div>
         </div>
@@ -1198,6 +1218,8 @@
     const socError = document.getElementById("socError");
 
     const chargeModeSelect = document.getElementById("chargeModeSelect");
+    const panelPliego = document.getElementById("panelPliego");
+    const panelPliegoUte = document.getElementById("panelPliegoUte");
     const tarifaTipoField = document.getElementById("tarifaTipoField");
     const tarifaHomeFields = document.getElementById("tarifaHomeFields");
     const utePublicFields = document.getElementById("utePublicFields");
@@ -1473,19 +1495,51 @@
         opt.textContent = "Sin cargadores UTE cargados (revisar cargadores_ute.csv)";
         uteChargerSelect.appendChild(opt);
         updateUteChargerInfo();
+        populateTarifaUteTable();
         return;
       }
 
       cargadoresUte.forEach((ch, idx) => {
         const opt = document.createElement("option");
         opt.value = String(idx);
-        opt.textContent = `${ch.nombre} — fijo $U ${formatCurrency(ch.cargoFijo)} + $U ${formatCurrency(ch.precioKwh)}/kWh`;
+        opt.textContent = ch.nombre;
         uteChargerSelect.appendChild(opt);
       });
 
       uteChargerSelect.disabled = false;
       uteChargerSelect.value = "0";
       updateUteChargerInfo();
+      populateTarifaUteTable();
+    }
+
+    function populateTarifaUteTable() {
+      const tbody = document.getElementById("tarifaUteTableBody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      if (!cargadoresUte || cargadoresUte.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 3;
+        td.textContent = "Sin datos de cargadores públicos (revisar cargadores_ute.csv).";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      cargadoresUte.forEach(ch => {
+        const tr = document.createElement("tr");
+        const td1 = document.createElement("td");
+        const td2 = document.createElement("td");
+        const td3 = document.createElement("td");
+        td1.textContent = ch.nombre;
+        td2.textContent = "$U " + formatCurrency(ch.cargoFijo);
+        td3.innerHTML = `<strong>${formatCurrency(ch.precioKwh)}</strong>`;
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tbody.appendChild(tr);
+      });
     }
 
     function getUteChargerSeleccionado() {
@@ -1510,6 +1564,8 @@
       if (tarifaTipoField) tarifaTipoField.style.display = isPublicUte ? "none" : "";
       if (tarifaHomeFields) tarifaHomeFields.style.display = isPublicUte ? "none" : "grid";
       if (utePublicFields) utePublicFields.style.display = isPublicUte ? "grid" : "none";
+      if (panelPliego) panelPliego.style.display = isPublicUte ? "none" : "";
+      if (panelPliegoUte) panelPliegoUte.style.display = isPublicUte ? "" : "none";
       updateUteChargerInfo();
     }
 
