@@ -608,7 +608,6 @@
       <canvas id="compassCanvas"></canvas>
       <div class="heading-pill">
         <span id="headingHuman">Norte · 0°</span>
-        <strong id="speedHuman">-- km/h</strong>
       </div>
       <div class="speed-sign" id="speedSign" aria-label="Velocidad actual">
         <span class="speed-sign-num" id="speedSignNum">--</span>
@@ -1287,7 +1286,7 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
   ctx.clearRect(0,0,w,h);
 
   const cx=w/2,cy=h/2;
-  const R=Math.min(w,h)*0.42;
+  const R=Math.min(w,h)*0.46;
   const C=getColors();
   const isDark=document.documentElement.getAttribute("data-theme")==="dark";
 
@@ -1594,7 +1593,6 @@ function updateUI(){
 
   // heading pill
   $("headingHuman").textContent=`${toCardinal(s.heading)} · ${Math.round(s.heading)}°`;
-  $("speedHuman").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)} km/h`:"-- km/h";
 
   // cartel de velocidad (esquina inferior derecha de la brújula)
   $("speedSignNum").textContent=(customMode||hasGps)?`${Math.round(s.speedKmh)}`:"--";
