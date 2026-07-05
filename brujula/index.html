@@ -1325,7 +1325,10 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
     ctx.rotate(windCanvasAngle);
 
     const count=Math.min(20,Math.max(6,Math.round(windKmh/3.5)));
-    const alpha=Math.min(.75,windKmh/60+.2);
+    // Antes el piso de opacidad era muy bajo (~0.28 con viento de 5 km/h,
+    // casi invisible). Ahora arranca en 0.5 aunque el viento sea flojo, y
+    // sigue subiendo con la intensidad hasta 0.9 con viento fuerte.
+    const alpha=Math.min(.9,.5+windKmh/55);
     windAnimOffset=(windAnimOffset+windKmh/2000)%1;
 
     // color dinámico según la potencia del viento: azul (calma) → rojo (fuerte)
@@ -1341,23 +1344,23 @@ function drawCompass(heading,windFrom,windKmh,speedKmh){
 
       const g=ctx.createLinearGradient(xOff,startY,xOff,startY+lineLen);
       g.addColorStop(0,"transparent");
-      g.addColorStop(.3,`rgba(${wc},${alpha*.7})`);
+      g.addColorStop(.3,`rgba(${wc},${alpha*.85})`);
       g.addColorStop(.85,`rgba(${wc},${alpha})`);
       g.addColorStop(1,"transparent");
       ctx.beginPath();
       ctx.moveTo(xOff,startY);
       ctx.lineTo(xOff,startY+lineLen);
       ctx.strokeStyle=g;
-      ctx.lineWidth=windKmh>30?2:1.5;
+      ctx.lineWidth=windKmh>30?2.6:2;
       ctx.stroke();
 
       const ay=startY+lineLen*.75;
       ctx.beginPath();
-      ctx.moveTo(xOff,ay+8);
-      ctx.lineTo(xOff-4,ay);
-      ctx.lineTo(xOff+4,ay);
+      ctx.moveTo(xOff,ay+9);
+      ctx.lineTo(xOff-5,ay);
+      ctx.lineTo(xOff+5,ay);
       ctx.closePath();
-      ctx.fillStyle=`rgba(${wc},${alpha*.8})`;
+      ctx.fillStyle=`rgba(${wc},${Math.min(1,alpha*1.05)})`;
       ctx.fill();
     }
     ctx.restore();
