@@ -585,11 +585,106 @@
       .advertise-cta { margin: 10px 12px 20px; font-size: 0.8rem; }
     }
 
+    /* ── Bottom app navigation ── */
+    body {
+      padding-bottom: calc(94px + env(safe-area-inset-bottom));
+    }
+    .ev-bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      z-index: 9997;
+      width: min(calc(100% - 20px), 760px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 2px;
+      padding: 8px 8px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .ev-bottom-nav-item {
+      min-width: 0;
+      min-height: 58px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 18px;
+      color: var(--color-text-tertiary);
+      text-decoration: none !important;
+      font: 700 0.68rem var(--font-display);
+      line-height: 1.05;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+    .ev-bottom-nav-item:hover {
+      transform: translateY(-1px);
+      background: rgba(45, 212, 168, 0.07);
+      color: var(--ev-green);
+    }
+    .ev-bottom-nav-item.active {
+      color: var(--ev-green-deep);
+      background: linear-gradient(135deg, rgba(45, 212, 168, 0.18), rgba(22, 160, 122, 0.10));
+    }
+    .ev-bottom-nav-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ev-bottom-nav-icon svg {
+      width: 23px;
+      height: 23px;
+      fill: currentColor;
+      display: block;
+    }
+    .ev-bottom-nav-label {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    [data-theme="dark"] .ev-bottom-nav {
+      background: rgba(15, 23, 42, 0.88);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38), 0 4px 14px rgba(0, 0, 0, 0.22);
+    }
+    [data-theme="dark"] .ev-bottom-nav-item {
+      color: rgba(226, 232, 240, 0.58);
+    }
+    [data-theme="dark"] .ev-bottom-nav-item:hover,
+    [data-theme="dark"] .ev-bottom-nav-item.active {
+      color: var(--ev-teal);
+      background: rgba(45, 212, 168, 0.12);
+    }
+    @media (max-width: 420px) {
+      .ev-bottom-nav {
+        width: calc(100% - 14px);
+        padding: 7px 6px;
+        border-radius: 22px;
+      }
+      .ev-bottom-nav-item {
+        min-height: 54px;
+        font-size: 0.61rem;
+        border-radius: 16px;
+      }
+      .ev-bottom-nav-icon { width: 22px; height: 22px; }
+      .ev-bottom-nav-icon svg { width: 21px; height: 21px; }
+    }
+
     /* ── PWA install button ── */
     .install-app-btn {
       position: fixed;
       right: 18px;
-      bottom: 18px;
+      bottom: calc(104px + env(safe-area-inset-bottom));
       z-index: 9998;
       display: none;
       align-items: center;
@@ -606,7 +701,7 @@
     .install-app-btn.show { display: inline-flex; }
     .install-app-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 34px rgba(22,160,122,0.3); }
     @media (max-width: 560px) {
-      .install-app-btn { right: 12px; bottom: 12px; padding: 9px 13px; font-size: 0.76rem; }
+      .install-app-btn { right: 12px; bottom: calc(96px + env(safe-area-inset-bottom)); padding: 9px 13px; font-size: 0.76rem; }
     }
 
     @media (max-width: 560px) {
@@ -623,128 +718,39 @@
   </style>
 </head>
 <body>
-  <!-- Floating bubble: Comparador de redes -->
-  <a class="float-bubble collapsed" id="floatBubble" href="/carga.html" title="Comparador de redes de carga"
-     onclick="return handleBubbleClick(event, 'floatBubble')">
-    <span class="fb-badge">⚡ Comparador</span>
-    <span class="fb-pill">
-      <span class="fb-pulse"></span>
-      <span class="fb-icon">
-        <!-- Calculator SVG -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v4h10V4H7zm0 6v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2zm-8 4v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v6h2v-6h-2zm-8 4v2h2v-2H7zm4 0v2h2v-2h-2z"/>
-        </svg>
+  <!-- Navegación inferior estilo app -->
+  <nav class="ev-bottom-nav" aria-label="Navegación principal EVUruguay">
+    <a class="ev-bottom-nav-item" data-nav="inicio" href="/" aria-label="Inicio">
+      <span class="ev-bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 11.2 12 4l9 7.2V21a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.8z"/></svg>
       </span>
-      <span class="fb-text">
-        <span class="fb-label">Comparador de redes</span>
-        <span class="fb-sublabel">Compará costos de carga</span>
+      <span class="ev-bottom-nav-label">Inicio</span>
+    </a>
+    <a class="ev-bottom-nav-item" data-nav="redes" href="/carga.html" aria-label="Redes de carga">
+      <span class="ev-bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
       </span>
-      <span class="fb-arrow">→</span>
-    </span>
-  </a>
-
-  <!-- Floating bubble: CarBuy recomendador -->
-  <a class="float-bubble float-bubble-carbuy collapsed" id="floatBubbleCarbuy" href="/carbuy/recomendador.html" title="¿Qué vehículo EV puedo comprar?"
-     onclick="return handleBubbleClick(event, 'floatBubbleCarbuy')">
-    <span class="fb-badge">🚗 Recomendador</span>
-    <span class="fb-pill">
-      <span class="fb-pulse"></span>
-      <span class="fb-icon">
-        <!-- Car SVG -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 11l1.5-4.5h11L19 11M17.5 16a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m-8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0M3 11.5l1-3.5A2 2 0 0 1 5.9 6.5h12.2A2 2 0 0 1 20 8l1 3.5V17a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H6v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5.5z"/>
-        </svg>
+      <span class="ev-bottom-nav-label">Redes</span>
+    </a>
+    <a class="ev-bottom-nav-item" data-nav="comprar" href="/carbuy/recomendador.html" aria-label="Comprar EV">
+      <span class="ev-bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 11l1.5-4.5h11L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1v1a1 1 0 0 1-2 0v-1H7v1a1 1 0 0 1-2 0v-1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.2-2.5L6.4 11h11.2l-.8-2.5H7.2zM7 14a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm10 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
       </span>
-      <span class="fb-text">
-        <span class="fb-label">¿Qué EV puedo comprar?</span>
-        <span class="fb-sublabel">Recomendador de vehículos</span>
+      <span class="ev-bottom-nav-label">Comprar EV</span>
+    </a>
+    <a class="ev-bottom-nav-item" data-nav="instalacion" href="/instalacion/" aria-label="Instalación">
+      <span class="ev-bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94L14.7 6.3z"/></svg>
       </span>
-      <span class="fb-arrow">→</span>
-    </span>
-  </a>
-
-  <!-- Floating bubble: Simulador de instalación -->
-  <a class="float-bubble float-bubble-instalacion collapsed" id="floatBubbleInstalacion" href="/instalacion/" title="Simulador de instalación EV"
-     onclick="return handleBubbleClick(event, 'floatBubbleInstalacion')">
-    <span class="fb-badge">🔧 Instalación</span>
-    <span class="fb-pill">
-      <span class="fb-pulse"></span>
-      <span class="fb-icon">
-        <!-- Wrench/plug SVG -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-        </svg>
+      <span class="ev-bottom-nav-label">Instalación</span>
+    </a>
+    <a class="ev-bottom-nav-item" data-nav="brujula" href="/brujula/" aria-label="Brújula de eficiencia">
+      <span class="ev-bottom-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 5.5-2.5 5-5 2.5 2.5-5 5-2.5zM12 11a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
       </span>
-      <span class="fb-text">
-        <span class="fb-label">Simulador de instalación</span>
-        <span class="fb-sublabel">Dimensioná tu carga en casa</span>
-      </span>
-      <span class="fb-arrow">→</span>
-    </span>
-  </a>
-
-  <!-- Floating bubble: Brújula de Eficiencia -->
-  <a class="float-bubble float-bubble-eficiencia collapsed" id="floatBubbleEficiencia" href="/brujula/" title="Brújula de Eficiencia"
-     onclick="return handleBubbleClick(event, 'floatBubbleEficiencia')">
-    <span class="fb-badge">🧭 Eficiencia</span>
-    <span class="fb-pill">
-      <span class="fb-pulse"></span>
-      <span class="fb-icon">
-        <!-- Compass SVG -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm3.5 3.5-5 2.5-2.5 5 5-2.5 2.5-5zM12 11a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-        </svg>
-      </span>
-      <span class="fb-text">
-        <span class="fb-label">Brújula de Eficiencia</span>
-        <span class="fb-sublabel">Impacto del viento en tu autonomía</span>
-      </span>
-      <span class="fb-arrow">→</span>
-    </span>
-  </a>
-
-  <script>
-    (function() {
-      var expandedBubble = null;
-      var autoCollapseTimer = null;
-
-      window.handleBubbleClick = function(e, id) {
-        var bubble = document.getElementById(id);
-        var isCollapsed = bubble.classList.contains('collapsed');
-
-        if (isCollapsed) {
-          // Expand this bubble
-          e.preventDefault();
-          // Collapse any other expanded bubble
-          if (expandedBubble && expandedBubble !== bubble) {
-            expandedBubble.classList.add('collapsed');
-          }
-          bubble.classList.remove('collapsed');
-          expandedBubble = bubble;
-          // Auto-collapse after 4 seconds if user doesn't click again
-          clearTimeout(autoCollapseTimer);
-          autoCollapseTimer = setTimeout(function() {
-            bubble.classList.add('collapsed');
-            expandedBubble = null;
-          }, 4000);
-          return false;
-        } else {
-          // Already expanded → navigate normally
-          clearTimeout(autoCollapseTimer);
-          return true;
-        }
-      };
-
-      // Collapse on outside click
-      document.addEventListener('click', function(e) {
-        if (expandedBubble && !expandedBubble.contains(e.target)) {
-          expandedBubble.classList.add('collapsed');
-          expandedBubble = null;
-          clearTimeout(autoCollapseTimer);
-        }
-      });
-    })();
-  </script>
+      <span class="ev-bottom-nav-label">Brújula</span>
+    </a>
+  </nav>
 
   <!-- Theme toggle -->
   <button class="ev-theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro">
@@ -755,6 +761,22 @@
   <button class="install-app-btn" id="installAppBtn" type="button" aria-label="Instalar EVUruguay en este dispositivo">
     📱 Instalar EVUruguay
   </button>
+
+  <script>
+    (function() {
+      const path = (window.location.pathname || '/').toLowerCase();
+      let active = 'inicio';
+      if (path.includes('/carga')) active = 'redes';
+      else if (path.includes('/carbuy')) active = 'comprar';
+      else if (path.includes('/instalacion')) active = 'instalacion';
+      else if (path.includes('/brujula')) active = 'brujula';
+      document.querySelectorAll('.ev-bottom-nav-item').forEach(function(item) {
+        const isActive = item.dataset.nav === active;
+        item.classList.toggle('active', isActive);
+        if (isActive) item.setAttribute('aria-current', 'page');
+      });
+    })();
+  </script>
 
   <div class="ad-banner-wrap ad-top">
     <span class="ad-label">Publicidad</span>
@@ -768,7 +790,7 @@
   <div class="ad-banner-wrap ad-top compass-banner-wrap">
     <div class="ad-slot compass-banner-slot">
       <a href="https://evuruguay.com/brujula/" title="Ir a la Brújula de Eficiencia">
-        <img src="brujula.png" alt="Brújula de Eficiencia EVUruguay" loading="eager" />
+        <img src="img/brujula.png" alt="Brújula de Eficiencia EVUruguay" loading="eager" />
       </a>
     </div>
   </div>
