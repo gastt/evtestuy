@@ -1490,3 +1490,137 @@ body.carbuy-page .app-header.ev-page-header p {
 body.carbuy-page .app-header .ev-brand-centered {
   margin-bottom: 6px;
 }
+
+/* ── Bottom app navigation (filled icon version) ── */
+body {
+  padding-bottom: calc(94px + env(safe-area-inset-bottom));
+}
+
+.ev-bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 9997;
+  width: min(calc(100% - 20px), 760px);
+  min-height: auto;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  padding: 8px 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ev-bottom-nav-item {
+  min-width: 0;
+  min-height: 58px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 18px;
+  color: var(--color-text-tertiary, #94a3b8);
+  text-decoration: none !important;
+  font: 700 0.68rem var(--font-display, system-ui, sans-serif);
+  line-height: 1.05;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.ev-bottom-nav-item:hover {
+  transform: translateY(-1px);
+  background: rgba(45, 212, 168, 0.07);
+  color: var(--ev-green, #16a07a);
+}
+
+.ev-bottom-nav-item.active,
+.ev-bottom-nav-item[aria-current="page"] {
+  color: var(--ev-green-deep, #0f7b5f);
+  background: linear-gradient(135deg, rgba(45, 212, 168, 0.18), rgba(22, 160, 122, 0.10));
+}
+
+.ev-bottom-nav-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-bottom-nav-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+  display: block;
+}
+
+.ev-bottom-nav-label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .ev-bottom-nav,
+html[data-theme="dark"] .ev-bottom-nav {
+  background: rgba(15, 23, 42, 0.88);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38), 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item,
+html[data-theme="dark"] .ev-bottom-nav-item {
+  color: rgba(226, 232, 240, 0.58);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item:hover,
+[data-theme="dark"] .ev-bottom-nav-item.active,
+[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"],
+html[data-theme="dark"] .ev-bottom-nav-item:hover,
+html[data-theme="dark"] .ev-bottom-nav-item.active,
+html[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"] {
+  color: var(--ev-teal, #2dd4a8);
+  background: rgba(45, 212, 168, 0.12);
+}
+
+.install-app-btn {
+  bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 560px) {
+  .install-app-btn {
+    bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .ev-bottom-nav {
+    width: calc(100% - 14px);
+    padding: 7px 6px;
+    border-radius: 22px;
+  }
+
+  .ev-bottom-nav-item {
+    min-height: 54px;
+    font-size: 0.61rem;
+    border-radius: 16px;
+  }
+
+  .ev-bottom-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ev-bottom-nav-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+}
