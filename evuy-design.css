@@ -1299,3 +1299,21 @@ html[data-theme="dark"] body.carbuy-page .adas-box .adas-item span:last-child,
 html[data-theme="dark"] body.carbuy-page .details-note strong {
   color: rgba(226, 232, 240, 0.92) !important;
 }
+
+/* Keep CarBuy page sections stacked vertically when shared ad banners are present. */
+body.carbuy-page {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100%;
+}
+
+body.carbuy-page .ad-banner-wrap,
+body.carbuy-page .app-shell {
+  flex: 0 0 auto;
+}
+
+body.carbuy-page .layout {
+  width: 100%;
+}
