@@ -1224,3 +1224,78 @@ html[data-theme="dark"] body.carbuy-page .result-card {
   background: rgba(15, 23, 42, 0.70) !important;
   border-color: rgba(45, 212, 168, 0.14) !important;
 }
+
+/* ── Shared advertising banners ── */
+.ad-banner-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ad-banner-wrap.ad-top {
+  padding: 10px 12px 4px;
+}
+
+.ad-banner-wrap.ad-bottom {
+  padding: 4px 12px 10px;
+}
+
+.ad-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary, #94a3b8);
+  align-self: center;
+}
+
+.ad-slot {
+  width: 100%;
+  max-width: 728px;
+  min-height: 90px;
+  border-radius: var(--radius-md, 18px);
+  overflow: hidden;
+  background: var(--color-surface, #ffffff);
+  border: 1px dashed rgba(15, 23, 42, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-slot a,
+.ad-slot img {
+  display: block;
+  width: 100%;
+}
+
+.ad-slot img {
+  height: auto;
+  object-fit: contain;
+}
+
+[data-theme="dark"] .ad-slot,
+html[data-theme="dark"] .ad-slot {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+/* Improve equipment contrast in the EV recommender detail card. */
+body.carbuy-page .adas-item,
+body.carbuy-page .details-note strong {
+  color: var(--color-text, #16231d) !important;
+}
+
+body.carbuy-page .adas-box .adas-item span:last-child {
+  color: var(--color-text, #16231d) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .adas-item,
+[data-theme="dark"] body.carbuy-page .adas-box .adas-item span:last-child,
+[data-theme="dark"] body.carbuy-page .details-note strong,
+html[data-theme="dark"] body.carbuy-page .adas-item,
+html[data-theme="dark"] body.carbuy-page .adas-box .adas-item span:last-child,
+html[data-theme="dark"] body.carbuy-page .details-note strong {
+  color: rgba(226, 232, 240, 0.92) !important;
+}
