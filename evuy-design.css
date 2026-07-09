@@ -1624,3 +1624,30 @@ html[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"] {
     height: 21px;
   }
 }
+
+/* ── Instalación: fix dark title/brand rendering from bundled inline styles ── */
+body.instalacion-page #root [data-ev-brand-replaced="true"] {
+  width: auto !important;
+  max-width: max-content !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  margin-inline: auto !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1,
+[data-theme="dark"] body.instalacion-page #root h1 {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #e8f5ee !important;
+  color: #e8f5ee !important;
+  text-shadow: 0 10px 30px rgba(45, 212, 168, 0.12);
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1 br,
+[data-theme="dark"] body.instalacion-page #root h1 br {
+  display: block;
+}
