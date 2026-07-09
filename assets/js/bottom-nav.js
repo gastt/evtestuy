@@ -4,6 +4,8 @@
 
     const path = (window.location.pathname || "/").toLowerCase();
 
+    if (path.includes("/brujula")) return;
+
     const items = [
       {
         id: "inicio",
