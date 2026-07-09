@@ -875,3 +875,352 @@ a.ev-brand:hover {
 @media (max-width: 560px) {
   .ev-theme-toggle { top: 12px; right: 12px; width: 38px; height: 38px; font-size: 16px; }
 }
+
+/* ── EVUruguay shared app shell polish ── */
+html {
+  scroll-padding-bottom: calc(110px + env(safe-area-inset-bottom));
+}
+
+body.has-ev-bottom-nav {
+  padding-bottom: calc(104px + env(safe-area-inset-bottom));
+}
+
+/* Bring standalone tools closer to the EVUruguay app language without changing their logic. */
+.app-shell,
+.br-shell,
+.instalacion-shell {
+  border-radius: var(--radius-xl, 28px);
+}
+
+.app-header,
+.br-header,
+.ev-app header {
+  letter-spacing: -0.01em;
+}
+
+.app-header h1,
+.br-title,
+.ev-heading-xl {
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
+.card,
+.panel,
+.result-card,
+.ev-card,
+.ev-section-card {
+  border-radius: var(--radius-lg, 22px);
+}
+
+button,
+.button,
+.btn,
+.ev-btn,
+.ev-btn-primary,
+.ev-btn-ghost {
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
+/* ── Barra inferior tipo app ── */
+.ev-bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(94%, 560px);
+  min-height: 68px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.ev-bottom-nav-item {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--color-text-secondary, #64748b);
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.1;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.ev-bottom-nav-icon {
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-bottom-nav-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ev-bottom-nav-label {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ev-bottom-nav-item.active,
+.ev-bottom-nav-item[aria-current="page"] {
+  color: #16a07a;
+  background: rgba(45, 212, 168, 0.12);
+}
+
+.ev-bottom-nav-item:hover,
+.ev-bottom-nav-item:focus-visible {
+  color: #16a07a;
+  background: rgba(45, 212, 168, 0.08);
+  outline: none;
+}
+
+.ev-bottom-nav-item:focus-visible {
+  box-shadow: 0 0 0 3px rgba(45, 212, 168, 0.28);
+}
+
+.install-app-btn {
+  bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+}
+
+[data-theme="dark"] .ev-bottom-nav,
+html[data-theme="dark"] .ev-bottom-nav {
+  background: rgba(15, 23, 42, 0.94);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item,
+html[data-theme="dark"] .ev-bottom-nav-item {
+  color: rgba(226, 232, 240, 0.72);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item.active,
+[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"],
+html[data-theme="dark"] .ev-bottom-nav-item.active,
+html[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"] {
+  color: #2dd4a8;
+  background: rgba(45, 212, 168, 0.14);
+}
+
+@media (max-width: 420px) {
+  body.has-ev-bottom-nav {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .ev-bottom-nav {
+    width: calc(100% - 18px);
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    min-height: 64px;
+    border-radius: 22px;
+    padding: 7px 6px;
+  }
+
+  .ev-bottom-nav-item {
+    font-size: 0.62rem;
+  }
+
+  .ev-bottom-nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ── CarBuy: align recommender with EVUruguay main app language ── */
+body.carbuy-page {
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 168, 0.16), transparent 34rem),
+    linear-gradient(180deg, var(--ev-cream, #f8f7f2) 0%, var(--ev-mint, #eef9f4) 100%) !important;
+  color: var(--color-text, #16231d) !important;
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif) !important;
+}
+
+body.carbuy-page .app-shell {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 22px 16px 24px;
+}
+
+body.carbuy-page .app-header {
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: var(--radius-xl, 28px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(236, 253, 245, 0.92));
+  border: 1px solid rgba(22, 160, 122, 0.16);
+  box-shadow: var(--shadow-card, 0 18px 44px rgba(6, 78, 59, 0.10));
+}
+
+body.carbuy-page .badge,
+body.carbuy-page .status-pill,
+body.carbuy-page .pill-filter,
+body.carbuy-page .chip {
+  background: rgba(255, 255, 255, 0.76) !important;
+  border-color: rgba(22, 160, 122, 0.16) !important;
+  color: var(--color-text-secondary, #64746d) !important;
+}
+
+body.carbuy-page .badge-dot,
+body.carbuy-page .status-dot,
+body.carbuy-page .chip-accent-dot,
+body.carbuy-page .adas-box-title .dot {
+  background: var(--ev-teal, #2dd4a8) !important;
+  box-shadow: 0 0 0 5px rgba(45, 212, 168, 0.18) !important;
+}
+
+body.carbuy-page .app-header h1 {
+  color: var(--color-text, #16231d) !important;
+  letter-spacing: -0.03em;
+}
+
+body.carbuy-page .app-header h1 .accent,
+body.carbuy-page .result-price,
+body.carbuy-page .details-price,
+body.carbuy-page .note strong,
+body.carbuy-page .site-footer a {
+  color: var(--ev-primary, #16a07a) !important;
+}
+
+body.carbuy-page .app-header p,
+body.carbuy-page .card-subtitle,
+body.carbuy-page .results-summary,
+body.carbuy-page .result-subtitle,
+body.carbuy-page .result-quick,
+body.carbuy-page .details-subtitle,
+body.carbuy-page .details-placeholder,
+body.carbuy-page .details-body,
+body.carbuy-page .details-note,
+body.carbuy-page .note,
+body.carbuy-page .site-footer {
+  color: var(--color-text-secondary, #64746d) !important;
+}
+
+body.carbuy-page .card {
+  background: var(--color-surface, #ffffff) !important;
+  border: 1px solid rgba(22, 160, 122, 0.14) !important;
+  border-radius: var(--radius-xl, 28px) !important;
+  box-shadow: var(--shadow-card, 0 18px 44px rgba(6, 78, 59, 0.10)) !important;
+}
+
+body.carbuy-page .card::before {
+  background: radial-gradient(circle at 0 0, rgba(45, 212, 168, 0.12), transparent 58%) !important;
+  opacity: 1 !important;
+}
+
+body.carbuy-page .card-title,
+body.carbuy-page .results-title,
+body.carbuy-page .result-name,
+body.carbuy-page .details-title,
+body.carbuy-page .adas-box-title,
+body.carbuy-page .field-label,
+body.carbuy-page .chip-label,
+body.carbuy-page .pill-filter strong {
+  color: var(--color-text, #16231d) !important;
+}
+
+body.carbuy-page .card-title-icon,
+body.carbuy-page .adas-tick {
+  background: rgba(45, 212, 168, 0.12) !important;
+  border-color: rgba(45, 212, 168, 0.32) !important;
+  color: var(--ev-primary, #16a07a) !important;
+}
+
+body.carbuy-page .field-input,
+body.carbuy-page .field-select,
+body.carbuy-page .details-panel,
+body.carbuy-page .empty-state,
+body.carbuy-page .result-thumb {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-color: var(--color-border, rgba(22, 160, 122, 0.16)) !important;
+  color: var(--color-text, #16231d) !important;
+  box-shadow: inset 0 1px 2px rgba(6, 78, 59, 0.04);
+}
+
+body.carbuy-page .field-input:focus,
+body.carbuy-page .field-select:focus {
+  border-color: var(--ev-primary, #16a07a) !important;
+  box-shadow: 0 0 0 3px rgba(45, 212, 168, 0.18) !important;
+}
+
+body.carbuy-page .btn-primary {
+  background: linear-gradient(135deg, var(--ev-teal, #2dd4a8), var(--ev-primary, #16a07a)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 30px rgba(22, 160, 122, 0.28) !important;
+}
+
+body.carbuy-page .result-card {
+  background: rgba(255, 255, 255, 0.84) !important;
+  border-color: rgba(22, 160, 122, 0.14) !important;
+  border-radius: var(--radius-md, 18px) !important;
+}
+
+body.carbuy-page .result-card:hover,
+body.carbuy-page .result-card.selected {
+  border-color: rgba(22, 160, 122, 0.48) !important;
+  box-shadow: 0 14px 30px rgba(6, 78, 59, 0.12) !important;
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.94), rgba(255, 255, 255, 0.96)) !important;
+}
+
+body.carbuy-page .details-badge,
+body.carbuy-page .chip-accent,
+body.carbuy-page .chip-patente-contado,
+body.carbuy-page .details-note-contado,
+body.carbuy-page .adas-box {
+  background: rgba(45, 212, 168, 0.10) !important;
+  border-color: rgba(22, 160, 122, 0.28) !important;
+  color: var(--ev-forest, #0f7b5f) !important;
+}
+
+body.carbuy-page .site-footer {
+  border-top-color: rgba(22, 160, 122, 0.14) !important;
+}
+
+[data-theme="dark"] body.carbuy-page,
+html[data-theme="dark"] body.carbuy-page {
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 168, 0.10), transparent 34rem),
+    var(--color-bg, #08120e) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .app-header,
+html[data-theme="dark"] body.carbuy-page .app-header,
+[data-theme="dark"] body.carbuy-page .card,
+html[data-theme="dark"] body.carbuy-page .card {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(45, 212, 168, 0.14) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .field-input,
+[data-theme="dark"] body.carbuy-page .field-select,
+[data-theme="dark"] body.carbuy-page .details-panel,
+[data-theme="dark"] body.carbuy-page .empty-state,
+[data-theme="dark"] body.carbuy-page .result-card,
+html[data-theme="dark"] body.carbuy-page .field-input,
+html[data-theme="dark"] body.carbuy-page .field-select,
+html[data-theme="dark"] body.carbuy-page .details-panel,
+html[data-theme="dark"] body.carbuy-page .empty-state,
+html[data-theme="dark"] body.carbuy-page .result-card {
+  background: rgba(15, 23, 42, 0.70) !important;
+  border-color: rgba(45, 212, 168, 0.14) !important;
+}
