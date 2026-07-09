@@ -17,9 +17,11 @@
   ];
 
   function mountBottomNav() {
+    const path = (window.location.pathname || "/").toLowerCase();
+
+    if (path.includes("/brujula")) return;
     if (document.querySelector(".ev-bottom-nav")) return;
 
-    const path = (window.location.pathname || "/").toLowerCase();
     const nav = document.createElement("nav");
     nav.className = "ev-bottom-nav";
     nav.setAttribute("aria-label", "Navegación principal");
