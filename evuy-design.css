@@ -1458,3 +1458,35 @@ body.carbuy-page .vehicle-image-zoom:focus-visible {
     height: 210px !important;
   }
 }
+
+/* ── Shared centered EVUruguay page brand ── */
+.ev-page-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ev-brand-centered,
+.ev-page-header .ev-brand {
+  justify-content: center;
+  align-self: center;
+  text-decoration: none;
+}
+
+.ev-page-header .ev-brand {
+  margin-inline: auto;
+}
+
+body.carbuy-page .app-header.ev-page-header {
+  align-items: center;
+  text-align: center;
+}
+
+body.carbuy-page .app-header.ev-page-header p {
+  margin-inline: auto;
+}
+
+body.carbuy-page .app-header .ev-brand-centered {
+  margin-bottom: 6px;
+}

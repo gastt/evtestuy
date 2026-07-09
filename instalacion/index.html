@@ -26,6 +26,45 @@
     </div>
     <span class="ad-label">Publicidad</span>
   </div>
+  <script>
+    (function () {
+      function buildBrandLink() {
+        const link = document.createElement('a');
+        link.href = '/';
+        link.className = 'ev-brand ev-brand-centered';
+        link.setAttribute('aria-label', 'Ir al inicio de EVUruguay');
+        link.innerHTML = '<div class="ev-brand-logo">EV</div><div class="ev-brand-text">EV<span>Uruguay</span></div>';
+        return link;
+      }
+
+      function replaceSimulatorBadge() {
+        const target = Array.from(document.querySelectorAll('span')).find((span) =>
+          span.textContent && span.textContent.trim().toLowerCase() === 'simulador ev · uruguay'
+        );
+        if (!target || !target.parentElement || target.parentElement.dataset.evBrandReplaced === 'true') return false;
+
+        const badge = target.parentElement;
+        badge.dataset.evBrandReplaced = 'true';
+        badge.replaceChildren(buildBrandLink());
+        badge.style.background = 'transparent';
+        badge.style.border = '0';
+        badge.style.borderRadius = '0';
+        badge.style.padding = '0';
+        badge.style.marginBottom = '10px';
+        badge.style.justifyContent = 'center';
+        badge.style.width = '100%';
+        return true;
+      }
+
+      if (replaceSimulatorBadge()) return;
+      const root = document.getElementById('root');
+      if (!root) return;
+      const observer = new MutationObserver(() => {
+        if (replaceSimulatorBadge()) observer.disconnect();
+      });
+      observer.observe(root, { childList: true, subtree: true });
+    })();
+  </script>
   <script src="/assets/js/bottom-nav.js" defer></script>
 </body>
 </html>
