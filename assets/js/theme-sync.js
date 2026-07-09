@@ -68,6 +68,10 @@
 
   function ensureThemeToggle() {
     if (!document.body) return;
+    if (path.includes("/instalacion")) {
+      updateToggleLabels(currentTheme());
+      return;
+    }
     if (document.querySelector("#themeToggle, #themeBtn, .ev-theme-toggle")) {
       updateToggleLabels(currentTheme());
       return;
