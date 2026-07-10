@@ -2133,3 +2133,126 @@ body.has-ev-top-app-bar .ev-top-app-bar::before {
   background: var(--ev-browser-chrome-color);
   pointer-events: none;
 }
+
+/* ── Contextual webapp install bubble ── */
+.ev-install-bubble {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: calc(104px + env(safe-area-inset-bottom));
+  z-index: 9996;
+  width: min(420px, calc(100vw - 28px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(13, 125, 95, 0.14);
+  box-shadow: 0 20px 46px rgba(6, 78, 59, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform: translateY(18px) scale(0.98);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.ev-install-bubble.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.ev-install-bubble-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font: 900 0.9rem var(--font-display, system-ui, sans-serif);
+  background: linear-gradient(135deg, var(--ev-green, #16a07a), var(--ev-teal, #2dd4a8));
+  box-shadow: 0 10px 24px rgba(22, 160, 122, 0.22);
+}
+
+.ev-install-bubble-body {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.ev-install-bubble-body strong {
+  color: var(--color-text, #1e293b);
+  font: 800 0.92rem var(--font-display, system-ui, sans-serif);
+  letter-spacing: -0.01em;
+}
+
+.ev-install-bubble-body span,
+.ev-install-bubble-body li {
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.ev-install-bubble-body ol {
+  display: none;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.ev-install-bubble.show-steps {
+  align-items: start;
+}
+
+.ev-install-bubble.show-steps .ev-install-bubble-body ol {
+  display: block;
+}
+
+.ev-install-bubble-action {
+  border: 0;
+  border-radius: var(--radius-pill, 999px);
+  padding: 9px 13px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ev-green, #16a07a), var(--ev-teal, #2dd4a8));
+  font: 800 0.75rem var(--font-display, system-ui, sans-serif);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ev-install-bubble-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-tertiary, #94a3b8);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .ev-install-bubble,
+[data-theme="dark"] .ev-install-bubble {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(45, 212, 168, 0.16);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.34);
+}
+
+@media (max-width: 560px) {
+  .ev-install-bubble {
+    left: 10px;
+    right: 10px;
+    bottom: calc(92px + env(safe-area-inset-bottom));
+    width: auto;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ev-install-bubble-action {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
