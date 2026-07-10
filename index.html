@@ -125,194 +125,6 @@
 
 
 
-    /* Visual SOC battery selector */
-    .soc-battery-widget {
-      --soc-start: 0%;
-      --soc-end: 100%;
-      margin-top: 2px;
-      display: grid;
-      gap: 14px;
-    }
-    .soc-battery-copy {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 12px;
-      color: var(--color-text-secondary);
-      font-size: 0.8rem;
-    }
-    .soc-battery-copy strong {
-      display: block;
-      color: var(--color-text);
-      font-size: 0.95rem;
-    }
-    .soc-battery-delta {
-      flex: 0 0 auto;
-      padding: 6px 10px;
-      border-radius: var(--radius-pill);
-      background: rgba(45, 212, 168, 0.12);
-      color: var(--ev-green-deep);
-      font: 800 0.78rem var(--font-display);
-      border: 1px solid rgba(45, 212, 168, 0.22);
-    }
-    .soc-battery-shell {
-      position: relative;
-      height: 72px;
-      border-radius: 20px;
-      padding: 8px 18px 8px 8px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(236,253,245,0.78));
-      border: 1px solid rgba(13, 125, 95, 0.16);
-      box-shadow: inset 0 1px rgba(255,255,255,0.8), 0 16px 34px rgba(6,78,59,0.08);
-    }
-    .soc-battery-shell::after {
-      content: '';
-      position: absolute;
-      right: 4px;
-      top: 50%;
-      width: 10px;
-      height: 28px;
-      transform: translateY(-50%);
-      border-radius: 0 8px 8px 0;
-      background: rgba(13, 125, 95, 0.18);
-      border: 1px solid rgba(13, 125, 95, 0.12);
-      border-left: 0;
-    }
-    .soc-battery-track {
-      position: relative;
-      height: 100%;
-      border-radius: 15px;
-      overflow: hidden;
-      background:
-        repeating-linear-gradient(90deg, rgba(13,125,95,0.08) 0 1px, transparent 1px 10%),
-        rgba(226, 245, 237, 0.82);
-      border: 1px solid rgba(13, 125, 95, 0.10);
-    }
-    .soc-battery-fill {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: var(--soc-start);
-      width: calc(var(--soc-end) - var(--soc-start));
-      min-width: 2px;
-      border-radius: 14px;
-      background: linear-gradient(90deg, var(--ev-green), var(--ev-teal));
-      box-shadow: 0 0 26px rgba(45, 212, 168, 0.34);
-      transition: left 0.18s ease, width 0.18s ease;
-    }
-    .soc-battery-marker {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: rgba(6, 78, 59, 0.52);
-      transform: translateX(-1px);
-      z-index: 2;
-    }
-    .soc-battery-marker.start { left: var(--soc-start); }
-    .soc-battery-marker.end { left: var(--soc-end); }
-    .soc-battery-marker span {
-      position: absolute;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      padding: 4px 7px;
-      border-radius: var(--radius-pill);
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(13,125,95,0.14);
-      color: var(--ev-green-deep);
-      font: 800 0.68rem var(--font-display);
-      white-space: nowrap;
-      box-shadow: 0 8px 18px rgba(6,78,59,0.10);
-    }
-    .soc-range-stack {
-      display: grid;
-      gap: 10px;
-    }
-    .soc-range-row {
-      display: grid;
-      grid-template-columns: 92px minmax(0, 1fr) 48px;
-      align-items: center;
-      gap: 10px;
-      color: var(--color-text-secondary);
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-    .soc-range-row output {
-      text-align: right;
-      color: var(--color-text);
-      font-variant-numeric: tabular-nums;
-    }
-    .soc-slider {
-      width: 100%;
-      accent-color: var(--ev-green);
-    }
-    [data-theme="dark"] .soc-battery-delta { color: var(--ev-teal); background: rgba(45,212,168,0.10); }
-    [data-theme="dark"] .soc-battery-shell { background: rgba(15,23,42,0.72); border-color: rgba(45,212,168,0.15); }
-    [data-theme="dark"] .soc-battery-track { background: rgba(15,31,23,0.86); border-color: rgba(45,212,168,0.12); }
-    [data-theme="dark"] .soc-battery-marker span { background: rgba(15,23,42,0.92); color: var(--ev-teal); border-color: rgba(45,212,168,0.18); }
-    @media (max-width: 560px) {
-      .soc-battery-shell { height: 64px; border-radius: 18px; }
-      .soc-range-row { grid-template-columns: 74px minmax(0, 1fr) 42px; font-size: 0.72rem; gap: 8px; }
-      .soc-battery-copy { align-items: flex-start; flex-direction: column; }
-    }
-
-
-    /* SOC battery: large filled battery style */
-    .soc-battery-widget { --soc-fill: 100%; }
-    .soc-battery-copy { align-items: center; }
-    .soc-battery-delta { background: rgba(45, 212, 168, 0.10); }
-    .soc-battery-shell {
-      height: 106px;
-      padding: 14px 28px 14px 14px;
-      border-radius: 24px;
-      background: rgba(255,255,255,0.72);
-    }
-    .soc-battery-shell::after {
-      right: 7px;
-      width: 18px;
-      height: 42px;
-      border-radius: 0 12px 12px 0;
-      background: rgba(45, 212, 168, 0.92);
-      border-color: rgba(45, 212, 168, 0.92);
-    }
-    .soc-battery-track {
-      border-radius: 0;
-      background: rgba(226, 245, 237, 0.72);
-      border: 0;
-      box-shadow: inset 0 0 0 1px rgba(13,125,95,0.08);
-    }
-    .soc-battery-fill {
-      left: 0;
-      width: var(--soc-fill);
-      min-width: 0;
-      border-radius: 0;
-      background: linear-gradient(90deg, #13e5b1, #00f0b3);
-      box-shadow: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: visible;
-    }
-    .soc-battery-percent {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 3;
-      color: rgba(4, 48, 35, 0.86);
-      font: 900 clamp(2rem, 9vw, 3.4rem) var(--font-display);
-      letter-spacing: -0.06em;
-      pointer-events: none;
-      font-variant-numeric: tabular-nums;
-    }
-    .soc-battery-marker { display: none; }
-    [data-theme="dark"] .soc-battery-shell { background: rgba(15,23,42,0.62); }
-    [data-theme="dark"] .soc-battery-track { background: rgba(15,31,23,0.9); box-shadow: inset 0 0 0 1px rgba(45,212,168,0.10); }
-    [data-theme="dark"] .soc-battery-percent { color: rgba(2, 44, 34, 0.92); }
-    @media (max-width: 560px) {
-      .soc-battery-shell { height: 88px; padding: 12px 24px 12px 12px; }
-      .soc-battery-shell::after { width: 14px; height: 34px; }
-    }
     .ad-banner-wrap {
       width: 100%;
       display: flex;
@@ -702,41 +514,14 @@
           </button>
         </div>
         <div class="collapsible-body">
-          <div class="soc-battery-widget" id="socBatteryWidget" style="--soc-start:0%;--soc-end:100%;">
-            <div class="soc-battery-copy">
-              <div>
-                <strong>Elegí visualmente cuánta batería vas a cargar</strong>
-                Mové los controles para calcular solo el tramo entre el SOC inicial y final.
-              </div>
-              <div class="soc-battery-delta" id="socDeltaLabel">100% de batería</div>
+          <div class="ev-grid-2">
+            <div class="ev-field">
+              <label class="ev-label" for="socStart">SOC inicial (%)</label>
+              <input class="ev-input" id="socStart" type="number" min="0" max="100" step="1" value="0" />
             </div>
-            <div class="soc-battery-shell" aria-hidden="true">
-              <div class="soc-battery-track">
-                <div class="soc-battery-fill"></div>
-                <div class="soc-battery-percent" id="socFillLabel">100%</div>
-              </div>
-            </div>
-            <div class="soc-range-stack" aria-label="Selector visual de estado de carga">
-              <label class="soc-range-row" for="socStartRange">
-                <span>Inicial</span>
-                <input class="soc-slider" id="socStartRange" type="range" min="0" max="99" step="1" value="0" />
-                <output id="socStartOutput" for="socStartRange">0%</output>
-              </label>
-              <label class="soc-range-row" for="socEndRange">
-                <span>Final</span>
-                <input class="soc-slider" id="socEndRange" type="range" min="1" max="100" step="1" value="100" />
-                <output id="socEndOutput" for="socEndRange">100%</output>
-              </label>
-            </div>
-            <div class="ev-grid-2">
-              <div class="ev-field">
-                <label class="ev-label" for="socStart">SOC inicial (%)</label>
-                <input class="ev-input" id="socStart" type="number" min="0" max="100" step="1" value="0" />
-              </div>
-              <div class="ev-field">
-                <label class="ev-label" for="socEnd">SOC final (%)</label>
-                <input class="ev-input" id="socEnd" type="number" min="0" max="100" step="1" value="100" />
-              </div>
+            <div class="ev-field">
+              <label class="ev-label" for="socEnd">SOC final (%)</label>
+              <input class="ev-input" id="socEnd" type="number" min="0" max="100" step="1" value="100" />
             </div>
           </div>
           <div class="ev-error" id="socError" style="display:none;"></div>
@@ -955,13 +740,6 @@
 
     const socStartInput = document.getElementById("socStart");
     const socEndInput = document.getElementById("socEnd");
-    const socStartRange = document.getElementById("socStartRange");
-    const socEndRange = document.getElementById("socEndRange");
-    const socBatteryWidget = document.getElementById("socBatteryWidget");
-    const socStartOutput = document.getElementById("socStartOutput");
-    const socEndOutput = document.getElementById("socEndOutput");
-    const socFillLabel = document.getElementById("socFillLabel");
-    const socDeltaLabel = document.getElementById("socDeltaLabel");
     const socError = document.getElementById("socError");
 
     const chargeModeSelect = document.getElementById("chargeModeSelect");
@@ -1559,47 +1337,6 @@
       if (!isNaN(n) && n > 0) return n;
 
       return null;
-    }
-
-    function clampSocValue(value, min, max) {
-      const n = Math.round(Number(value));
-      if (isNaN(n)) return min;
-      return Math.min(max, Math.max(min, n));
-    }
-
-    function updateSocVisual() {
-      const start = clampSocValue(socStartInput.value, 0, 99);
-      const end = clampSocValue(socEndInput.value, 1, 100);
-      const delta = Math.max(0, end - start);
-
-      if (socBatteryWidget) {
-        socBatteryWidget.style.setProperty("--soc-start", `${start}%`);
-        socBatteryWidget.style.setProperty("--soc-end", `${end}%`);
-        socBatteryWidget.style.setProperty("--soc-fill", `${delta}%`);
-      }
-      if (socStartRange) socStartRange.value = String(start);
-      if (socEndRange) socEndRange.value = String(end);
-      if (socStartOutput) socStartOutput.textContent = `${start}%`;
-      if (socEndOutput) socEndOutput.textContent = `${end}%`;
-      if (socFillLabel) socFillLabel.textContent = `${delta}%`;
-      if (socDeltaLabel) socDeltaLabel.textContent = `De ${start}% a ${end}%`;
-    }
-
-    function setSocValues(nextStart, nextEnd, changed) {
-      let start = clampSocValue(nextStart, 0, 99);
-      let end = clampSocValue(nextEnd, 1, 100);
-
-      if (end <= start) {
-        if (changed === "start") {
-          end = Math.min(100, start + 1);
-        } else {
-          start = Math.max(0, end - 1);
-        }
-      }
-
-      socStartInput.value = String(start);
-      socEndInput.value = String(end);
-      updateSocVisual();
     }
 
     function validateSoc() {
@@ -2272,18 +2009,8 @@
       updateChargersComparison();
     });
 
-    function handleSocInput(changed, source) {
-      const startValue = changed === "start" ? source.value : socStartInput.value;
-      const endValue = changed === "end" ? source.value : socEndInput.value;
-      setSocValues(startValue, endValue, changed);
-      recalculate();
-    }
-
-    socStartInput.addEventListener("input", () => handleSocInput("start", socStartInput));
-    socEndInput.addEventListener("input", () => handleSocInput("end", socEndInput));
-    if (socStartRange) socStartRange.addEventListener("input", () => handleSocInput("start", socStartRange));
-    if (socEndRange) socEndRange.addEventListener("input", () => handleSocInput("end", socEndRange));
-    updateSocVisual();
+    socStartInput.addEventListener("input", recalculate);
+    socEndInput.addEventListener("input", recalculate);
 
     tarifaTipoSelect.addEventListener("change", () => {
       initFranjas();
