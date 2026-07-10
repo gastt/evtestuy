@@ -58,11 +58,42 @@
         return true;
       }
 
-      if (replaceSimulatorBadge()) return;
+      function enhanceInstallHeader() {
+        const root = document.getElementById('root');
+        const title = root && root.querySelector('h1');
+        if (!title || title.dataset.evHeaderEnhanced === 'true') return false;
+
+        title.dataset.evHeaderEnhanced = 'true';
+        title.classList.add('ev-heading', 'ev-heading-xl', 'instalacion-tool-title');
+
+        const parent = title.parentElement;
+        if (!parent) return true;
+        parent.classList.add('ev-page-header', 'instalacion-tool-header');
+
+        const overline = document.createElement('p');
+        overline.className = 'ev-overline instalacion-tool-overline';
+        overline.textContent = 'Instalación en casa';
+        parent.insertBefore(overline, title);
+
+        const subtitle = document.createElement('p');
+        subtitle.className = 'ev-subtitle instalacion-tool-subtitle';
+        subtitle.textContent = 'Simulá el punto de carga ideal para tu hogar según vehículo, potencia, distancia al tablero, cableado y ubicación.';
+        title.insertAdjacentElement('afterend', subtitle);
+        return true;
+      }
+
       const root = document.getElementById('root');
+      const applyEnhancements = () => ({
+        brand: replaceSimulatorBadge(),
+        header: enhanceInstallHeader()
+      });
+
+      const initial = applyEnhancements();
+      if (initial.brand && initial.header) return;
       if (!root) return;
       const observer = new MutationObserver(() => {
-        if (replaceSimulatorBadge()) observer.disconnect();
+        const result = applyEnhancements();
+        if (result.brand && result.header) observer.disconnect();
       });
       observer.observe(root, { childList: true, subtree: true });
     })();

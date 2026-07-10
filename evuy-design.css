@@ -1666,3 +1666,39 @@ html[data-theme="dark"] body.instalacion-page #root h1,
   -webkit-text-fill-color: #e8f5ee !important;
   color: #e8f5ee !important;
 }
+
+/* ── Tool intro copy: align CarBuy and Instalación with Inicio/Redes ── */
+.ev-tool-description {
+  max-width: 680px;
+  margin: 8px auto 0;
+  color: var(--color-text-tertiary, #7c8a83);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+body.carbuy-page .app-header.ev-page-header .ev-overline,
+body.instalacion-page .instalacion-tool-overline {
+  margin-top: 8px;
+}
+
+body.carbuy-page .app-header.ev-page-header .ev-heading,
+body.instalacion-page .instalacion-tool-title {
+  margin: 8px 0 4px !important;
+  text-align: center;
+}
+
+body.instalacion-page .instalacion-tool-header {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+body.instalacion-page .instalacion-tool-subtitle {
+  max-width: 720px;
+  margin: 8px auto 0 !important;
+  text-align: center;
+}
+
+html[data-theme="dark"] .ev-tool-description,
+[data-theme="dark"] .ev-tool-description {
+  color: rgba(226, 232, 240, 0.68);
+}
