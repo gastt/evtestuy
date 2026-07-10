@@ -1890,3 +1890,38 @@ body.has-ev-top-app-bar .topbar {
     height: 44px;
   }
 }
+
+/* Brújula: keep the GPS sync control reachable with the fixed shared top bar. */
+html.has-ev-compass-top-app-bar,
+html.has-ev-compass-top-app-bar body {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+body.has-ev-compass-top-app-bar {
+  padding-top: 0;
+}
+
+body.has-ev-compass-top-app-bar .app {
+  height: auto;
+  min-height: calc(100svh - 70px - env(safe-area-inset-top));
+  margin-top: calc(70px + env(safe-area-inset-top));
+  overflow: visible;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom));
+}
+
+body.has-ev-compass-top-app-bar .start-btn {
+  position: sticky;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 20;
+}
+
+@media (max-width: 520px) {
+  body.has-ev-compass-top-app-bar .app {
+    min-height: calc(100svh - 64px - env(safe-area-inset-top));
+    margin-top: calc(64px + env(safe-area-inset-top));
+    gap: 8px;
+  }
+}

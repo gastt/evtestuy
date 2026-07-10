@@ -18,6 +18,9 @@
     const actions = bar.querySelector(".ev-top-app-actions");
 
     if (isCompass) {
+      document.documentElement.classList.add("has-ev-compass-top-app-bar");
+      document.body.classList.add("has-ev-compass-top-app-bar");
+
       const infoButton = document.getElementById("infoBtn");
       const themeButton = document.getElementById("themeBtn");
       [infoButton, themeButton].filter(Boolean).forEach((button) => {
