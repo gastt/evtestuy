@@ -21,7 +21,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="evuy-design.css" />
+  <link rel="stylesheet" href="/evuy-design.css" />
   <style>
     /* Page-specific layout */
     .ev-app {
@@ -118,339 +118,201 @@
     .comp-bar-fill-ev { background: linear-gradient(90deg, var(--ev-green), var(--ev-teal)); }
     .comp-bar-fill-ice { background: linear-gradient(90deg, #e63946, #f87171); }
 
-    /* Red panel override */
-    #panelComparadorRedes { background: linear-gradient(135deg, #fef2f2 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.12) !important; }
-    #panelComparadorRedes .ev-card-title span { color: #b91c1c !important; }
-    #panelComparadorRedes .ev-collapse-btn { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.06) !important; color: #e63946 !important; }
-    #panelComparadorRedes a.ev-link { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.04) !important; color: #b91c1c !important; }
-
-    /* Amber panel override */
-    #panelCarBuy { background: linear-gradient(135deg, #fefce8 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.12) !important; }
-    #panelCarBuy .ev-card-title span { color: #a16207 !important; }
-    #panelCarBuy .ev-collapse-btn { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.06) !important; color: #ca8a04 !important; }
-    #panelCarBuy a.ev-link { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.04) !important; color: #a16207 !important; }
-
-    /* Green panel override — Simulador Instalación */
-    #panelInstalacion { background: linear-gradient(135deg, #ecfdf5 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.15) !important; }
-    #panelInstalacion .ev-card-title span { color: #0f7b5f !important; }
-    #panelInstalacion .ev-collapse-btn { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.08) !important; color: #16a07a !important; }
-    #panelInstalacion a.ev-link { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.06) !important; color: #0f7b5f !important; }
-
-    /* Dark mode: page-specific overrides */
-    [data-theme="dark"] #panelComparadorRedes { background: linear-gradient(135deg, rgba(230, 57, 70, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.15) !important; }
-    [data-theme="dark"] #panelComparadorRedes .ev-card-title span { color: #fca5a5 !important; }
-    [data-theme="dark"] #panelComparadorRedes .ev-collapse-btn { color: #fca5a5 !important; }
-    [data-theme="dark"] #panelComparadorRedes a.ev-link { color: #fca5a5 !important; }
-
-    [data-theme="dark"] #panelCarBuy { background: linear-gradient(135deg, rgba(202, 138, 4, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.15) !important; }
-    [data-theme="dark"] #panelCarBuy .ev-card-title span { color: #fde68a !important; }
-    [data-theme="dark"] #panelCarBuy .ev-collapse-btn { color: #fde68a !important; }
-    [data-theme="dark"] #panelCarBuy a.ev-link { color: #fde68a !important; }
-
-    /* Dark mode: Simulador Instalación panel */
-    [data-theme="dark"] #panelInstalacion { background: linear-gradient(135deg, rgba(45, 212, 168, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.18) !important; }
-    [data-theme="dark"] #panelInstalacion .ev-card-title span { color: #a7f3d0 !important; }
-    [data-theme="dark"] #panelInstalacion .ev-collapse-btn { color: #a7f3d0 !important; }
-    [data-theme="dark"] #panelInstalacion a.ev-link { color: #a7f3d0 !important; }
-
     /* Dark mode: savings highlight */
     [data-theme="dark"] .savings-highlight { background: rgba(45, 212, 168, 0.06); border-color: rgba(45, 212, 168, 0.15); color: #a7f3d0; }
     [data-theme="dark"] .savings-highlight strong { color: var(--ev-teal); }
     [data-theme="dark"] .comparison-card .ev-card-title span { color: #93c5fd !important; }
 
-    /* ── Floating bubble ── */
-    .float-bubble {
-      position: fixed;
-      top: 18px;
-      left: 18px;
-      z-index: 9999;
+
+
+    /* Visual SOC battery selector */
+    .soc-battery-widget {
+      --soc-start: 0%;
+      --soc-end: 100%;
+      margin-top: 2px;
+      display: grid;
+      gap: 14px;
+    }
+    .soc-battery-copy {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 5px;
-      text-decoration: none !important;
-      animation: fbIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      color: var(--color-text-secondary);
+      font-size: 0.8rem;
     }
-
-    /* Badge "Nuevo" */
-    .fb-badge {
-      background: linear-gradient(135deg, #dc2626, #ef4444);
-      color: #fff;
-      font-size: 0.6rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 2px 10px;
+    .soc-battery-copy strong {
+      display: block;
+      color: var(--color-text);
+      font-size: 0.95rem;
+    }
+    .soc-battery-delta {
+      flex: 0 0 auto;
+      padding: 6px 10px;
       border-radius: var(--radius-pill);
-      box-shadow: 0 2px 10px rgba(220,38,38,0.4);
-      pointer-events: none;
-      white-space: nowrap;
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease;
-      overflow: hidden;
-      max-height: 30px;
+      background: rgba(45, 212, 168, 0.12);
+      color: var(--ev-green-deep);
+      font: 800 0.78rem var(--font-display);
+      border: 1px solid rgba(45, 212, 168, 0.22);
     }
-    .float-bubble.collapsed .fb-badge {
-      opacity: 0;
-      transform: translateY(-6px);
-      max-height: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-
-    /* Pill / circle container */
-    .fb-pill {
+    .soc-battery-shell {
       position: relative;
-      display: flex;
-      align-items: center;
-      gap: 0;
-      background: var(--color-surface);
-      border: 1.5px solid rgba(220,38,38,0.4);
-      border-radius: var(--radius-pill);
+      height: 72px;
+      border-radius: 20px;
       padding: 8px 18px 8px 8px;
-      box-shadow: 0 4px 24px rgba(220,38,38,0.18), 0 1px 5px rgba(0,0,0,0.07);
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      transition:
-        padding 0.4s cubic-bezier(0.4,0,0.2,1),
-        border-radius 0.4s cubic-bezier(0.4,0,0.2,1),
-        box-shadow 0.3s ease,
-        border-color 0.3s ease;
-      cursor: pointer;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(236,253,245,0.78));
+      border: 1px solid rgba(13, 125, 95, 0.16);
+      box-shadow: inset 0 1px rgba(255,255,255,0.8), 0 16px 34px rgba(6,78,59,0.08);
     }
-    .float-bubble:hover .fb-pill {
-      border-color: rgba(220,38,38,0.7);
-      box-shadow: 0 8px 32px rgba(220,38,38,0.28), 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .float-bubble.collapsed .fb-pill {
-      padding: 10px;
-      border-radius: 50%;
-    }
-
-    /* Pulse ring */
-    .fb-pulse {
+    .soc-battery-shell::after {
+      content: '';
       position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      border: 2px solid rgba(220,38,38,0.5);
-      animation: fbPulse 2.6s ease-out infinite;
-      pointer-events: none;
+      right: 4px;
+      top: 50%;
+      width: 10px;
+      height: 28px;
+      transform: translateY(-50%);
+      border-radius: 0 8px 8px 0;
+      background: rgba(13, 125, 95, 0.18);
+      border: 1px solid rgba(13, 125, 95, 0.12);
+      border-left: 0;
+    }
+    .soc-battery-track {
+      position: relative;
+      height: 100%;
+      border-radius: 15px;
+      overflow: hidden;
+      background:
+        repeating-linear-gradient(90deg, rgba(13,125,95,0.08) 0 1px, transparent 1px 10%),
+        rgba(226, 245, 237, 0.82);
+      border: 1px solid rgba(13, 125, 95, 0.10);
+    }
+    .soc-battery-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: var(--soc-start);
+      width: calc(var(--soc-end) - var(--soc-start));
+      min-width: 2px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, var(--ev-green), var(--ev-teal));
+      box-shadow: 0 0 26px rgba(45, 212, 168, 0.34);
+      transition: left 0.18s ease, width 0.18s ease;
+    }
+    .soc-battery-marker {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(6, 78, 59, 0.52);
+      transform: translateX(-1px);
+      z-index: 2;
+    }
+    .soc-battery-marker.start { left: var(--soc-start); }
+    .soc-battery-marker.end { left: var(--soc-end); }
+    .soc-battery-marker span {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 4px 7px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(13,125,95,0.14);
+      color: var(--ev-green-deep);
+      font: 800 0.68rem var(--font-display);
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(6,78,59,0.10);
+    }
+    .soc-range-stack {
+      display: grid;
+      gap: 10px;
+    }
+    .soc-range-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) 48px;
+      align-items: center;
+      gap: 10px;
+      color: var(--color-text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .soc-range-row output {
+      text-align: right;
+      color: var(--color-text);
+      font-variant-numeric: tabular-nums;
+    }
+    .soc-slider {
+      width: 100%;
+      accent-color: var(--ev-green);
+    }
+    [data-theme="dark"] .soc-battery-delta { color: var(--ev-teal); background: rgba(45,212,168,0.10); }
+    [data-theme="dark"] .soc-battery-shell { background: rgba(15,23,42,0.72); border-color: rgba(45,212,168,0.15); }
+    [data-theme="dark"] .soc-battery-track { background: rgba(15,31,23,0.86); border-color: rgba(45,212,168,0.12); }
+    [data-theme="dark"] .soc-battery-marker span { background: rgba(15,23,42,0.92); color: var(--ev-teal); border-color: rgba(45,212,168,0.18); }
+    @media (max-width: 560px) {
+      .soc-battery-shell { height: 64px; border-radius: 18px; }
+      .soc-range-row { grid-template-columns: 74px minmax(0, 1fr) 42px; font-size: 0.72rem; gap: 8px; }
+      .soc-battery-copy { align-items: flex-start; flex-direction: column; }
     }
 
-    /* Icon circle */
-    .fb-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #dc2626, #ef4444);
+
+    /* SOC battery: large filled battery style */
+    .soc-battery-widget { --soc-fill: 100%; }
+    .soc-battery-copy { align-items: center; }
+    .soc-battery-delta { background: rgba(45, 212, 168, 0.10); }
+    .soc-battery-shell {
+      height: 106px;
+      padding: 14px 28px 14px 14px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.72);
+    }
+    .soc-battery-shell::after {
+      right: 7px;
+      width: 18px;
+      height: 42px;
+      border-radius: 0 12px 12px 0;
+      background: rgba(45, 212, 168, 0.92);
+      border-color: rgba(45, 212, 168, 0.92);
+    }
+    .soc-battery-track {
+      border-radius: 0;
+      background: rgba(226, 245, 237, 0.72);
+      border: 0;
+      box-shadow: inset 0 0 0 1px rgba(13,125,95,0.08);
+    }
+    .soc-battery-fill {
+      left: 0;
+      width: var(--soc-fill);
+      min-width: 0;
+      border-radius: 0;
+      background: linear-gradient(90deg, #13e5b1, #00f0b3);
+      box-shadow: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(220,38,38,0.35);
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      overflow: visible;
     }
-    .float-bubble:hover .fb-icon {
-      transform: scale(1.1) rotate(-8deg);
-    }
-    .fb-icon svg {
-      width: 18px;
-      height: 18px;
-      fill: #fff;
-    }
-
-    /* Text block */
-    .fb-text {
+    .soc-battery-percent {
+      position: absolute;
+      inset: 0;
       display: flex;
-      flex-direction: column;
-      gap: 1px;
-      margin-left: 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      max-width: 160px;
-      opacity: 1;
-      transition:
-        max-width 0.4s cubic-bezier(0.4,0,0.2,1),
-        opacity 0.3s ease,
-        margin 0.4s ease;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      color: rgba(4, 48, 35, 0.86);
+      font: 900 clamp(2rem, 9vw, 3.4rem) var(--font-display);
+      letter-spacing: -0.06em;
+      pointer-events: none;
+      font-variant-numeric: tabular-nums;
     }
-    .float-bubble.collapsed .fb-text {
-      max-width: 0;
-      opacity: 0;
-      margin-left: 0;
-    }
-    .fb-label {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--color-text);
-      line-height: 1.2;
-      text-decoration: none;
-    }
-    .fb-sublabel {
-      font-size: 0.63rem;
-      font-weight: 500;
-      color: var(--color-text-secondary);
-      line-height: 1.2;
-    }
-
-    /* Arrow */
-    .fb-arrow {
-      margin-left: 8px;
-      font-size: 0.78rem;
-      color: #dc2626;
-      font-weight: 700;
-      flex-shrink: 0;
-      opacity: 1;
-      max-width: 20px;
-      transition:
-        max-width 0.4s cubic-bezier(0.4,0,0.2,1),
-        opacity 0.3s ease,
-        margin 0.4s ease;
-    }
-    .float-bubble.collapsed .fb-arrow {
-      max-width: 0;
-      opacity: 0;
-      margin-left: 0;
-    }
-
-    /* Keyframes */
-    @keyframes fbIn {
-      0%   { opacity: 0; transform: translateX(-24px) scale(0.85); }
-      100% { opacity: 1; transform: translateX(0) scale(1); }
-    }
-    @keyframes fbPulse {
-      0%   { transform: scale(1);    opacity: 0.6; }
-      80%  { transform: scale(1.22); opacity: 0; }
-      100% { transform: scale(1.22); opacity: 0; }
-    }
-
-    /* Dark mode tweaks */
-    [data-theme="dark"] .fb-pill {
-      border-color: rgba(220,38,38,0.25);
-      box-shadow: 0 4px 24px rgba(220,38,38,0.1), 0 1px 5px rgba(0,0,0,0.4);
-    }
-
-    /* ── CarBuy bubble (amber variant) ── */
-    .float-bubble-carbuy {
-      top: 88px;
-      left: 18px;
-    }
-    .float-bubble-carbuy .fb-badge {
-      background: linear-gradient(135deg, #ca8a04, #f59e0b);
-      box-shadow: 0 2px 10px rgba(202,138,4,0.4);
-    }
-    .float-bubble-carbuy .fb-pill {
-      border-color: rgba(202,138,4,0.4);
-      box-shadow: 0 4px 24px rgba(202,138,4,0.18), 0 1px 5px rgba(0,0,0,0.07);
-    }
-    .float-bubble-carbuy:hover .fb-pill {
-      border-color: rgba(202,138,4,0.7);
-      box-shadow: 0 8px 32px rgba(202,138,4,0.28), 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .float-bubble-carbuy .fb-pulse {
-      border-color: rgba(202,138,4,0.5);
-    }
-    .float-bubble-carbuy .fb-icon {
-      background: linear-gradient(135deg, #ca8a04, #f59e0b);
-      box-shadow: 0 2px 8px rgba(202,138,4,0.35);
-    }
-    .float-bubble-carbuy .fb-arrow {
-      color: #ca8a04;
-    }
-    [data-theme="dark"] .float-bubble-carbuy .fb-pill {
-      border-color: rgba(202,138,4,0.25);
-      box-shadow: 0 4px 24px rgba(202,138,4,0.1), 0 1px 5px rgba(0,0,0,0.4);
-    }
-
-    @keyframes fbInUp {
-      0%   { opacity: 0; transform: translateX(-24px) scale(0.85); }
-      100% { opacity: 1; transform: translateX(0) scale(1); }
-    }
-    .float-bubble-carbuy {
-      animation-name: fbInUp;
-      animation-delay: 0.15s;
-    }
-
-    /* ── Instalación bubble (green variant) ── */
-    .float-bubble-instalacion {
-      top: 158px;
-      left: 18px;
-      animation-name: fbInUp;
-      animation-delay: 0.3s;
-    }
-    .float-bubble-instalacion .fb-badge {
-      background: linear-gradient(135deg, #16a07a, #2dd4a8);
-      box-shadow: 0 2px 10px rgba(45,212,168,0.4);
-    }
-    .float-bubble-instalacion .fb-pill {
-      border-color: rgba(45,212,168,0.4);
-      box-shadow: 0 4px 24px rgba(45,212,168,0.18), 0 1px 5px rgba(0,0,0,0.07);
-    }
-    .float-bubble-instalacion:hover .fb-pill {
-      border-color: rgba(45,212,168,0.7);
-      box-shadow: 0 8px 32px rgba(45,212,168,0.28), 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .float-bubble-instalacion .fb-pulse {
-      border-color: rgba(45,212,168,0.5);
-    }
-    .float-bubble-instalacion .fb-icon {
-      background: linear-gradient(135deg, #16a07a, #2dd4a8);
-      box-shadow: 0 2px 8px rgba(45,212,168,0.35);
-    }
-    .float-bubble-instalacion .fb-arrow {
-      color: #16a07a;
-    }
-    [data-theme="dark"] .float-bubble-instalacion .fb-pill {
-      border-color: rgba(45,212,168,0.25);
-      box-shadow: 0 4px 24px rgba(45,212,168,0.1), 0 1px 5px rgba(0,0,0,0.4);
-    }
-
-    /* ── Eficiencia bubble (blue variant) ── */
-    .float-bubble-eficiencia {
-      top: 228px;
-      left: 18px;
-      animation-name: fbInUp;
-      animation-delay: 0.45s;
-    }
-    .float-bubble-eficiencia .fb-badge {
-      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-      box-shadow: 0 2px 10px rgba(29,78,216,0.4);
-    }
-    .float-bubble-eficiencia .fb-pill {
-      border-color: rgba(29,78,216,0.4);
-      box-shadow: 0 4px 24px rgba(29,78,216,0.18), 0 1px 5px rgba(0,0,0,0.07);
-    }
-    .float-bubble-eficiencia:hover .fb-pill {
-      border-color: rgba(29,78,216,0.7);
-      box-shadow: 0 8px 32px rgba(29,78,216,0.28), 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .float-bubble-eficiencia .fb-pulse {
-      border-color: rgba(29,78,216,0.5);
-    }
-    .float-bubble-eficiencia .fb-icon {
-      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-      box-shadow: 0 2px 8px rgba(29,78,216,0.35);
-    }
-    .float-bubble-eficiencia .fb-arrow {
-      color: #1d4ed8;
-    }
-    [data-theme="dark"] .float-bubble-eficiencia .fb-pill {
-      border-color: rgba(29,78,216,0.25);
-      box-shadow: 0 4px 24px rgba(29,78,216,0.1), 0 1px 5px rgba(0,0,0,0.4);
-    }
-
+    .soc-battery-marker { display: none; }
+    [data-theme="dark"] .soc-battery-shell { background: rgba(15,23,42,0.62); }
+    [data-theme="dark"] .soc-battery-track { background: rgba(15,31,23,0.9); box-shadow: inset 0 0 0 1px rgba(45,212,168,0.10); }
+    [data-theme="dark"] .soc-battery-percent { color: rgba(2, 44, 34, 0.92); }
     @media (max-width: 560px) {
-      .float-bubble { top: 12px; left: 12px; }
-      .float-bubble-carbuy { top: 78px; left: 12px; }
-      .float-bubble-instalacion { top: 144px; left: 12px; }
-      .float-bubble-eficiencia { top: 210px; left: 12px; }
-      .fb-icon { width: 30px; height: 30px; }
-      .fb-icon svg { width: 15px; height: 15px; }
+      .soc-battery-shell { height: 88px; padding: 12px 24px 12px 12px; }
+      .soc-battery-shell::after { width: 14px; height: 34px; }
     }
-
-    /* ── AdSense banners ── */
     .ad-banner-wrap {
       width: 100%;
       display: flex;
@@ -589,98 +451,6 @@
     body {
       padding-bottom: calc(94px + env(safe-area-inset-bottom));
     }
-    .ev-bottom-nav {
-      position: fixed;
-      left: 50%;
-      bottom: max(10px, env(safe-area-inset-bottom));
-      z-index: 9997;
-      width: min(calc(100% - 20px), 760px);
-      transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 2px;
-      padding: 8px 8px;
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.92);
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.08);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-    }
-    .ev-bottom-nav-item {
-      min-width: 0;
-      min-height: 58px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border-radius: 18px;
-      color: var(--color-text-tertiary);
-      text-decoration: none !important;
-      font: 700 0.68rem var(--font-display);
-      line-height: 1.05;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
-    }
-    .ev-bottom-nav-item:hover {
-      transform: translateY(-1px);
-      background: rgba(45, 212, 168, 0.07);
-      color: var(--ev-green);
-    }
-    .ev-bottom-nav-item.active {
-      color: var(--ev-green-deep);
-      background: linear-gradient(135deg, rgba(45, 212, 168, 0.18), rgba(22, 160, 122, 0.10));
-    }
-    .ev-bottom-nav-icon {
-      width: 24px;
-      height: 24px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .ev-bottom-nav-icon svg {
-      width: 23px;
-      height: 23px;
-      fill: currentColor;
-      display: block;
-    }
-    .ev-bottom-nav-label {
-      display: block;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    [data-theme="dark"] .ev-bottom-nav {
-      background: rgba(15, 23, 42, 0.88);
-      border-color: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38), 0 4px 14px rgba(0, 0, 0, 0.22);
-    }
-    [data-theme="dark"] .ev-bottom-nav-item {
-      color: rgba(226, 232, 240, 0.58);
-    }
-    [data-theme="dark"] .ev-bottom-nav-item:hover,
-    [data-theme="dark"] .ev-bottom-nav-item.active {
-      color: var(--ev-teal);
-      background: rgba(45, 212, 168, 0.12);
-    }
-    @media (max-width: 420px) {
-      .ev-bottom-nav {
-        width: calc(100% - 14px);
-        padding: 7px 6px;
-        border-radius: 22px;
-      }
-      .ev-bottom-nav-item {
-        min-height: 54px;
-        font-size: 0.61rem;
-        border-radius: 16px;
-      }
-      .ev-bottom-nav-icon { width: 22px; height: 22px; }
-      .ev-bottom-nav-icon svg { width: 21px; height: 21px; }
-    }
-
-    /* ── PWA install button ── */
     .install-app-btn {
       position: fixed;
       right: 18px;
@@ -716,42 +486,9 @@
       .status { text-align: center; }
     }
   </style>
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
 <body>
-  <!-- Navegación inferior estilo app -->
-  <nav class="ev-bottom-nav" aria-label="Navegación principal EVUruguay">
-    <a class="ev-bottom-nav-item" data-nav="inicio" href="/" aria-label="Inicio">
-      <span class="ev-bottom-nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 11.2 12 4l9 7.2V21a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.8z"/></svg>
-      </span>
-      <span class="ev-bottom-nav-label">Inicio</span>
-    </a>
-    <a class="ev-bottom-nav-item" data-nav="redes" href="/carga.html" aria-label="Redes de carga">
-      <span class="ev-bottom-nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
-      </span>
-      <span class="ev-bottom-nav-label">Redes</span>
-    </a>
-    <a class="ev-bottom-nav-item" data-nav="comprar" href="/carbuy/recomendador.html" aria-label="Comprar EV">
-      <span class="ev-bottom-nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 11l1.5-4.5h11L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1v1a1 1 0 0 1-2 0v-1H7v1a1 1 0 0 1-2 0v-1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.2-2.5L6.4 11h11.2l-.8-2.5H7.2zM7 14a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm10 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
-      </span>
-      <span class="ev-bottom-nav-label">Comprar EV</span>
-    </a>
-    <a class="ev-bottom-nav-item" data-nav="instalacion" href="/instalacion/" aria-label="Instalación">
-      <span class="ev-bottom-nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94L14.7 6.3z"/></svg>
-      </span>
-      <span class="ev-bottom-nav-label">Instalación</span>
-    </a>
-    <a class="ev-bottom-nav-item" data-nav="brujula" href="/brujula/" aria-label="Brújula de eficiencia">
-      <span class="ev-bottom-nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 5.5-2.5 5-5 2.5 2.5-5 5-2.5zM12 11a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
-      </span>
-      <span class="ev-bottom-nav-label">Brújula</span>
-    </a>
-  </nav>
-
   <!-- Theme toggle -->
   <button class="ev-theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro">
     <span class="icon-light">💡</span>
@@ -761,22 +498,6 @@
   <button class="install-app-btn" id="installAppBtn" type="button" aria-label="Instalar EVUruguay en este dispositivo">
     📱 Instalar EVUruguay
   </button>
-
-  <script>
-    (function() {
-      const path = (window.location.pathname || '/').toLowerCase();
-      let active = 'inicio';
-      if (path.includes('/carga')) active = 'redes';
-      else if (path.includes('/carbuy')) active = 'comprar';
-      else if (path.includes('/instalacion')) active = 'instalacion';
-      else if (path.includes('/brujula')) active = 'brujula';
-      document.querySelectorAll('.ev-bottom-nav-item').forEach(function(item) {
-        const isActive = item.dataset.nav === active;
-        item.classList.toggle('active', isActive);
-        if (isActive) item.setAttribute('aria-current', 'page');
-      });
-    })();
-  </script>
 
   <div class="ad-banner-wrap ad-top">
     <span class="ad-label">Publicidad</span>
@@ -799,7 +520,7 @@
   <div class="ev-app">
     <!-- Panel Izquierdo -->
     <div>
-      <header>
+      <header class="ev-page-header ev-tool-header">
         <a href="/" class="ev-brand" style="text-decoration:none;">
           <div class="ev-brand-logo">EV</div>
           <div class="ev-brand-text">EV<span>Uruguay</span></div>
@@ -981,14 +702,41 @@
           </button>
         </div>
         <div class="collapsible-body">
-          <div class="ev-grid-2">
-            <div class="ev-field">
-              <label class="ev-label" for="socStart">SOC inicial (%)</label>
-              <input class="ev-input" id="socStart" type="number" min="0" max="100" step="1" value="0" />
+          <div class="soc-battery-widget" id="socBatteryWidget" style="--soc-start:0%;--soc-end:100%;">
+            <div class="soc-battery-copy">
+              <div>
+                <strong>Elegí visualmente cuánta batería vas a cargar</strong>
+                Mové los controles para calcular solo el tramo entre el SOC inicial y final.
+              </div>
+              <div class="soc-battery-delta" id="socDeltaLabel">100% de batería</div>
             </div>
-            <div class="ev-field">
-              <label class="ev-label" for="socEnd">SOC final (%)</label>
-              <input class="ev-input" id="socEnd" type="number" min="0" max="100" step="1" value="100" />
+            <div class="soc-battery-shell" aria-hidden="true">
+              <div class="soc-battery-track">
+                <div class="soc-battery-fill"></div>
+                <div class="soc-battery-percent" id="socFillLabel">100%</div>
+              </div>
+            </div>
+            <div class="soc-range-stack" aria-label="Selector visual de estado de carga">
+              <label class="soc-range-row" for="socStartRange">
+                <span>Inicial</span>
+                <input class="soc-slider" id="socStartRange" type="range" min="0" max="99" step="1" value="0" />
+                <output id="socStartOutput" for="socStartRange">0%</output>
+              </label>
+              <label class="soc-range-row" for="socEndRange">
+                <span>Final</span>
+                <input class="soc-slider" id="socEndRange" type="range" min="1" max="100" step="1" value="100" />
+                <output id="socEndOutput" for="socEndRange">100%</output>
+              </label>
+            </div>
+            <div class="ev-grid-2">
+              <div class="ev-field">
+                <label class="ev-label" for="socStart">SOC inicial (%)</label>
+                <input class="ev-input" id="socStart" type="number" min="0" max="100" step="1" value="0" />
+              </div>
+              <div class="ev-field">
+                <label class="ev-label" for="socEnd">SOC final (%)</label>
+                <input class="ev-input" id="socEnd" type="number" min="0" max="100" step="1" value="100" />
+              </div>
             </div>
           </div>
           <div class="ev-error" id="socError" style="display:none;"></div>
@@ -1116,51 +864,6 @@
       </div>
     </div>
 
-    <!-- Comparador de redes -->
-    <div class="ev-section-card chargers-card collapsible" id="panelComparadorRedes" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>Compará el costo de tu carga en las diferentes redes de carga de Uruguay</span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelComparadorRedes">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Accedé a la herramienta donde podés comparar cuánto cuesta la misma carga en cada red pública y privada del país.</p>
-        <a class="ev-link" href="/carga.html">Ir al comparador de redes →</a>
-      </div>
-    </div>
-
-    <!-- Recomendador -->
-    <div class="ev-section-card chargers-card collapsible" id="panelCarBuy" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>Qué vehículo puedo comprar? <span style="opacity:.6">(BETA)</span></span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelCarBuy">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Probá la herramienta beta para ayudarte a elegir un vehículo eléctrico según tus preferencias y presupuesto.</p>
-        <a class="ev-link" href="/carbuy/recomendador.html">Ir a "Qué vehículo puedo comprar?" →</a>
-      </div>
-    </div>
-
-    <!-- Simulador de Instalación -->
-    <div class="ev-section-card chargers-card collapsible" id="panelInstalacion" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>⚡ Simulador de Instalación EV para el hogar</span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelInstalacion">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Dimensioná el cableado, protecciones, tablero y materiales necesarios para instalar un punto de carga en tu hogar, según la normativa de UTE (Cap. XXX). Incluye lista de materiales con links a MercadoLibre y diagrama animado de la instalación.</p>
-        <a class="ev-link" href="/instalacion/">Ir al simulador de instalación →</a>
-      </div>
-    </div>
-
     <!-- Footer -->
     <div class="ev-footer">
       <div class="ev-footer-line"></div>
@@ -1252,6 +955,13 @@
 
     const socStartInput = document.getElementById("socStart");
     const socEndInput = document.getElementById("socEnd");
+    const socStartRange = document.getElementById("socStartRange");
+    const socEndRange = document.getElementById("socEndRange");
+    const socBatteryWidget = document.getElementById("socBatteryWidget");
+    const socStartOutput = document.getElementById("socStartOutput");
+    const socEndOutput = document.getElementById("socEndOutput");
+    const socFillLabel = document.getElementById("socFillLabel");
+    const socDeltaLabel = document.getElementById("socDeltaLabel");
     const socError = document.getElementById("socError");
 
     const chargeModeSelect = document.getElementById("chargeModeSelect");
@@ -1849,6 +1559,47 @@
       if (!isNaN(n) && n > 0) return n;
 
       return null;
+    }
+
+    function clampSocValue(value, min, max) {
+      const n = Math.round(Number(value));
+      if (isNaN(n)) return min;
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function updateSocVisual() {
+      const start = clampSocValue(socStartInput.value, 0, 99);
+      const end = clampSocValue(socEndInput.value, 1, 100);
+      const delta = Math.max(0, end - start);
+
+      if (socBatteryWidget) {
+        socBatteryWidget.style.setProperty("--soc-start", `${start}%`);
+        socBatteryWidget.style.setProperty("--soc-end", `${end}%`);
+        socBatteryWidget.style.setProperty("--soc-fill", `${delta}%`);
+      }
+      if (socStartRange) socStartRange.value = String(start);
+      if (socEndRange) socEndRange.value = String(end);
+      if (socStartOutput) socStartOutput.textContent = `${start}%`;
+      if (socEndOutput) socEndOutput.textContent = `${end}%`;
+      if (socFillLabel) socFillLabel.textContent = `${delta}%`;
+      if (socDeltaLabel) socDeltaLabel.textContent = `De ${start}% a ${end}%`;
+    }
+
+    function setSocValues(nextStart, nextEnd, changed) {
+      let start = clampSocValue(nextStart, 0, 99);
+      let end = clampSocValue(nextEnd, 1, 100);
+
+      if (end <= start) {
+        if (changed === "start") {
+          end = Math.min(100, start + 1);
+        } else {
+          start = Math.max(0, end - 1);
+        }
+      }
+
+      socStartInput.value = String(start);
+      socEndInput.value = String(end);
+      updateSocVisual();
     }
 
     function validateSoc() {
@@ -2521,8 +2272,18 @@
       updateChargersComparison();
     });
 
-    socStartInput.addEventListener("input", recalculate);
-    socEndInput.addEventListener("input", recalculate);
+    function handleSocInput(changed, source) {
+      const startValue = changed === "start" ? source.value : socStartInput.value;
+      const endValue = changed === "end" ? source.value : socEndInput.value;
+      setSocValues(startValue, endValue, changed);
+      recalculate();
+    }
+
+    socStartInput.addEventListener("input", () => handleSocInput("start", socStartInput));
+    socEndInput.addEventListener("input", () => handleSocInput("end", socEndInput));
+    if (socStartRange) socStartRange.addEventListener("input", () => handleSocInput("start", socStartRange));
+    if (socEndRange) socEndRange.addEventListener("input", () => handleSocInput("end", socEndRange));
+    updateSocVisual();
 
     tarifaTipoSelect.addEventListener("change", () => {
       initFranjas();
@@ -2874,5 +2635,7 @@
     })();
   </script>
 
+  <script src="/assets/js/top-app-bar.js" defer></script>
+  <script src="/assets/js/bottom-nav.js" defer></script>
 </body>
 </html>
