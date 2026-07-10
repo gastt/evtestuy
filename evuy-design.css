@@ -2263,3 +2263,107 @@ html[data-theme="dark"] .ev-install-bubble,
     width: 100%;
   }
 }
+
+/* ── Fresh version update bubble ── */
+.ev-update-bubble {
+  position: fixed;
+  left: 50%;
+  bottom: calc(104px + env(safe-area-inset-bottom));
+  z-index: 9998;
+  width: min(440px, calc(100vw - 28px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 42px 14px 14px;
+  border-radius: 24px;
+  border: 1px solid rgba(13, 125, 95, 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 20px 46px rgba(6, 78, 59, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform: translate(-50%, 18px) scale(0.98);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.ev-update-bubble.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.ev-update-bubble-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font: 900 1.1rem var(--font-display, system-ui, sans-serif);
+  background: linear-gradient(135deg, var(--ev-green, #16a07a), var(--ev-teal, #2dd4a8));
+  box-shadow: 0 10px 24px rgba(22, 160, 122, 0.22);
+}
+
+.ev-update-bubble-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.ev-update-bubble-copy strong {
+  color: var(--color-text, #1e293b);
+  font: 800 0.92rem var(--font-display, system-ui, sans-serif);
+}
+
+.ev-update-bubble-copy span {
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.ev-update-bubble-action {
+  border: 0;
+  border-radius: var(--radius-pill, 999px);
+  padding: 9px 13px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ev-green, #16a07a), var(--ev-teal, #2dd4a8));
+  font: 800 0.75rem var(--font-display, system-ui, sans-serif);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ev-update-bubble-close {
+  position: absolute;
+  top: 7px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-tertiary, #94a3b8);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .ev-update-bubble,
+[data-theme="dark"] .ev-update-bubble {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(45, 212, 168, 0.16);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.34);
+}
+
+@media (max-width: 560px) {
+  .ev-update-bubble {
+    bottom: calc(92px + env(safe-area-inset-bottom));
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ev-update-bubble-action {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
