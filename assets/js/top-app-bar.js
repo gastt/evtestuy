@@ -21,12 +21,11 @@
       document.documentElement.classList.add("has-ev-compass-top-app-bar");
       document.body.classList.add("has-ev-compass-top-app-bar");
 
-      const infoButton = document.getElementById("infoBtn");
-      const themeButton = document.getElementById("themeBtn");
-      [infoButton, themeButton].filter(Boolean).forEach((button) => {
-        button.classList.add("ev-top-app-action");
-        if (button.id === "themeBtn") button.classList.add("ev-top-app-theme");
-        actions.appendChild(button);
+      const legacyActions = document.querySelectorAll(".topbar .top-right > *");
+      legacyActions.forEach((control) => {
+        control.classList.add("ev-top-app-action");
+        if (control.id === "themeBtn") control.classList.add("ev-top-app-theme");
+        actions.appendChild(control);
       });
     } else {
       actions.innerHTML = `
@@ -38,6 +37,20 @@
     }
 
     document.body.classList.add("has-ev-top-app-bar");
+
+    if (isCompass) {
+      const legacyTopbar = document.querySelector(".topbar");
+      const app = document.querySelector(".app");
+      if (legacyTopbar) {
+        legacyTopbar.replaceWith(bar);
+      } else if (app) {
+        app.prepend(bar);
+      } else {
+        document.body.prepend(bar);
+      }
+      return;
+    }
+
     document.body.prepend(bar);
   }
 
