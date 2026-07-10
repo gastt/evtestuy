@@ -1735,3 +1735,126 @@ body.carbuy-page .app-header.ev-tool-header {
 body.instalacion-page .instalacion-tool-header {
   width: min(100%, 780px);
 }
+
+/* ── Fixed top app bar ── */
+body.has-ev-top-app-bar {
+  padding-top: calc(82px + env(safe-area-inset-top));
+}
+
+.ev-top-app-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  height: calc(70px + env(safe-area-inset-top));
+  padding: calc(12px + env(safe-area-inset-top)) 22px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ev-top-app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-decoration: none !important;
+}
+
+.ev-top-app-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: #ffffff;
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--ev-teal, #2dd4a8), var(--ev-primary, #16a07a));
+  box-shadow: 0 10px 24px rgba(22, 160, 122, 0.24);
+}
+
+.ev-top-app-name {
+  color: var(--ev-green-deep, #0f7b5f);
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+}
+
+.ev-top-app-name span {
+  color: var(--ev-teal, #2dd4a8);
+}
+
+.ev-top-app-theme.ev-theme-toggle {
+  position: static;
+  flex: 0 0 auto;
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+}
+
+body.has-ev-top-app-bar > .ev-theme-toggle:not(.ev-top-app-theme) {
+  display: none !important;
+}
+
+body.has-ev-top-app-bar .ev-tool-header .ev-brand,
+body.has-ev-top-app-bar #root [data-ev-brand-replaced="true"] {
+  display: none !important;
+}
+
+html[data-theme="dark"] .ev-top-app-bar,
+[data-theme="dark"] .ev-top-app-bar {
+  background: rgba(15, 23, 42, 0.88);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .ev-top-app-name,
+[data-theme="dark"] .ev-top-app-name {
+  color: #a7f3d0;
+}
+
+html[data-theme="dark"] .ev-top-app-theme.ev-theme-toggle,
+[data-theme="dark"] .ev-top-app-theme.ev-theme-toggle {
+  background: rgba(15, 23, 42, 0.82);
+}
+
+@media (max-width: 520px) {
+  .ev-top-app-bar {
+    height: calc(64px + env(safe-area-inset-top));
+    padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  }
+
+  body.has-ev-top-app-bar {
+    padding-top: calc(74px + env(safe-area-inset-top));
+  }
+
+  .ev-top-app-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .ev-top-app-name {
+    font-size: 1.42rem;
+  }
+
+  .ev-top-app-theme.ev-theme-toggle {
+    width: 44px;
+    height: 44px;
+  }
+}
