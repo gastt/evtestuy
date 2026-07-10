@@ -1651,3 +1651,18 @@ html[data-theme="dark"] body.instalacion-page #root h1 br,
 [data-theme="dark"] body.instalacion-page #root h1 br {
   display: block;
 }
+
+/* Instalación: prevent title gradient from painting as a full-width bar in any theme. */
+body.instalacion-page #root h1 {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: var(--ev-green-deep, #0f7b5f) !important;
+  color: var(--ev-green-deep, #0f7b5f) !important;
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1,
+[data-theme="dark"] body.instalacion-page #root h1 {
+  -webkit-text-fill-color: #e8f5ee !important;
+  color: #e8f5ee !important;
+}
