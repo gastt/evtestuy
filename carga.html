@@ -2,13 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f7b5f" />
 <title>EVUruguay · Costos por operador</title>
-<link rel="stylesheet" href="evuy-design.css" />
+<link rel="stylesheet" href="/evuy-design.css" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="EVUruguay" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2900400294044604"
@@ -248,6 +249,7 @@
     #pwa-ios-popup ol li { margin-bottom:4px; }
     #pwa-ios-popup .ios-close { display:block; margin-top:14px; width:100%; background:none; border:1px solid rgba(45,212,168,0.3); border-radius:var(--radius-pill); padding:7px; font-size:0.75rem; color:var(--ev-green); font-weight:600; cursor:pointer; }
 </style>
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
 <body>
   <!-- Theme toggle -->
@@ -259,12 +261,14 @@
   <div class="ad-banner-wrap ad-top">
     <span class="ad-label">Publicidad</span>
     <div class="ad-slot">
-      </div>
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
     </div>
   </div>
   <div class="ev-shell">
   <div class="ev-app">
-    <header style="grid-column:1/-1;">
+    <header class="ev-page-header ev-tool-header" style="grid-column:1/-1;">
       <a href="/" class="ev-brand" style="text-decoration:none;">
         <div class="ev-brand-logo">EV</div>
         <div class="ev-brand-text">EV<span>Uruguay</span></div>
@@ -832,9 +836,13 @@ init();
 </script>
   <div class="ad-banner-wrap ad-bottom">
     <div class="ad-slot">
-      </div>
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      </a>
     </div>
     <span class="ad-label">Publicidad</span>
   </div>
+  <script src="/assets/js/top-app-bar.js" defer></script>
+  <script src="/assets/js/bottom-nav.js" defer></script>
 </body>
 </html>
