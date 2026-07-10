@@ -2,9 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="theme-color" content="#0f7b5f" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Recomendador de Vehículos Eléctricos</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <style>
     :root {
       --bg-main: #050816;
@@ -745,29 +748,46 @@
     }
 
   </style>
+  <link rel="stylesheet" href="/evuy-design.css" />
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
-<body>
+<body class="carbuy-page">
+  <div class="ad-banner-wrap ad-top">
+    <span class="ad-label">Publicidad</span>
+    <div class="ad-slot">
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
+    </div>
+  </div>
   <div class="app-shell">
-    <header class="app-header">
-      <div class="badge">
-        <span class="badge-dot"></span>
-        <span>EVUruguay - Recomendador de EV</span>
-      </div>
-      <h1>
-        ¿Qué
-        <span class="accent">vehículo eléctrico</span>
-        te conviene?
-      </h1>
-      <p>
-        Completá tu presupuesto, el tipo de vehículo, autonomía mínima y si necesitás ADAS.
-        El recomendador filtra modelos reales y arma un resumen de equipamiento sólo del modelo que selecciones.
+    <header class="app-header ev-page-header ev-tool-header">
+      <a href="/" class="ev-brand ev-brand-centered" aria-label="Ir al inicio de EVUruguay">
+        <div class="ev-brand-logo">EV</div>
+        <div class="ev-brand-text">EV<span>Uruguay</span></div>
+      </a>
+      <h1 class="ev-heading ev-heading-xl">Recomendador de vehículos eléctricos</h1>
+      <p class="ev-subtitle">
+        Encontrá el eléctrico que mejor encaja con tu presupuesto, autonomía mínima, tipo de uso y equipamiento deseado.
       </p>
+      <p class="ev-tool-description">
+        Compará opciones reales de la planilla EVUruguay con una ficha clara de precio, autonomía, seguridad, extras y patente estimada.
+      </p>
+      <div class="ev-chip-row ev-pill-row carbuy-hero-pills" aria-label="Características de la herramienta">
+        <div class="ev-pill">Filtrá por <strong>presupuesto</strong></div>
+        <div class="ev-pill">Priorizá <strong>autonomía y uso</strong></div>
+        <div class="ev-pill">Revisá <strong>equipamiento</strong></div>
+      </div>
     </header>
 
     <main class="layout">
       <!-- Panel izquierdo: filtros / preguntas -->
       <section class="card">
         <div class="card-inner">
+          <div class="ev-callout carbuy-filter-callout">
+            <span class="ev-callout-dot"></span>
+            <span class="ev-callout-text">Definí tu búsqueda<span class="ev-callout-hint">Usamos presupuesto, autonomía, uso y equipamiento para ordenar las recomendaciones.</span></span>
+          </div>
           <div class="card-title-row">
             <div class="card-title">
               <div class="card-title-icon">⚡</div>
@@ -1447,6 +1467,46 @@
       return pieces.join(" ");
     }
 
+
+    function closeVehicleImageModal() {
+      const modal = document.getElementById("vehicle-image-modal");
+      if (!modal) return;
+      modal.classList.remove("show");
+      document.body.classList.remove("vehicle-modal-open");
+    }
+
+    function openVehicleImageModal(src, alt) {
+      if (!src) return;
+      let modal = document.getElementById("vehicle-image-modal");
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "vehicle-image-modal";
+        modal.className = "vehicle-image-modal";
+        modal.innerHTML = `
+          <div class="vehicle-image-modal-backdrop" data-close="true"></div>
+          <div class="vehicle-image-modal-dialog" role="dialog" aria-modal="true" aria-label="Imagen ampliada del vehículo">
+            <button type="button" class="vehicle-image-modal-close" aria-label="Cerrar imagen ampliada">×</button>
+            <img class="vehicle-image-modal-img" alt="">
+          </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener("click", (event) => {
+          if (event.target.dataset.close === "true" || event.target.classList.contains("vehicle-image-modal-close")) {
+            closeVehicleImageModal();
+          }
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") closeVehicleImageModal();
+        });
+      }
+
+      const img = modal.querySelector(".vehicle-image-modal-img");
+      img.src = src;
+      img.alt = alt || "Imagen ampliada del vehículo";
+      modal.classList.add("show");
+      document.body.classList.add("vehicle-modal-open");
+    }
+
     function renderDetailsPanel(vehicle, isRecommended) {
       const panel = document.getElementById("details-panel");
       if (!panel) return;
@@ -1472,7 +1532,7 @@
         ${isRecommended ? '<div class="details-badge">Candidato recomendado</div>' : ''}
 
         <div class="details-hero">
-          ${vehicle.imageUrl ? `<img class="vehicle-image" src="${vehicle.imageUrl}" alt="${vehicle.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : ''}
+          ${vehicle.imageUrl ? `<img class="vehicle-image vehicle-image-zoom" src="${vehicle.imageUrl}" alt="${vehicle.name}" loading="lazy" referrerpolicy="no-referrer" title="Abrir imagen ampliada" tabindex="0" onerror="this.style.display='none'">` : ''}
           <div style="min-width:0; flex:1;">
             <div class="details-title">${vehicle.name}</div>
             <div class="details-subtitle">${vehicle.bodyLabel || 'Vehículo eléctrico'}</div>
@@ -1524,6 +1584,18 @@
             : ''
         }
       `;
+
+      const zoomImage = panel.querySelector(".vehicle-image-zoom");
+      if (zoomImage) {
+        const openZoom = () => openVehicleImageModal(zoomImage.currentSrc || zoomImage.src, zoomImage.alt || vehicle.name);
+        zoomImage.addEventListener("click", openZoom);
+        zoomImage.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openZoom();
+          }
+        });
+      }
     }
 
     function renderResults(list, opts) {
@@ -1682,5 +1754,17 @@
       }
     }
   </script>
+  <div class="ad-banner-wrap ad-bottom">
+    <div class="ad-slot">
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      </a>
+    </div>
+    <span class="ad-label">Publicidad</span>
+  </div>
+  <script src="/assets/js/install-prompt.js" defer></script>
+  <script src="/assets/js/update-check.js" defer></script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
+  <script src="/assets/js/bottom-nav.js" defer></script>
 </body>
 </html>
