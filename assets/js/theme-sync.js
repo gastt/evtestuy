@@ -35,6 +35,14 @@
     // Safari/Chrome use this color for the browser/system top area.
     // Keep dark mode unchanged; in light mode match the colored EVUruguay topbar.
     meta.setAttribute("content", theme === "dark" ? "#06120d" : "#0f7b5f");
+
+    let appleStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    if (!appleStatus) {
+      appleStatus = document.createElement("meta");
+      appleStatus.setAttribute("name", "apple-mobile-web-app-status-bar-style");
+      document.head.appendChild(appleStatus);
+    }
+    appleStatus.setAttribute("content", "black-translucent");
   }
 
   function updateToggleLabels(theme) {
