@@ -1876,6 +1876,13 @@ html[data-theme="dark"] .ev-top-app-theme.ev-theme-toggle,
   flex: 0 0 auto;
 }
 
+.ev-top-app-action.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  color: currentColor;
+}
+
 body.has-ev-top-app-bar .topbar {
   display: none !important;
 }

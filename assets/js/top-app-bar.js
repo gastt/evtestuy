@@ -25,6 +25,16 @@
       legacyActions.forEach((control) => {
         control.classList.add("ev-top-app-action");
         if (control.id === "themeBtn") control.classList.add("ev-top-app-theme");
+        if (control.matches('a[href*="evuruguay.com"], a[data-nav="inicio"]')) {
+          control.setAttribute("href", "/");
+          control.setAttribute("aria-label", "Ir al inicio");
+          control.setAttribute("data-nav", "inicio");
+          control.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 11.2 12 4l9 7.2V21a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.8z" fill="currentColor"/>
+            </svg>
+          `;
+        }
         actions.appendChild(control);
       });
     } else {
