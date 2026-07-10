@@ -6,8 +6,95 @@
   <title>Simulador de Instalación EV — EVUruguay</title>
   <meta name="theme-color" content="#f1f9f5" />
   <script type="module" crossorigin src="/instalacion/assets/index-D7KJObQq.js"></script>
+  <link rel="stylesheet" href="/evuy-design.css" />
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
-<body>
+<body class="instalacion-page">
+  <div class="ad-banner-wrap ad-top">
+    <span class="ad-label">Publicidad</span>
+    <div class="ad-slot">
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
+    </div>
+  </div>
   <div id="root"></div>
+  <div class="ad-banner-wrap ad-bottom">
+    <div class="ad-slot">
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      </a>
+    </div>
+    <span class="ad-label">Publicidad</span>
+  </div>
+  <script>
+    (function () {
+      function buildBrandLink() {
+        const link = document.createElement('a');
+        link.href = '/';
+        link.className = 'ev-brand ev-brand-centered';
+        link.setAttribute('aria-label', 'Ir al inicio de EVUruguay');
+        link.innerHTML = '<div class="ev-brand-logo">EV</div><div class="ev-brand-text">EV<span>Uruguay</span></div>';
+        return link;
+      }
+
+      function replaceSimulatorBadge() {
+        const target = Array.from(document.querySelectorAll('span')).find((span) =>
+          span.textContent && span.textContent.trim().toLowerCase() === 'simulador ev · uruguay'
+        );
+        if (!target || !target.parentElement || target.parentElement.dataset.evBrandReplaced === 'true') return false;
+
+        const badge = target.parentElement;
+        badge.dataset.evBrandReplaced = 'true';
+        badge.replaceChildren(buildBrandLink());
+        badge.style.background = 'transparent';
+        badge.style.border = '0';
+        badge.style.borderRadius = '0';
+        badge.style.padding = '0';
+        badge.style.marginBottom = '10px';
+        badge.style.justifyContent = 'center';
+        badge.style.width = 'auto';
+        badge.style.display = 'inline-flex';
+        return true;
+      }
+
+      function enhanceInstallHeader() {
+        const root = document.getElementById('root');
+        const title = root && root.querySelector('h1');
+        if (!title || title.dataset.evHeaderEnhanced === 'true') return false;
+
+        title.dataset.evHeaderEnhanced = 'true';
+        title.classList.add('ev-heading', 'ev-heading-xl', 'instalacion-tool-title');
+
+        const parent = title.parentElement;
+        if (!parent) return true;
+        parent.classList.add('ev-page-header', 'ev-tool-header', 'instalacion-tool-header');
+
+
+        const subtitle = document.createElement('p');
+        subtitle.className = 'ev-subtitle instalacion-tool-subtitle';
+        subtitle.textContent = 'Simulá el punto de carga ideal para tu hogar según vehículo, potencia, distancia al tablero, cableado y ubicación.';
+        title.insertAdjacentElement('afterend', subtitle);
+        return true;
+      }
+
+      const root = document.getElementById('root');
+      const applyEnhancements = () => ({
+        brand: replaceSimulatorBadge(),
+        header: enhanceInstallHeader()
+      });
+
+      const initial = applyEnhancements();
+      if (initial.brand && initial.header) return;
+      if (!root) return;
+      const observer = new MutationObserver(() => {
+        const result = applyEnhancements();
+        if (result.brand && result.header) observer.disconnect();
+      });
+      observer.observe(root, { childList: true, subtree: true });
+    })();
+  </script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
+  <script src="/assets/js/bottom-nav.js" defer></script>
 </body>
 </html>

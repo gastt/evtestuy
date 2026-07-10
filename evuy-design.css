@@ -875,3 +875,1018 @@ a.ev-brand:hover {
 @media (max-width: 560px) {
   .ev-theme-toggle { top: 12px; right: 12px; width: 38px; height: 38px; font-size: 16px; }
 }
+
+/* ── EVUruguay shared app shell polish ── */
+html {
+  scroll-padding-bottom: calc(110px + env(safe-area-inset-bottom));
+}
+
+body.has-ev-bottom-nav {
+  padding-bottom: calc(104px + env(safe-area-inset-bottom));
+}
+
+/* Bring standalone tools closer to the EVUruguay app language without changing their logic. */
+.app-shell,
+.br-shell,
+.instalacion-shell {
+  border-radius: var(--radius-xl, 28px);
+}
+
+.app-header,
+.br-header,
+.ev-app header {
+  letter-spacing: -0.01em;
+}
+
+.app-header h1,
+.br-title,
+.ev-heading-xl {
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
+.card,
+.panel,
+.result-card,
+.ev-card,
+.ev-section-card {
+  border-radius: var(--radius-lg, 22px);
+}
+
+button,
+.button,
+.btn,
+.ev-btn,
+.ev-btn-primary,
+.ev-btn-ghost {
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
+/* ── Barra inferior tipo app ── */
+.ev-bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(94%, 560px);
+  min-height: 68px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.ev-bottom-nav-item {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--color-text-secondary, #64748b);
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.1;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.ev-bottom-nav-icon {
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-bottom-nav-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ev-bottom-nav-label {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ev-bottom-nav-item.active,
+.ev-bottom-nav-item[aria-current="page"] {
+  color: #16a07a;
+  background: rgba(45, 212, 168, 0.12);
+}
+
+.ev-bottom-nav-item:hover,
+.ev-bottom-nav-item:focus-visible {
+  color: #16a07a;
+  background: rgba(45, 212, 168, 0.08);
+  outline: none;
+}
+
+.ev-bottom-nav-item:focus-visible {
+  box-shadow: 0 0 0 3px rgba(45, 212, 168, 0.28);
+}
+
+.install-app-btn {
+  bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+}
+
+[data-theme="dark"] .ev-bottom-nav,
+html[data-theme="dark"] .ev-bottom-nav {
+  background: rgba(15, 23, 42, 0.94);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item,
+html[data-theme="dark"] .ev-bottom-nav-item {
+  color: rgba(226, 232, 240, 0.72);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item.active,
+[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"],
+html[data-theme="dark"] .ev-bottom-nav-item.active,
+html[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"] {
+  color: #2dd4a8;
+  background: rgba(45, 212, 168, 0.14);
+}
+
+@media (max-width: 420px) {
+  body.has-ev-bottom-nav {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .ev-bottom-nav {
+    width: calc(100% - 18px);
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    min-height: 64px;
+    border-radius: 22px;
+    padding: 7px 6px;
+  }
+
+  .ev-bottom-nav-item {
+    font-size: 0.62rem;
+  }
+
+  .ev-bottom-nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ── CarBuy: align recommender with EVUruguay main app language ── */
+body.carbuy-page {
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 168, 0.16), transparent 34rem),
+    linear-gradient(180deg, var(--ev-cream, #f8f7f2) 0%, var(--ev-mint, #eef9f4) 100%) !important;
+  color: var(--color-text, #16231d) !important;
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif) !important;
+}
+
+body.carbuy-page .app-shell {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 22px 16px 24px;
+}
+
+body.carbuy-page .app-header {
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: var(--radius-xl, 28px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(236, 253, 245, 0.92));
+  border: 1px solid rgba(22, 160, 122, 0.16);
+  box-shadow: var(--shadow-card, 0 18px 44px rgba(6, 78, 59, 0.10));
+}
+
+body.carbuy-page .badge,
+body.carbuy-page .status-pill,
+body.carbuy-page .pill-filter,
+body.carbuy-page .chip {
+  background: rgba(255, 255, 255, 0.76) !important;
+  border-color: rgba(22, 160, 122, 0.16) !important;
+  color: var(--color-text-secondary, #64746d) !important;
+}
+
+body.carbuy-page .badge-dot,
+body.carbuy-page .status-dot,
+body.carbuy-page .chip-accent-dot,
+body.carbuy-page .adas-box-title .dot {
+  background: var(--ev-teal, #2dd4a8) !important;
+  box-shadow: 0 0 0 5px rgba(45, 212, 168, 0.18) !important;
+}
+
+body.carbuy-page .app-header h1 {
+  color: var(--color-text, #16231d) !important;
+  letter-spacing: -0.03em;
+}
+
+body.carbuy-page .app-header h1 .accent,
+body.carbuy-page .result-price,
+body.carbuy-page .details-price,
+body.carbuy-page .note strong,
+body.carbuy-page .site-footer a {
+  color: var(--ev-primary, #16a07a) !important;
+}
+
+body.carbuy-page .app-header p,
+body.carbuy-page .card-subtitle,
+body.carbuy-page .results-summary,
+body.carbuy-page .result-subtitle,
+body.carbuy-page .result-quick,
+body.carbuy-page .details-subtitle,
+body.carbuy-page .details-placeholder,
+body.carbuy-page .details-body,
+body.carbuy-page .details-note,
+body.carbuy-page .note,
+body.carbuy-page .site-footer {
+  color: var(--color-text-secondary, #64746d) !important;
+}
+
+body.carbuy-page .card {
+  background: var(--color-surface, #ffffff) !important;
+  border: 1px solid rgba(22, 160, 122, 0.14) !important;
+  border-radius: var(--radius-xl, 28px) !important;
+  box-shadow: var(--shadow-card, 0 18px 44px rgba(6, 78, 59, 0.10)) !important;
+}
+
+body.carbuy-page .card::before {
+  background: radial-gradient(circle at 0 0, rgba(45, 212, 168, 0.12), transparent 58%) !important;
+  opacity: 1 !important;
+}
+
+body.carbuy-page .card-title,
+body.carbuy-page .results-title,
+body.carbuy-page .result-name,
+body.carbuy-page .details-title,
+body.carbuy-page .adas-box-title,
+body.carbuy-page .field-label,
+body.carbuy-page .chip-label,
+body.carbuy-page .pill-filter strong {
+  color: var(--color-text, #16231d) !important;
+}
+
+body.carbuy-page .card-title-icon,
+body.carbuy-page .adas-tick {
+  background: rgba(45, 212, 168, 0.12) !important;
+  border-color: rgba(45, 212, 168, 0.32) !important;
+  color: var(--ev-primary, #16a07a) !important;
+}
+
+body.carbuy-page .field-input,
+body.carbuy-page .field-select,
+body.carbuy-page .details-panel,
+body.carbuy-page .empty-state,
+body.carbuy-page .result-thumb {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-color: var(--color-border, rgba(22, 160, 122, 0.16)) !important;
+  color: var(--color-text, #16231d) !important;
+  box-shadow: inset 0 1px 2px rgba(6, 78, 59, 0.04);
+}
+
+body.carbuy-page .field-input:focus,
+body.carbuy-page .field-select:focus {
+  border-color: var(--ev-primary, #16a07a) !important;
+  box-shadow: 0 0 0 3px rgba(45, 212, 168, 0.18) !important;
+}
+
+body.carbuy-page .btn-primary {
+  background: linear-gradient(135deg, var(--ev-teal, #2dd4a8), var(--ev-primary, #16a07a)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 30px rgba(22, 160, 122, 0.28) !important;
+}
+
+body.carbuy-page .result-card {
+  background: rgba(255, 255, 255, 0.84) !important;
+  border-color: rgba(22, 160, 122, 0.14) !important;
+  border-radius: var(--radius-md, 18px) !important;
+}
+
+body.carbuy-page .result-card:hover,
+body.carbuy-page .result-card.selected {
+  border-color: rgba(22, 160, 122, 0.48) !important;
+  box-shadow: 0 14px 30px rgba(6, 78, 59, 0.12) !important;
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.94), rgba(255, 255, 255, 0.96)) !important;
+}
+
+body.carbuy-page .details-badge,
+body.carbuy-page .chip-accent,
+body.carbuy-page .chip-patente-contado,
+body.carbuy-page .details-note-contado,
+body.carbuy-page .adas-box {
+  background: rgba(45, 212, 168, 0.10) !important;
+  border-color: rgba(22, 160, 122, 0.28) !important;
+  color: var(--ev-forest, #0f7b5f) !important;
+}
+
+body.carbuy-page .site-footer {
+  border-top-color: rgba(22, 160, 122, 0.14) !important;
+}
+
+[data-theme="dark"] body.carbuy-page,
+html[data-theme="dark"] body.carbuy-page {
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 168, 0.10), transparent 34rem),
+    var(--color-bg, #08120e) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .app-header,
+html[data-theme="dark"] body.carbuy-page .app-header,
+[data-theme="dark"] body.carbuy-page .card,
+html[data-theme="dark"] body.carbuy-page .card {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(45, 212, 168, 0.14) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .field-input,
+[data-theme="dark"] body.carbuy-page .field-select,
+[data-theme="dark"] body.carbuy-page .details-panel,
+[data-theme="dark"] body.carbuy-page .empty-state,
+[data-theme="dark"] body.carbuy-page .result-card,
+html[data-theme="dark"] body.carbuy-page .field-input,
+html[data-theme="dark"] body.carbuy-page .field-select,
+html[data-theme="dark"] body.carbuy-page .details-panel,
+html[data-theme="dark"] body.carbuy-page .empty-state,
+html[data-theme="dark"] body.carbuy-page .result-card {
+  background: rgba(15, 23, 42, 0.70) !important;
+  border-color: rgba(45, 212, 168, 0.14) !important;
+}
+
+/* ── Shared advertising banners ── */
+.ad-banner-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ad-banner-wrap.ad-top {
+  padding: 10px 12px 4px;
+}
+
+.ad-banner-wrap.ad-bottom {
+  padding: 4px 12px 10px;
+}
+
+.ad-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary, #94a3b8);
+  align-self: center;
+}
+
+.ad-slot {
+  width: 100%;
+  max-width: 728px;
+  min-height: 90px;
+  border-radius: var(--radius-md, 18px);
+  overflow: hidden;
+  background: var(--color-surface, #ffffff);
+  border: 1px dashed rgba(15, 23, 42, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-slot a,
+.ad-slot img {
+  display: block;
+  width: 100%;
+}
+
+.ad-slot img {
+  height: auto;
+  object-fit: contain;
+}
+
+[data-theme="dark"] .ad-slot,
+html[data-theme="dark"] .ad-slot {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+/* Improve equipment contrast in the EV recommender detail card. */
+body.carbuy-page .adas-item,
+body.carbuy-page .details-note strong {
+  color: var(--color-text, #16231d) !important;
+}
+
+body.carbuy-page .adas-box .adas-item span:last-child {
+  color: var(--color-text, #16231d) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .adas-item,
+[data-theme="dark"] body.carbuy-page .adas-box .adas-item span:last-child,
+[data-theme="dark"] body.carbuy-page .details-note strong,
+html[data-theme="dark"] body.carbuy-page .adas-item,
+html[data-theme="dark"] body.carbuy-page .adas-box .adas-item span:last-child,
+html[data-theme="dark"] body.carbuy-page .details-note strong {
+  color: rgba(226, 232, 240, 0.92) !important;
+}
+
+/* Keep CarBuy page sections stacked vertically when shared ad banners are present. */
+body.carbuy-page {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100%;
+}
+
+body.carbuy-page .ad-banner-wrap,
+body.carbuy-page .app-shell {
+  flex: 0 0 auto;
+}
+
+body.carbuy-page .layout {
+  width: 100%;
+}
+
+/* ── CarBuy desktop results: wider list and larger vehicle imagery ── */
+body.carbuy-page .results-layout {
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+}
+
+body.carbuy-page .details-panel-wrapper {
+  order: -1;
+}
+
+body.carbuy-page #results-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+body.carbuy-page .result-card {
+  grid-template-columns: minmax(0, 1fr) 112px !important;
+  gap: 10px 14px !important;
+  padding: 14px !important;
+}
+
+body.carbuy-page .result-thumb {
+  width: 112px !important;
+  height: 76px !important;
+  border-radius: 16px !important;
+}
+
+body.carbuy-page .details-hero {
+  align-items: center;
+  gap: 18px;
+}
+
+body.carbuy-page .vehicle-image {
+  width: min(38vw, 360px) !important;
+  min-width: 220px;
+  height: 220px !important;
+  border-radius: 22px !important;
+  object-fit: cover;
+  box-shadow: 0 18px 42px rgba(6, 78, 59, 0.16);
+}
+
+body.carbuy-page .vehicle-image-zoom {
+  cursor: zoom-in;
+}
+
+body.carbuy-page .vehicle-image-zoom:focus-visible {
+  outline: 3px solid rgba(45, 212, 168, 0.45);
+  outline-offset: 3px;
+}
+
+.vehicle-modal-open {
+  overflow: hidden;
+}
+
+.vehicle-image-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.vehicle-image-modal.show {
+  display: flex;
+}
+
+.vehicle-image-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.vehicle-image-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 980px);
+  max-height: 88vh;
+  border-radius: 28px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.36);
+}
+
+.vehicle-image-modal-img {
+  display: block;
+  width: 100%;
+  max-height: 88vh;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.vehicle-image-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  body.carbuy-page #results-list {
+    grid-template-columns: 1fr;
+  }
+
+  body.carbuy-page .result-card {
+    grid-template-columns: minmax(0, 1fr) 86px !important;
+  }
+
+  body.carbuy-page .result-thumb {
+    width: 86px !important;
+    height: 62px !important;
+  }
+
+  body.carbuy-page .details-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.carbuy-page .vehicle-image {
+    width: 100% !important;
+    min-width: 0;
+    height: 210px !important;
+  }
+}
+
+/* ── Shared centered EVUruguay page brand ── */
+.ev-page-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ev-brand-centered,
+.ev-page-header .ev-brand {
+  justify-content: center;
+  align-self: center;
+  text-decoration: none;
+}
+
+.ev-page-header .ev-brand {
+  margin-inline: auto;
+}
+
+body.carbuy-page .app-header.ev-page-header {
+  align-items: center;
+  text-align: center;
+}
+
+body.carbuy-page .app-header.ev-page-header p {
+  margin-inline: auto;
+}
+
+body.carbuy-page .app-header .ev-brand-centered {
+  margin-bottom: 6px;
+}
+
+/* ── Bottom app navigation (filled icon version) ── */
+body {
+  padding-bottom: calc(94px + env(safe-area-inset-bottom));
+}
+
+.ev-bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 9997;
+  width: min(calc(100% - 20px), 760px);
+  min-height: auto;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  padding: 8px 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ev-bottom-nav-item {
+  min-width: 0;
+  min-height: 58px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 18px;
+  color: var(--color-text-tertiary, #94a3b8);
+  text-decoration: none !important;
+  font: 700 0.68rem var(--font-display, system-ui, sans-serif);
+  line-height: 1.05;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.ev-bottom-nav-item:hover {
+  transform: translateY(-1px);
+  background: rgba(45, 212, 168, 0.07);
+  color: var(--ev-green, #16a07a);
+}
+
+.ev-bottom-nav-item.active,
+.ev-bottom-nav-item[aria-current="page"] {
+  color: var(--ev-green-deep, #0f7b5f);
+  background: linear-gradient(135deg, rgba(45, 212, 168, 0.18), rgba(22, 160, 122, 0.10));
+}
+
+.ev-bottom-nav-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-bottom-nav-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+  display: block;
+}
+
+.ev-bottom-nav-label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .ev-bottom-nav,
+html[data-theme="dark"] .ev-bottom-nav {
+  background: rgba(15, 23, 42, 0.88);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38), 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item,
+html[data-theme="dark"] .ev-bottom-nav-item {
+  color: rgba(226, 232, 240, 0.58);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item:hover,
+[data-theme="dark"] .ev-bottom-nav-item.active,
+[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"],
+html[data-theme="dark"] .ev-bottom-nav-item:hover,
+html[data-theme="dark"] .ev-bottom-nav-item.active,
+html[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"] {
+  color: var(--ev-teal, #2dd4a8);
+  background: rgba(45, 212, 168, 0.12);
+}
+
+.install-app-btn {
+  bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 560px) {
+  .install-app-btn {
+    bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .ev-bottom-nav {
+    width: calc(100% - 14px);
+    padding: 7px 6px;
+    border-radius: 22px;
+  }
+
+  .ev-bottom-nav-item {
+    min-height: 54px;
+    font-size: 0.61rem;
+    border-radius: 16px;
+  }
+
+  .ev-bottom-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ev-bottom-nav-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+/* ── Instalación: fix dark title/brand rendering from bundled inline styles ── */
+body.instalacion-page #root [data-ev-brand-replaced="true"] {
+  width: auto !important;
+  max-width: max-content !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  margin-inline: auto !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1,
+[data-theme="dark"] body.instalacion-page #root h1 {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #e8f5ee !important;
+  color: #e8f5ee !important;
+  text-shadow: 0 10px 30px rgba(45, 212, 168, 0.12);
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1 br,
+[data-theme="dark"] body.instalacion-page #root h1 br {
+  display: block;
+}
+
+/* Instalación: prevent title gradient from painting as a full-width bar in any theme. */
+body.instalacion-page #root h1 {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: var(--ev-green-deep, #0f7b5f) !important;
+  color: var(--ev-green-deep, #0f7b5f) !important;
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1,
+[data-theme="dark"] body.instalacion-page #root h1 {
+  -webkit-text-fill-color: #e8f5ee !important;
+  color: #e8f5ee !important;
+}
+
+/* ── Tool intro copy: align CarBuy and Instalación with Inicio/Redes ── */
+.ev-tool-description {
+  max-width: 680px;
+  margin: 8px auto 0;
+  color: var(--color-text-tertiary, #7c8a83);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+body.carbuy-page .app-header.ev-page-header .ev-overline,
+body.instalacion-page .instalacion-tool-overline {
+  margin-top: 8px;
+}
+
+body.carbuy-page .app-header.ev-page-header .ev-heading,
+body.instalacion-page .instalacion-tool-title {
+  margin: 8px 0 4px !important;
+  text-align: center;
+}
+
+body.instalacion-page .instalacion-tool-header {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+body.instalacion-page .instalacion-tool-subtitle {
+  max-width: 720px;
+  margin: 8px auto 0 !important;
+  text-align: center;
+}
+
+html[data-theme="dark"] .ev-tool-description,
+[data-theme="dark"] .ev-tool-description {
+  color: rgba(226, 232, 240, 0.68);
+}
+
+/* ── Unified tool headers across Inicio, Redes, Comprar EV and Instalación ── */
+.ev-tool-header {
+  width: 100%;
+  text-align: center;
+  align-items: center;
+}
+
+.ev-tool-header .ev-brand {
+  margin: 0 auto 8px;
+}
+
+.ev-tool-header .ev-heading,
+.ev-tool-header h1 {
+  margin: 8px auto 6px !important;
+  text-align: center;
+}
+
+.ev-tool-header .ev-subtitle,
+.ev-tool-header .ev-tool-description {
+  max-width: 720px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center;
+}
+
+body.carbuy-page .app-header.ev-tool-header {
+  gap: 6px;
+}
+
+body.instalacion-page .instalacion-tool-header {
+  width: min(100%, 780px);
+}
+
+/* ── Fixed top app bar ── */
+body.has-ev-top-app-bar {
+  padding-top: calc(82px + env(safe-area-inset-top));
+}
+
+.ev-top-app-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  height: calc(70px + env(safe-area-inset-top));
+  padding: calc(12px + env(safe-area-inset-top)) 22px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ev-top-app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-decoration: none !important;
+}
+
+.ev-top-app-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: #ffffff;
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--ev-teal, #2dd4a8), var(--ev-primary, #16a07a));
+  box-shadow: 0 10px 24px rgba(22, 160, 122, 0.24);
+}
+
+.ev-top-app-name {
+  color: var(--ev-green-deep, #0f7b5f);
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+}
+
+.ev-top-app-name span {
+  color: var(--ev-teal, #2dd4a8);
+}
+
+.ev-top-app-theme.ev-theme-toggle {
+  position: static;
+  flex: 0 0 auto;
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+}
+
+body.has-ev-top-app-bar > .ev-theme-toggle:not(.ev-top-app-theme) {
+  display: none !important;
+}
+
+body.has-ev-top-app-bar .ev-tool-header .ev-brand,
+body.has-ev-top-app-bar #root [data-ev-brand-replaced="true"] {
+  display: none !important;
+}
+
+html[data-theme="dark"] .ev-top-app-bar,
+[data-theme="dark"] .ev-top-app-bar {
+  background: rgba(15, 23, 42, 0.88);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .ev-top-app-name,
+[data-theme="dark"] .ev-top-app-name {
+  color: #a7f3d0;
+}
+
+html[data-theme="dark"] .ev-top-app-theme.ev-theme-toggle,
+[data-theme="dark"] .ev-top-app-theme.ev-theme-toggle {
+  background: rgba(15, 23, 42, 0.82);
+}
+
+@media (max-width: 520px) {
+  .ev-top-app-bar {
+    height: calc(64px + env(safe-area-inset-top));
+    padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  }
+
+  body.has-ev-top-app-bar {
+    padding-top: calc(74px + env(safe-area-inset-top));
+  }
+
+  .ev-top-app-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .ev-top-app-name {
+    font-size: 1.42rem;
+  }
+
+  .ev-top-app-theme.ev-theme-toggle {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Brújula: move existing controls into the shared top app bar and hide the legacy title bar. */
+.ev-top-app-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.ev-top-app-action.icon-btn {
+  position: static;
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+body.has-ev-top-app-bar .topbar {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  .ev-top-app-actions {
+    gap: 8px;
+  }
+
+  .ev-top-app-action.icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
