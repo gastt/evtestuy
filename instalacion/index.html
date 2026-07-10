@@ -2,12 +2,37 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Simulador de Instalación EV — EVUruguay</title>
-  <meta name="theme-color" content="#f1f9f5" />
+  <meta name="theme-color" content="#0f7b5f" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <script type="module" crossorigin src="/instalacion/assets/index-D7KJObQq.js"></script>
+  <link rel="stylesheet" href="/evuy-design.css" />
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
-<body>
+<body class="instalacion-page">
+  <div class="ad-banner-wrap ad-top">
+    <span class="ad-label">Publicidad</span>
+    <div class="ad-slot">
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
+    </div>
+  </div>
   <div id="root"></div>
+  <div class="ad-banner-wrap ad-bottom">
+    <div class="ad-slot">
+      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      </a>
+    </div>
+    <span class="ad-label">Publicidad</span>
+  </div>
+  <script src="/assets/js/instalacion-shell.js" defer></script>
+  <script src="/assets/js/install-prompt.js" defer></script>
+  <script src="/assets/js/update-check.js" defer></script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
+  <script src="/assets/js/bottom-nav.js" defer></script>
 </body>
 </html>
