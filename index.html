@@ -118,41 +118,6 @@
     .comp-bar-fill-ev { background: linear-gradient(90deg, var(--ev-green), var(--ev-teal)); }
     .comp-bar-fill-ice { background: linear-gradient(90deg, #e63946, #f87171); }
 
-    /* Red panel override */
-    #panelComparadorRedes { background: linear-gradient(135deg, #fef2f2 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.12) !important; }
-    #panelComparadorRedes .ev-card-title span { color: #b91c1c !important; }
-    #panelComparadorRedes .ev-collapse-btn { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.06) !important; color: #e63946 !important; }
-    #panelComparadorRedes a.ev-link { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.04) !important; color: #b91c1c !important; }
-
-    /* Amber panel override */
-    #panelCarBuy { background: linear-gradient(135deg, #fefce8 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.12) !important; }
-    #panelCarBuy .ev-card-title span { color: #a16207 !important; }
-    #panelCarBuy .ev-collapse-btn { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.06) !important; color: #ca8a04 !important; }
-    #panelCarBuy a.ev-link { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.04) !important; color: #a16207 !important; }
-
-    /* Green panel override — Simulador Instalación */
-    #panelInstalacion { background: linear-gradient(135deg, #ecfdf5 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.15) !important; }
-    #panelInstalacion .ev-card-title span { color: #0f7b5f !important; }
-    #panelInstalacion .ev-collapse-btn { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.08) !important; color: #16a07a !important; }
-    #panelInstalacion a.ev-link { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.06) !important; color: #0f7b5f !important; }
-
-    /* Dark mode: page-specific overrides */
-    [data-theme="dark"] #panelComparadorRedes { background: linear-gradient(135deg, rgba(230, 57, 70, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.15) !important; }
-    [data-theme="dark"] #panelComparadorRedes .ev-card-title span { color: #fca5a5 !important; }
-    [data-theme="dark"] #panelComparadorRedes .ev-collapse-btn { color: #fca5a5 !important; }
-    [data-theme="dark"] #panelComparadorRedes a.ev-link { color: #fca5a5 !important; }
-
-    [data-theme="dark"] #panelCarBuy { background: linear-gradient(135deg, rgba(202, 138, 4, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.15) !important; }
-    [data-theme="dark"] #panelCarBuy .ev-card-title span { color: #fde68a !important; }
-    [data-theme="dark"] #panelCarBuy .ev-collapse-btn { color: #fde68a !important; }
-    [data-theme="dark"] #panelCarBuy a.ev-link { color: #fde68a !important; }
-
-    /* Dark mode: Simulador Instalación panel */
-    [data-theme="dark"] #panelInstalacion { background: linear-gradient(135deg, rgba(45, 212, 168, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.18) !important; }
-    [data-theme="dark"] #panelInstalacion .ev-card-title span { color: #a7f3d0 !important; }
-    [data-theme="dark"] #panelInstalacion .ev-collapse-btn { color: #a7f3d0 !important; }
-    [data-theme="dark"] #panelInstalacion a.ev-link { color: #a7f3d0 !important; }
-
     /* Dark mode: savings highlight */
     [data-theme="dark"] .savings-highlight { background: rgba(45, 212, 168, 0.06); border-color: rgba(45, 212, 168, 0.15); color: #a7f3d0; }
     [data-theme="dark"] .savings-highlight strong { color: var(--ev-teal); }
@@ -679,51 +644,6 @@
           El método de carga que más te conviene es <strong id="bestChargerMethod">—</strong>,
           con un costo de <strong id="bestChargerCost">—</strong> por carga para recorrer <strong id="bestChargerKm">—</strong>.
         </p>
-      </div>
-    </div>
-
-    <!-- Comparador de redes -->
-    <div class="ev-section-card chargers-card collapsible" id="panelComparadorRedes" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>Compará el costo de tu carga en las diferentes redes de carga de Uruguay</span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelComparadorRedes">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Accedé a la herramienta donde podés comparar cuánto cuesta la misma carga en cada red pública y privada del país.</p>
-        <a class="ev-link" href="/carga.html">Ir al comparador de redes →</a>
-      </div>
-    </div>
-
-    <!-- Recomendador -->
-    <div class="ev-section-card chargers-card collapsible" id="panelCarBuy" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>Qué vehículo puedo comprar? <span style="opacity:.6">(BETA)</span></span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelCarBuy">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Probá la herramienta beta para ayudarte a elegir un vehículo eléctrico según tus preferencias y presupuesto.</p>
-        <a class="ev-link" href="/carbuy/recomendador.html">Ir a "Qué vehículo puedo comprar?" →</a>
-      </div>
-    </div>
-
-    <!-- Simulador de Instalación -->
-    <div class="ev-section-card chargers-card collapsible" id="panelInstalacion" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>⚡ Simulador de Instalación EV para el hogar</span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelInstalacion">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Dimensioná el cableado, protecciones, tablero y materiales necesarios para instalar un punto de carga en tu hogar, según la normativa de UTE (Cap. XXX). Incluye lista de materiales con links a MercadoLibre y diagrama animado de la instalación.</p>
-        <a class="ev-link" href="/instalacion/">Ir al simulador de instalación →</a>
       </div>
     </div>
 
