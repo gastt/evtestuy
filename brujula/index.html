@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>EVUruguay — Brújula EV</title>
-  <meta name="theme-color" content="#06120d"/>
+  <meta name="theme-color" content="#030303"/>
   <style>
   /* ══════════════════════════════════════════════════════════════
      TOKENS — instrumento de a bordo: negro verdoso profundo,
@@ -12,18 +12,18 @@
      monoespaciada tabular como un panel digital de cabina.
      ══════════════════════════════════════════════════════════════ */
   :root{
-    --bg:#040f0b;
-    --surface:#0a2118;
-    --panel:rgba(10,28,21,.72);
-    --panel-2:rgba(14,36,27,.85);
-    --border:rgba(45,212,167,.16);
-    --border-hi:rgba(45,212,167,.46);
-    --text:#eafbf3;
+    --bg:var(--bg-page, #040f0b);
+    --surface:var(--bg-surface-raised, #0a2118);
+    --panel:rgba(8,8,8,.72);
+    --panel-2:rgba(14,14,14,.85);
+    --border:var(--color-border, rgba(45,212,167,.16));
+    --border-hi:var(--color-border-hover, rgba(45,212,167,.46));
+    --text:var(--color-text, #eafbf3);
     --muted:#74e3bd;
     --dim:rgba(116,227,189,.52);
-    --teal:#2ee6ab;
-    --green:#17c98a;
-    --forest:#0a8f66;
+    --teal:var(--color-accent-bright, #2ee6ab);
+    --green:var(--color-accent, #17c98a);
+    --forest:var(--ev-green-deep, #0a8f66);
     --amber:#f5a524;
     --red:#fb5a72;
     --blue:#4fc9ff;
@@ -37,18 +37,10 @@
     --font-mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
   }
   [data-theme=light]{
-    --bg:#eef7f2;
-    --surface:#ffffff;
     --panel:rgba(255,255,255,.86);
     --panel-2:rgba(255,255,255,.96);
-    --border:rgba(6,95,70,.16);
-    --border-hi:rgba(6,95,70,.4);
-    --text:#0c2118;
     --muted:#0a6b4c;
     --dim:rgba(10,107,76,.5);
-    --teal:#0a9268;
-    --green:#0a7a55;
-    --forest:#0a5f42;
     --amber:#c07a0a;
     --red:#d3324a;
     --blue:#0284c7;
@@ -534,13 +526,14 @@
   }
 </style>
   <link rel="stylesheet" href="/evuy-design.css" />
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
 <body>
 <div class="app">
 
   <!-- topbar -->
   <header class="topbar">
-    <a class="brand" href="https://evuruguay.com">
+    <a class="brand" href="/">
       <div class="brand-logo">EV</div>
       <div>
         <div class="brand-name">EVUruguay</div>
@@ -550,7 +543,7 @@
     <div class="top-right">
       <button class="icon-btn" id="infoBtn" type="button" aria-label="Cómo se calcula">ⓘ</button>
       <button class="icon-btn" id="themeBtn" type="button" aria-label="Tema">🌙</button>
-      <a class="icon-btn" href="https://evuruguay.com" aria-label="Volver">←</a>
+      <a class="icon-btn" href="/" aria-label="Ir al inicio" data-nav="inicio">←</a>
     </div>
   </header>
 
@@ -840,7 +833,7 @@ async function loadVehiculos(){
 
   try{
     if(statusEl) statusEl.textContent = "Cargando vehículos…";
-    const text = await getText('./vehiculos.csv');
+    const text = await getText('/vehiculos.csv');
     vehiculosDB = parseCSV(text);
     if(vehiculosDB.length === 0) throw new Error("CSV vacío o sin filas válidas");
     if(rowEl) rowEl.remove();
@@ -1787,14 +1780,6 @@ function startGps(){
 // ─── event listeners ──────────────────────────────────────────────────────
 $("startBtn").addEventListener("click",startGps);
 
-$("themeBtn").addEventListener("click",()=>{
-  const root=document.documentElement;
-  const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
-  root.setAttribute("data-theme",next);
-  $("themeBtn").textContent=next==="dark"?"🌙":"☀️";
-  document.querySelector("meta[name=theme-color]").setAttribute("content",next==="dark"?"#06120d":"#edf7f2");
-});
-
 $("infoBtn").addEventListener("click",()=>{
   $("infoModal").classList.add("show");
 });
@@ -1869,6 +1854,9 @@ requestAnimationFrame(()=>{
   loadVehiculos();
 });
 </script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
   <script src="/assets/js/bottom-nav.js" defer></script>
+  <script src="/assets/glass/displacement-utils.js" defer></script>
+  <script src="/assets/js/glass-nav.js" defer></script>
 </body>
 </html>
