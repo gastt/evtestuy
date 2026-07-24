@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#109879" />
+  <meta name="description" content="Comparador de vehículos eléctricos de EV Uruguay para analizar precio, autonomía, batería, potencia, baúl y equipamiento." />
+  <title>Comparador EV | EV Uruguay</title>
+  <link rel="stylesheet" href="/evuy-design.css" />
+  <script src="/assets/js/theme-sync.js" defer></script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
+  <script src="/assets/js/bottom-nav.js" defer></script>
+  <script src="/assets/glass/displacement-utils.js" defer></script>
+  <script src="/assets/js/glass-nav.js" defer></script>
+  <style>
+    :root {
+      --brand: var(--color-accent, #109879);
+      --brand-dark: var(--ev-green-deep, #08745d);
+      --brand-bright: var(--color-accent-bright, #2bd4ac);
+      --brand-soft: #e5f8f3;
+      --brand-faint: #f4fbf9;
+      --ink: var(--color-text, #1b2a3f);
+      --muted: var(--color-text-secondary, #65748a);
+      --line: var(--color-border, #dce8e5);
+      --surface: var(--bg-surface-raised, rgba(255, 255, 255, .94));
+      --surface-solid: var(--bg-surface, #fff);
+      --page: var(--bg-page, #f3faf8);
+      --danger: #dc5f59;
+      --danger-soft: #fff0ef;
+      --warning: #e69245;
+      --shadow: 0 18px 48px rgba(30, 77, 66, .11);
+      --shadow-soft: 0 8px 24px rgba(30, 77, 66, .08);
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --space: 20px;
+      --dock-h: 78px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 14% 0%, rgba(43, 212, 172, .13), transparent 27%),
+        radial-gradient(circle at 92% 12%, rgba(16, 152, 121, .09), transparent 24%),
+        repeating-radial-gradient(ellipse at 50% 108%, transparent 0 110px, rgba(16, 152, 121, .03) 111px 112px),
+        var(--page);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding-bottom: calc(var(--dock-h) + 38px);
+    }
+
+    html[data-theme="dark"] {
+      --brand-soft: #193d34;
+      --brand-faint: #132f29;
+      --danger-soft: #422522;
+      --shadow: 0 20px 50px rgba(0, 0, 0, .4);
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, .3);
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    svg { display: block; }
+
+    .topbar {
+      height: 76px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      color: #fff;
+      background: linear-gradient(105deg, #0c856a 0%, #12a482 48%, #2bd1ae 100%);
+      box-shadow: 0 10px 28px rgba(12, 118, 93, .18);
+    }
+
+    .topbar-inner {
+      max-width: 1480px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: clamp(23px, 2vw, 32px);
+      font-weight: 900;
+      letter-spacing: -1.1px;
+    }
+
+    .brand-mark {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .17);
+      border: 1px solid rgba(255, 255, 255, .23);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22);
+      font-size: 17px;
+      letter-spacing: -.4px;
+    }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .35);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(255, 255, 255, .13);
+      transition: transform .18s ease, background .18s ease;
+    }
+    .icon-btn:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .22); }
+
+    .shell { max-width: 1480px; margin: 0 auto; padding: 26px 28px 0; }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid rgba(150, 188, 179, .27);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      display: block;
+      padding: 30px 32px;
+      margin-bottom: var(--space);
+      overflow: hidden;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 330px;
+      height: 330px;
+      right: -100px;
+      top: -160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(43, 212, 172, .18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      color: var(--brand-dark);
+      background: var(--brand-soft);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    h1 { margin: 13px 0 8px; font-size: clamp(30px, 3.5vw, 48px); line-height: 1.04; letter-spacing: -1.9px; }
+    .hero-copy p { max-width: 820px; margin: 0; color: var(--muted); line-height: 1.58; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: var(--space);
+      align-items: start;
+    }
+
+    .sidebar { padding: 24px; position: sticky; top: 96px; }
+    .content { min-width: 0; display: grid; gap: var(--space); }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 17px;
+    }
+    .section-head h2, .section-head h3 { margin: 0; letter-spacing: -.65px; }
+    .section-head p { margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .counter {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 52px;
+      justify-content: center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: var(--brand-dark);
+      background: var(--brand-soft);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .filters { display: grid; gap: 14px; }
+    .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .field label { display: block; margin: 0 0 6px 3px; color: var(--muted); font-size: 12px; font-weight: 760; }
+    .control {
+      width: 100%;
+      height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      outline: none;
+      color: var(--ink);
+      background: var(--surface-solid);
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .control:focus { border-color: var(--brand-bright); box-shadow: 0 0 0 4px rgba(43, 212, 172, .12); }
+
+    .vehicle-list {
+      max-height: 520px;
+      margin-top: 18px;
+      overflow: auto;
+      padding: 2px 4px 2px 0;
+      display: grid;
+      gap: 8px;
+    }
+    .vehicle-list::-webkit-scrollbar { width: 8px; }
+    .vehicle-list::-webkit-scrollbar-thumb { background: rgba(16, 152, 121, .22); border-radius: 99px; }
+
+    .vehicle-item {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) 34px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface-solid);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .vehicle-item:hover { transform: translateY(-1px); border-color: rgba(16, 152, 121, .38); box-shadow: var(--shadow-soft); }
+    .vehicle-item.selected { border-color: var(--brand); background: var(--brand-faint); }
+    .car-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; color: var(--brand-dark); background: var(--brand-soft); }
+    .vehicle-name { font-size: 13px; font-weight: 820; line-height: 1.25; }
+    .vehicle-meta { margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 11px; }
+    .add-btn, .remove-btn {
+      border: 0;
+      display: grid;
+      place-items: center;
+      transition: background .18s ease, color .18s ease, transform .18s ease;
+    }
+    .add-btn { width: 34px; height: 34px; border-radius: 10px; color: var(--brand-dark); background: var(--brand-soft); font-size: 20px; }
+    .add-btn:hover, .vehicle-item.selected .add-btn { color: #fff; background: var(--brand); }
+    .add-btn:hover { transform: scale(1.04); }
+
+    .selected-panel { padding: 22px 24px; }
+    .clear-btn, .share-btn {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--muted);
+      background: var(--surface-solid);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .clear-btn:hover { color: var(--danger); border-color: rgba(220, 95, 89, .32); background: var(--danger-soft); }
+    .share-btn { color: var(--brand-dark); background: var(--brand-soft); border-color: rgba(16, 152, 121, .18); }
+    .share-btn:hover { color: #fff; background: var(--brand); border-color: var(--brand); }
+    .share-btn:disabled, .clear-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .selected-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 10px;
+      min-height: 68px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .selected-chip {
+      min-width: 175px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface-solid);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 30px;
+      gap: 8px;
+      align-items: center;
+    }
+    .selected-chip strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .selected-chip small { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 11px; }
+    .remove-btn { width: 30px; height: 30px; border-radius: 9px; color: var(--muted); background: var(--brand-faint); font-size: 18px; }
+    .remove-btn:hover { color: var(--danger); background: var(--danger-soft); }
+
+    .empty-strip {
+      width: 100%;
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      border: 1px dashed var(--line);
+      border-radius: 15px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+    .summary-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-soft); }
+    .summary-card .label { color: var(--muted); font-size: 11px; font-weight: 760; }
+    .summary-card .value { margin-top: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 21px; font-weight: 900; letter-spacing: -.8px; }
+    .summary-card .winner { margin-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--brand-dark); font-size: 10px; }
+
+    .visual-panel { padding: 24px; }
+    .visual-grid { display: grid; grid-template-columns: minmax(420px, .92fr) minmax(0, 1.08fr); gap: 16px; align-items: stretch; }
+    .chart-card { min-width: 0; padding: 17px; border: 1px solid var(--line); border-radius: 19px; background: var(--surface-solid); }
+    .chart-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .chart-title strong { font-size: 14px; }
+    .chart-title span { color: var(--muted); font-size: 11px; text-align: right; }
+
+    .radar-wrap { min-height: 390px; display: grid; place-items: center; }
+    .radar-svg { width: min(100%, 540px); height: auto; overflow: visible; }
+    .radar-grid { fill: none; stroke: var(--line); stroke-width: 1; }
+    .radar-axis { stroke: var(--line); stroke-width: 1; }
+    .radar-label { fill: var(--ink); font-size: 12px; font-weight: 750; }
+    .radar-scale { fill: var(--muted); font-size: 9px; }
+    .radar-shape { stroke-width: 2.2; fill-opacity: .10; stroke-linejoin: round; transition: opacity .2s ease; }
+    .radar-point { stroke-width: 2; }
+    .radar-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 13px; margin-top: 4px; }
+    .legend-item { max-width: 190px; display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
+    .legend-item span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .legend-dot { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; }
+
+    .bars-stack { display: grid; gap: 13px; }
+    .mini-chart { padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--brand-faint); }
+    .mini-chart-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+    .mini-chart-head strong { font-size: 12px; }
+    .mini-chart-head span { color: var(--muted); font-size: 10px; }
+    .bars { display: grid; gap: 10px; }
+    .bar-row { min-width: 0; }
+    .bar-label { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 5px; font-size: 10px; }
+    .bar-label span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+    .bar-label b { flex: 0 0 auto; font-size: 10px; }
+    .bar-track { height: 8px; overflow: hidden; border-radius: 99px; background: var(--brand-soft); }
+    .bar-fill { height: 100%; min-width: 3px; border-radius: inherit; background: linear-gradient(90deg, var(--brand), var(--brand-bright)); transition: width .45s cubic-bezier(.2, .8, .2, 1); }
+
+    .compare-panel { padding: 24px; overflow: hidden; }
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--surface-solid); }
+    table { width: 100%; min-width: 880px; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+    th, td { padding: 14px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    th:last-child, td:last-child { border-right: 0; }
+    tbody tr:last-child td { border-bottom: 0; }
+    thead th { position: sticky; top: 0; z-index: 3; min-width: 180px; background: var(--brand-faint); }
+    thead th:first-child, tbody td:first-child { position: sticky; left: 0; z-index: 4; min-width: 210px; font-weight: 780; background: var(--surface-solid); }
+    thead th:first-child { z-index: 5; background: var(--brand-faint); }
+    tbody tr:hover td, tbody tr:hover td:first-child { background: var(--brand-faint); }
+    .group-row td { padding: 10px 14px; color: var(--brand-dark); background: var(--brand-soft) !important; font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .best-cell { color: var(--brand-dark); background: rgba(43, 212, 172, .10) !important; font-weight: 850; }
+    .best-cell::after { content: "Mejor"; display: inline-block; margin-left: 7px; padding: 3px 6px; border-radius: 999px; color: #fff; background: var(--brand); font-size: 9px; vertical-align: 1px; }
+    .model-head { display: flex; flex-direction: column; gap: 5px; }
+    .model-head strong { font-size: 13px; line-height: 1.25; }
+    .model-head span { color: var(--muted); font-size: 11px; }
+
+    .boolean-badge {
+      width: 25px;
+      height: 25px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .boolean-badge.yes { color: #08745d; background: #ddf7ef; border: 1px solid #b9eadc; }
+    .boolean-badge.no { color: #c64f49; background: var(--danger-soft); border: 1px solid rgba(220, 95, 89, .25); }
+    html[data-theme="dark"] .boolean-badge.yes { color: var(--brand-bright); background: var(--brand-soft); border-color: rgba(43, 212, 172, 0.3); }
+
+    .empty-main {
+      min-height: 330px;
+      padding: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--line);
+      border-radius: 22px;
+      background: linear-gradient(160deg, var(--surface-solid), var(--brand-faint));
+      text-align: center;
+    }
+    .empty-main .empty-icon { width: 76px; height: 76px; display: grid; place-items: center; margin: 0 auto 15px; border-radius: 24px; color: var(--brand); background: var(--brand-soft); }
+    .empty-main h3 { margin: 0 0 8px; font-size: 22px; }
+    .empty-main p { max-width: 490px; margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .dock {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 60;
+      width: min(860px, calc(100vw - 28px));
+      min-height: var(--dock-h);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      padding: 9px 12px;
+      border: 1px solid rgba(150, 188, 179, .3);
+      border-radius: 25px;
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 48px rgba(31, 74, 65, .18);
+      transform: translateX(-50%);
+    }
+    html[data-theme="dark"] .dock { background: rgba(19, 40, 35, .94); }
+    .dock-item { min-height: 57px; border: 0; border-radius: 17px; color: #8796aa; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; font-size: 11px; font-weight: 800; }
+    .dock-item.active { color: var(--brand-dark); background: linear-gradient(135deg, #e0f8f2, #d5f2ec); }
+    html[data-theme="dark"] .dock-item.active { color: #64e5c4; background: var(--brand-soft); }
+    .dock-item svg { width: 21px; height: 21px; }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 116px;
+      z-index: 80;
+      max-width: 350px;
+      padding: 13px 15px;
+      border-radius: 14px;
+      color: #fff;
+      background: #172b27;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(25px);
+      transition: .25s ease;
+      font-size: 13px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+
+
+    /* Selección superior y separación general */
+    .selector-panel {
+      padding: 26px 28px 22px;
+      margin-bottom: 28px;
+      overflow: visible;
+    }
+    .selector-panel .section-head { margin-bottom: 20px; }
+    .selector-actions { display: flex; align-items: center; gap: 10px; }
+    .selection-limit {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .selector-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+    .selector-slot {
+      position: relative;
+      min-width: 0;
+      min-height: 82px;
+      padding: 17px 14px 12px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--surface-solid);
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .selector-slot:hover {
+      transform: translateY(-1px);
+      border-color: rgba(16, 152, 121, .38);
+      box-shadow: var(--shadow-soft);
+    }
+    .selector-slot.filled {
+      border-color: rgba(16, 152, 121, .48);
+      background: linear-gradient(145deg, var(--surface-solid), var(--brand-faint));
+    }
+    .slot-number {
+      position: absolute;
+      left: 12px;
+      top: -11px;
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--brand-dark);
+      background: var(--brand-soft);
+      border: 1px solid rgba(16, 152, 121, .12);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .vehicle-combobox {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) 28px;
+      align-items: center;
+      gap: 8px;
+    }
+    .vehicle-combobox svg { color: var(--brand-dark); }
+    .vehicle-search {
+      min-width: 0;
+      width: 100%;
+      height: 34px;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 760;
+    }
+    .vehicle-search::placeholder { color: #8998aa; font-weight: 600; }
+    .slot-clear {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 9px;
+      color: var(--muted);
+      background: var(--brand-faint);
+      font-size: 17px;
+      line-height: 1;
+    }
+    .slot-clear:hover { color: var(--danger); background: var(--danger-soft); }
+    .slot-arrow { color: var(--brand-dark); font-size: 15px; text-align: center; }
+    .slot-meta {
+      margin-top: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+    .load-error {
+      grid-column: 1 / -1;
+      padding: 18px;
+      border: 1px solid rgba(220, 95, 89, .28);
+      border-radius: 14px;
+      color: var(--danger);
+      background: var(--danger-soft);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .content { width: 100%; gap: 28px; }
+    #comparisonContent {
+      display: grid;
+      gap: 28px;
+      min-width: 0;
+    }
+    .summary-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .summary-card {
+      min-height: 112px;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      align-items: center;
+      column-gap: 12px;
+      padding: 18px;
+    }
+    .summary-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: var(--brand-dark);
+      background: var(--brand-soft);
+    }
+    .summary-icon svg { width: 22px; height: 22px; }
+    .summary-copy { min-width: 0; }
+    .summary-card .value { margin-top: 6px; }
+    .summary-card.empty .value { color: var(--muted); }
+    .summary-card.empty .winner { white-space: normal; line-height: 1.35; }
+    .visual-panel, .compare-panel { margin: 0; }
+    .visual-grid { gap: 24px; }
+    .chart-card { padding: 20px; }
+    .radar-empty-note {
+      margin-top: 4px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+    .values-empty {
+      min-height: 390px;
+      display: grid;
+      place-items: center;
+      padding: 26px;
+      text-align: center;
+    }
+    .values-empty .empty-icon {
+      width: 72px;
+      height: 72px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 14px;
+      border-radius: 24px;
+      color: var(--brand);
+      background: var(--brand-soft);
+    }
+    .values-empty strong { display: block; margin-bottom: 6px; font-size: 15px; }
+    .values-empty p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+
+
+    /* Integración visual EVUruguay */
+    .topbar, .dock { display: none !important; }
+    .shell { padding-bottom: 32px; }
+    body.has-ev-top-app-bar .shell { padding-top: 10px; }
+
+    .comparador-tool-header {
+      padding: 22px 18px 20px;
+      margin-bottom: var(--space);
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(45, 212, 168, 0.14), transparent 58%),
+        rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(22, 160, 122, 0.13);
+      box-shadow: 0 18px 44px rgba(6, 78, 59, 0.09);
+    }
+    html[data-theme="dark"] .comparador-tool-header {
+      background:
+        radial-gradient(circle at 50% 0%, rgba(45, 212, 168, 0.12), transparent 58%),
+        rgba(5, 5, 5, 0.72);
+      border-color: rgba(45, 212, 168, 0.14);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+    }
+    .comparador-tool-header .ev-heading {
+      max-width: 860px;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+    }
+    .comparador-tool-header .ev-subtitle {
+      max-width: 720px;
+      font-size: clamp(0.98rem, 2.4vw, 1.18rem);
+      line-height: 1.55;
+      color: var(--color-text-secondary, #64746d);
+    }
+    .comparador-tool-header .ev-tool-description {
+      max-width: 760px;
+      margin-top: 8px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--color-text-tertiary, #7c8a83);
+    }
+    .comparador-tool-header .ev-pill-row {
+      justify-content: center;
+      margin-inline: auto;
+    }
+
+    .vehicle-select { display: none; }
+    .mobile-compare-wrap { display: none; }
+    .desktop-compare-wrap { display: block; }
+    .compare-matrix {
+      min-width: max(560px, calc(var(--selected-count, 1) * 155px));
+      table-layout: fixed;
+    }
+    .compare-matrix thead th,
+    .compare-matrix tbody td,
+    .compare-matrix thead th:first-child,
+    .compare-matrix tbody td:first-child {
+      position: static;
+      min-width: 145px;
+      text-align: center;
+      background: var(--surface-solid);
+    }
+    .compare-matrix thead th {
+      position: sticky;
+      top: 0;
+      background: var(--brand-faint);
+    }
+    .compare-matrix .attribute-row td {
+      padding: 9px 12px;
+      color: var(--brand-dark);
+      background: var(--brand-soft) !important;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .compare-matrix .values-row td {
+      font-size: 13px;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+    }
+    .compare-matrix .best-cell::after {
+      content: " ★";
+      display: inline;
+      margin-left: 3px;
+      padding: 0;
+      color: var(--brand-dark);
+      background: transparent;
+      font-size: 10px;
+    }
+    .compare-matrix .section-row td {
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--brand-faint), var(--surface-solid)) !important;
+      font-size: 11px;
+      letter-spacing: .12em;
+    }
+
+    @media (max-width: 760px) {
+      .vehicle-combobox { grid-template-columns: 24px minmax(0, 1fr) 28px; }
+      .vehicle-search { display: none; }
+      .vehicle-select {
+        display: block;
+        min-width: 0;
+        width: 100%;
+        height: 38px;
+        border: 0;
+        outline: 0;
+        color: var(--ink);
+        background: transparent;
+        font-size: 13px;
+        font-weight: 760;
+        appearance: none;
+      }
+      .compare-panel { padding: 14px; }
+      .desktop-compare-wrap { display: none; }
+      .mobile-compare-wrap { display: block; }
+      .compare-matrix { min-width: max(420px, calc(var(--selected-count, 1) * 120px)); }
+      .compare-matrix thead th,
+      .compare-matrix tbody td,
+      .compare-matrix thead th:first-child,
+      .compare-matrix tbody td:first-child {
+        min-width: 118px;
+        padding: 11px 9px;
+        font-size: 12px;
+      }
+      .compare-matrix .attribute-row td {
+        padding: 8px 10px;
+        font-size: 9px;
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .selector-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 20px; }
+      .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .selector-panel { padding: 22px 18px 18px; }
+      .selector-panel .section-head { flex-direction: column; }
+      .selector-actions { width: 100%; justify-content: space-between; }
+      .selector-grid { grid-template-columns: 1fr 1fr; }
+      .summary-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .summary-card { min-height: 102px; padding: 15px; }
+    }
+
+    @media (max-width: 480px) {
+      .selector-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .summary-card { min-height: 92px; }
+    }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: 320px minmax(0, 1fr); }
+      .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .visual-grid { grid-template-columns: 1fr; }
+      .radar-wrap { min-height: 360px; }
+    }
+
+    @media (max-width: 860px) {
+      body { padding-bottom: 98px; }
+      .topbar { height: 68px; }
+      .topbar-inner { padding: 0 15px; }
+      .brand-mark { width: 44px; height: 44px; border-radius: 14px; }
+      .shell { padding: 16px 13px 0; }
+      .hero { padding: 23px 20px; }
+      .workspace { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .vehicle-list { max-height: 360px; }
+      .selected-strip { grid-template-columns: repeat(5, 190px); }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dock { min-height: 70px; padding: 7px; bottom: 10px; border-radius: 22px; }
+      .dock-item { min-height: 54px; }
+      .dock-item span { display: none; }
+      .dock-item svg { width: 23px; height: 23px; }
+    }
+
+    @media (max-width: 560px) {
+      .brand { font-size: 22px; gap: 10px; }
+      .field-row { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .summary-card { padding: 13px; }
+      .summary-card .value { font-size: 18px; }
+      .sidebar, .selected-panel, .visual-panel, .compare-panel { padding: 14px; border-radius: 22px; }
+      .visual-grid { display: block; }
+      .chart-card + .chart-card { margin-top: 12px; }
+      .radar-wrap { min-height: 310px; }
+      .radar-label { font-size: 10px; }
+      h1 { letter-spacing: -1.3px; }
+    }
+  </style>
+</head>
+<body class="comparador-page">
+  <div class="ad-banner-wrap ad-top">
+    <span class="ad-label">Publicidad</span>
+    <div class="ad-slot">
+      <a href="#" data-ad-whatsapp="top" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="EV Uruguay">
+        <span class="brand-mark">EV</span>
+        <span>EVUruguay</span>
+      </div>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 7.5A9 9 0 1 1 12 3Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <header class="panel hero app-header ev-page-header ev-tool-header comparador-tool-header">
+      <a href="/" class="ev-brand ev-brand-centered" aria-label="Ir al inicio de EVUruguay">
+        <div class="ev-brand-logo">EV</div>
+        <div class="ev-brand-text">EV<span>Uruguay</span></div>
+      </a>
+      <p class="ev-overline">Comparador EV 2026</p>
+      <h1 class="ev-heading ev-heading-xl">Comparador de vehículos eléctricos</h1>
+      <p class="ev-subtitle">Compará hasta cinco modelos.</p>
+      <p class="ev-tool-description">Los datos han sido recopilados de sitios públicos de internet, esta herramienta sirve a modo orientativo, verificar siempre la ficha oficial de cada vehículo en el sitio del fabricante.</p>
+      <div class="ev-chip-row ev-pill-row" aria-label="Características del comparador">
+        <div class="ev-pill">Hasta <strong>5 modelos</strong></div>
+        <div class="ev-pill">Datos <strong>EVUruguay</strong></div>
+        <div class="ev-pill">Compartí <strong>tu comparativa</strong></div>
+      </div>
+    </header>
+
+
+    <section class="panel selector-panel">
+      <div class="section-head">
+        <div>
+          <h2>Seleccioná hasta 5 vehículos</h2>
+          <p>Buscá y agregá los modelos que querés comparar. No se selecciona ninguno por defecto.</p>
+        </div>
+        <div class="selector-actions">
+          <span class="selection-limit"><span id="selectedCount">0</span> de 5 seleccionados</span>
+          <button id="shareBtn" class="share-btn" type="button" disabled>Compartir</button>
+          <button id="clearBtn" class="clear-btn" type="button">Limpiar todo</button>
+        </div>
+      </div>
+
+      <datalist id="vehicleOptions"></datalist>
+      <div class="selector-grid" id="selectorGrid" aria-live="polite"></div>
+    </section>
+
+    <div class="content">
+      <div id="comparisonContent"></div>
+    </div>
+
+    <div class="ad-banner-wrap ad-bottom">
+      <div class="ad-slot">
+        <a href="#" data-ad-whatsapp="bottom" aria-label="Anunciate en EVUruguay">
+          <img src="/img/publicidad2.png" alt="Anunciate en EVUruguay" loading="lazy" />
+        </a>
+      </div>
+      <span class="ad-label">Publicidad</span>
+    </div>
+  </main>
+
+  <nav class="dock" aria-label="Navegación principal">
+    <button class="dock-item" type="button" aria-label="Inicio"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.5 12 4l9 7.5V21h-6v-6H9v6H3z"/></svg><span>Inicio</span></button>
+    <button class="dock-item" type="button" aria-label="Redes"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.1 7 13 7 13s7-7.9 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg><span>Redes</span></button>
+    <button class="dock-item active" type="button" aria-current="page" aria-label="Comparar EV"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11 6.5 6h11L19 11l2 2v6h-2v2h-3v-2H8v2H5v-2H3v-6l2-2Zm2.7-3L7 11h10l-.7-3H7.7ZM7 16a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg><span>Comparar EV</span></button>
+    <button class="dock-item" type="button" aria-label="Instalación"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m14.7 6.3 3-3a5 5 0 0 1-6.4 6.4l-7.8 7.8a2.1 2.1 0 0 0 3 3l7.8-7.8a5 5 0 0 1 6.4-6.4l-3 3-3-3Z"/></svg><span>Instalación</span></button>
+    <button class="dock-item" type="button" aria-label="Brújula"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm3.6 5.4-2.2 6-6 2.2 2.2-6 6-2.2ZM12 10.8a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z"/></svg><span>Brújula</span></button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const CSV_FILE = 'vehiculos2026.csv';
+    const MAX_SELECTED = 5;
+    const SHARE_PARAM = 'modelo';
+    const RADAR_COLORS = ['#109879', '#3977c7', '#e08b3e', '#9a65c7', '#d55467'];
+
+    const state = { vehicles: [], attributes: [], selected: [], loaded: false, metricBounds: {} };
+    const $ = (id) => document.getElementById(id);
+    const norm = (s) => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const asNumber = (value) => {
+      if (typeof value === 'number' && Number.isFinite(value)) return value;
+      const match = String(value ?? '').replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+      return match ? Number(match[0]) : null;
+    };
+    const money = (n) => Number.isFinite(n) ? `USD ${Math.round(n).toLocaleString('es-UY')}` : '—';
+    const valueOrDash = (v) => (v === null || v === undefined || String(v).trim() === '') ? '—' : String(v);
+    const escapeHtml = (s) => String(s ?? '').replace(/[&<>'"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]));
+
+    function sharedVehicleNamesFromUrl() {
+      const params = new URLSearchParams(window.location.search || '');
+      const repeated = params.getAll(SHARE_PARAM).map(v => String(v || '').trim()).filter(Boolean);
+      if (repeated.length) return repeated.slice(0, MAX_SELECTED);
+
+      // Compatibilidad por si en el futuro se comparte una lista compacta.
+      const compact = String(params.get('modelos') || '').trim();
+      return compact ? compact.split('|').map(v => v.trim()).filter(Boolean).slice(0, MAX_SELECTED) : [];
+    }
+
+    function shareUrlForSelection() {
+      const url = new URL(window.location.href);
+      url.searchParams.delete(SHARE_PARAM);
+      url.searchParams.delete('modelos');
+      // Los nombres de los modelos cambian con frecuencia en la planilla (mayúsculas,
+      // espacios y versiones). Compartir el identificador de la columna evita que esos
+      // cambios de texto dejen una comparación sin vehículos al abrir el enlace.
+      state.selected.forEach(vehicle => url.searchParams.append(SHARE_PARAM, vehicle.id));
+      return url;
+    }
+
+    function vehicleFromSharedValue(value, vehicles) {
+      const normalized = norm(value);
+      // Los enlaces nuevos usan el identificador estable de la columna. Se mantiene la
+      // búsqueda por nombre para que los enlaces que ya se compartieron sigan funcionando.
+      return vehicles.find(vehicle => vehicle.id === value) ||
+        vehicles.find(vehicle => norm(vehicle.name) === normalized);
+    }
+
+    function syncShareUrl() {
+      if (!state.loaded || !window.history?.replaceState) return;
+      const url = shareUrlForSelection();
+      window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+    }
+
+    function findAttr(obj, names) {
+      const keys = Object.keys(obj.data);
+      for (const name of names) {
+        const target = norm(name);
+        const exact = keys.find(k => norm(k) === target);
+        if (exact) return obj.data[exact];
+        const partial = keys.find(k => norm(k).includes(target));
+        if (partial) return obj.data[partial];
+      }
+      return null;
+    }
+
+    const METRIC_ALIASES = {
+      price: ['Precio USD', 'Precio'],
+      range: ['Autonomía WLTP', 'Autonomía Ciclo WLTP', 'Autonomía'],
+      battery: ['Capacidad de Batería', 'Batería en KW', 'Capacidad batería', 'Batería'],
+      power: ['Potencia', 'Potencia máxima'],
+      trunk: ['Capacidad del Baúl', 'Baúl en litros', 'Baul en litros', 'Capacidad de Baúl', 'Baúl'],
+      score: ['PUNTUACION', 'Puntuación']
+    };
+
+    function derived(v) {
+      const price = asNumber(findAttr(v, METRIC_ALIASES.price));
+      const range = asNumber(findAttr(v, METRIC_ALIASES.range));
+      const battery = asNumber(findAttr(v, METRIC_ALIASES.battery));
+      const power = asNumber(findAttr(v, METRIC_ALIASES.power));
+      const trunk = asNumber(findAttr(v, METRIC_ALIASES.trunk));
+      const score = asNumber(findAttr(v, METRIC_ALIASES.score));
+      const efficiency = range && battery ? range / battery : null;
+      return { price, range, battery, power, trunk, score, efficiency };
+    }
+
+    function carSvg() {
+      return `<svg viewBox="0 0 24 24" width="23" height="23" fill="currentColor"><path d="M5 11 6.5 6h11L19 11l2 2v6h-2v2h-3v-2H8v2H5v-2H3v-6l2-2Zm2.7-3L7 11h10l-.7-3H7.7ZM7 16a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>`;
+    }
+
+    function detectCsvDelimiter(text) {
+      const firstLine = String(text || '').replace(/^\uFEFF/, '').split(/\r?\n/, 1)[0] || '';
+      let commas = 0, semicolons = 0, quoted = false;
+      for (let i = 0; i < firstLine.length; i++) {
+        const ch = firstLine[i];
+        if (ch === '"') {
+          if (quoted && firstLine[i + 1] === '"') i++;
+          else quoted = !quoted;
+        } else if (!quoted && ch === ',') commas++;
+        else if (!quoted && ch === ';') semicolons++;
+      }
+      return semicolons > commas ? ';' : ',';
+    }
+
+    function readCsvRows(text) {
+      text = String(text || '').replace(/^\uFEFF/, '');
+      const delimiter = detectCsvDelimiter(text);
+      const rows = [];
+      let row = [];
+      let field = '';
+      let quoted = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+
+        if (quoted) {
+          if (ch === '"') {
+            if (text[i + 1] === '"') {
+              field += '"';
+              i++;
+            } else {
+              quoted = false;
+            }
+          } else {
+            field += ch;
+          }
+          continue;
+        }
+
+        if (ch === '"') {
+          quoted = true;
+        } else if (ch === delimiter) {
+          row.push(field);
+          field = '';
+        } else if (ch === '\n') {
+          row.push(field.replace(/\r$/, ''));
+          rows.push(row);
+          row = [];
+          field = '';
+        } else {
+          field += ch;
+        }
+      }
+
+      if (field.length || row.length) {
+        row.push(field.replace(/\r$/, ''));
+        rows.push(row);
+      }
+
+      while (rows.length && rows[rows.length - 1].every(value => !String(value).trim())) rows.pop();
+      return rows;
+    }
+
+    function applyRows(rows) {
+      if (!rows?.length || !rows[0] || rows[0].length < 2) throw new Error('La planilla no tiene el formato esperado');
+
+      const attributes = [];
+      for (let r = 1; r < rows.length; r++) {
+        const label = rows[r]?.[0];
+        if (label !== null && label !== undefined && String(label).trim()) attributes.push(String(label).trim());
+      }
+
+      const vehicles = [];
+      for (let c = 1; c < rows[0].length; c++) {
+        const name = rows[0][c];
+        if (!name) continue;
+        const data = {};
+        for (let r = 1; r < rows.length; r++) {
+          const label = rows[r]?.[0];
+          if (label === null || label === undefined || !String(label).trim()) continue;
+          data[String(label).trim()] = rows[r]?.[c] ?? null;
+        }
+        const vehicle = { id: `v-${c}`, name: String(name).trim(), data };
+        vehicle.metrics = derived(vehicle);
+        vehicle.segment = valueOrDash(findAttr(vehicle, ['Segmento']));
+        vehicles.push(vehicle);
+      }
+
+      state.vehicles = vehicles;
+      state.attributes = attributes;
+      state.loaded = true;
+      state.metricBounds = calculateMetricBounds(vehicles);
+
+      const previousNames = state.selected.map(v => v.name);
+      const sharedNames = sharedVehicleNamesFromUrl();
+      const namesToRestore = previousNames.length ? previousNames : sharedNames;
+      state.selected = namesToRestore
+        .map(name => vehicleFromSharedValue(name, vehicles))
+        .filter(Boolean)
+        .slice(0, MAX_SELECTED);
+
+      renderAll();
+    }
+
+    function calculateMetricBounds(vehicles) {
+      const result = {};
+      for (const metric of ['battery', 'trunk', 'range', 'price', 'power']) {
+        const values = vehicles.map(v => v.metrics[metric]).filter(Number.isFinite).sort((a, b) => a - b);
+        if (!values.length) { result[metric] = { min: 0, max: 1 }; continue; }
+        const lowIndex = Math.floor((values.length - 1) * .03);
+        const highIndex = Math.ceil((values.length - 1) * .97);
+        result[metric] = { min: values[lowIndex], max: values[highIndex] };
+      }
+      return result;
+    }
+
+    async function loadDefaultFile() {
+      try {
+        const response = await fetch(CSV_FILE, { cache: 'default' });
+        if (!response.ok) throw new Error('No se pudieron obtener los datos');
+        const text = await response.text();
+
+        // Entrega un frame al navegador antes de procesar para mantener la interfaz fluida.
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const rows = readCsvRows(text);
+        applyRows(rows);
+      } catch (error) {
+        console.error('Error al iniciar el comparador:', error);
+        $('selectorGrid').innerHTML = '<div class="load-error">No se pudieron cargar los modelos. Verificá que todos los archivos del sitio estén publicados en la misma carpeta.</div>';
+        $('clearBtn').disabled = true;
+      }
+    }
+
+    function populateFilters() {
+      const current = $('segmentFilter').value;
+      const segments = [...new Set(state.vehicles.map(v => v.segment).filter(s => s && s !== '—'))].sort((a, b) => a.localeCompare(b, 'es'));
+      $('segmentFilter').innerHTML = '<option value="">Todos</option>' + segments.map(s => `<option>${escapeHtml(s)}</option>`).join('');
+      if (segments.includes(current)) $('segmentFilter').value = current;
+    }
+
+    function filteredVehicles() {
+      const q = norm($('searchInput').value);
+      const segment = $('segmentFilter').value;
+      const maxPriceRaw = $('maxPriceFilter').value.trim();
+      const minRangeRaw = $('minRangeFilter').value.trim();
+      const maxPrice = Number(maxPriceRaw);
+      const minRange = Number(minRangeRaw);
+      const sort = $('sortSelect').value;
+
+      const list = state.vehicles.filter(v => {
+        const m = v.metrics;
+        return (!q || norm(v.name).includes(q)) &&
+          (!segment || v.segment === segment) &&
+          (!maxPriceRaw || (m.price !== null && m.price <= maxPrice)) &&
+          (!minRangeRaw || (m.range !== null && m.range >= minRange));
+      });
+
+      const nullLast = (val, fallback) => val === null ? fallback : val;
+      list.sort((a, b) => {
+        if (sort === 'priceAsc') return nullLast(a.metrics.price, Infinity) - nullLast(b.metrics.price, Infinity);
+        if (sort === 'rangeDesc') return nullLast(b.metrics.range, -Infinity) - nullLast(a.metrics.range, -Infinity);
+        if (sort === 'batteryDesc') return nullLast(b.metrics.battery, -Infinity) - nullLast(a.metrics.battery, -Infinity);
+        if (sort === 'scoreDesc') return nullLast(b.metrics.score, -Infinity) - nullLast(a.metrics.score, -Infinity);
+        return a.name.localeCompare(b.name, 'es');
+      });
+      return list;
+    }
+
+
+    function renderSelectors() {
+      if (!state.loaded) {
+        $('shareBtn').disabled = true;
+        $('clearBtn').disabled = true;
+        $('selectorGrid').innerHTML = Array.from({ length: MAX_SELECTED }, (_, i) => `
+          <div class="selector-slot">
+            <span class="slot-number">${i + 1}</span>
+            <div class="vehicle-combobox">
+              <span>${carSvg()}</span>
+              <input class="vehicle-search" type="text" placeholder="Preparando comparador…" disabled />
+              <span class="slot-arrow">⌄</span>
+            </div>
+          </div>`).join('');
+        return;
+      }
+
+      $('selectedCount').textContent = state.selected.length;
+      $('clearBtn').disabled = state.selected.length === 0;
+      $('shareBtn').disabled = state.selected.length === 0;
+      $('vehicleOptions').innerHTML = state.vehicles
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name, 'es'))
+        .map(v => `<option value="${escapeHtml(v.name)}"></option>`)
+        .join('');
+
+      $('selectorGrid').innerHTML = Array.from({ length: MAX_SELECTED }, (_, i) => {
+        const vehicle = state.selected[i] || null;
+        const meta = vehicle
+          ? [vehicle.segment !== '—' ? vehicle.segment : null, Number.isFinite(vehicle.metrics.range) ? `${vehicle.metrics.range} km WLTP` : null, Number.isFinite(vehicle.metrics.price) ? money(vehicle.metrics.price) : null].filter(Boolean).join(' · ')
+          : 'Escribí para buscar en el listado';
+        return `<div class="selector-slot ${vehicle ? 'filled' : ''}">
+          <span class="slot-number">${i + 1}</span>
+          <div class="vehicle-combobox">
+            <span aria-hidden="true">${carSvg()}</span>
+            <input
+              class="vehicle-search"
+              type="text"
+              list="vehicleOptions"
+              value="${vehicle ? escapeHtml(vehicle.name) : ''}"
+              placeholder="Buscar vehículo"
+              aria-label="Seleccionar vehículo ${i + 1}"
+              autocomplete="off"
+              onfocus="this.select()"
+              onchange="chooseVehicleSlot(${i}, this.value)"
+            />
+            <select
+              class="vehicle-select"
+              aria-label="Seleccionar vehículo ${i + 1}"
+              onchange="chooseVehicleSlot(${i}, this.value)"
+            >
+              <option value="">Seleccionar vehículo</option>
+              ${state.vehicles.slice().sort((a, b) => a.name.localeCompare(b.name, 'es')).map(optionVehicle => `<option value="${escapeHtml(optionVehicle.name)}" ${vehicle && optionVehicle.id === vehicle.id ? 'selected' : ''}>${escapeHtml(optionVehicle.name)}</option>`).join('')}
+            </select>
+            ${vehicle
+              ? `<button class="slot-clear" type="button" aria-label="Quitar ${escapeHtml(vehicle.name)}" onclick="removeVehicleSlot(${i})">×</button>`
+              : '<span class="slot-arrow" aria-hidden="true">⌄</span>'}
+          </div>
+          <div class="slot-meta">${escapeHtml(meta)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function chooseVehicleSlot(index, rawValue) {
+      const value = String(rawValue || '').trim();
+      if (!value) {
+        if (index < state.selected.length) state.selected.splice(index, 1);
+        renderAll();
+        return;
+      }
+
+      const vehicle = state.vehicles.find(v => norm(v.name) === norm(value));
+      if (!vehicle) {
+        showToast('Elegí un modelo del listado.');
+        renderSelectors();
+        return;
+      }
+
+      const duplicateIndex = state.selected.findIndex(v => v.id === vehicle.id);
+      if (duplicateIndex >= 0 && duplicateIndex !== index) {
+        showToast('Ese modelo ya está incluido en la comparación.');
+        renderSelectors();
+        return;
+      }
+
+      if (index < state.selected.length) state.selected[index] = vehicle;
+      else if (state.selected.length < MAX_SELECTED) state.selected.push(vehicle);
+      renderAll();
+    }
+
+    function removeVehicleSlot(index) {
+      if (index >= 0 && index < state.selected.length) state.selected.splice(index, 1);
+      renderAll();
+    }
+    window.chooseVehicleSlot = chooseVehicleSlot;
+    window.removeVehicleSlot = removeVehicleSlot;
+
+    function renderVehicleList() {
+      if (!state.loaded) return;
+      const list = filteredVehicles();
+      const selectedIds = new Set(state.selected.map(v => v.id));
+      $('vehicleList').innerHTML = list.length ? list.map(v => {
+        const isSelected = selectedIds.has(v.id);
+        const m = v.metrics;
+        const meta = [v.segment !== '—' ? v.segment : null, m.range ? `${m.range} km` : null, m.price ? money(m.price) : null].filter(Boolean).join(' · ');
+        return `<article class="vehicle-item ${isSelected ? 'selected' : ''}">
+          <div class="car-mark">${carSvg()}</div>
+          <div><div class="vehicle-name">${escapeHtml(v.name)}</div><div class="vehicle-meta">${escapeHtml(meta || 'Sin datos resumidos')}</div></div>
+          <button class="add-btn" type="button" aria-label="${isSelected ? 'Quitar' : 'Agregar'} ${escapeHtml(v.name)}" onclick="toggleVehicle('${v.id}')">${isSelected ? '−' : '+'}</button>
+        </article>`;
+      }).join('') : '<div class="empty-strip">No encontramos modelos con esos filtros.</div>';
+    }
+
+    function toggleVehicle(id) {
+      const index = state.selected.findIndex(v => v.id === id);
+      if (index >= 0) state.selected.splice(index, 1);
+      else {
+        if (state.selected.length >= MAX_SELECTED) return showToast('Podés comparar hasta 5 vehículos a la vez.');
+        const vehicle = state.vehicles.find(v => v.id === id);
+        if (vehicle) state.selected.push(vehicle);
+      }
+      renderAll();
+    }
+    window.toggleVehicle = toggleVehicle;
+
+    function renderSelectedStrip() {
+      $('selectedCount').textContent = state.selected.length;
+      if (!state.selected.length) {
+        $('selectedStrip').innerHTML = '<div class="empty-strip">Todavía no seleccionaste modelos.</div>';
+        return;
+      }
+      $('selectedStrip').innerHTML = state.selected.map(v => `<div class="selected-chip">
+        <div><strong>${escapeHtml(v.name)}</strong><small>${escapeHtml(v.segment)} · ${v.metrics.range ? `${v.metrics.range} km WLTP` : 'Autonomía s/d'}</small></div>
+        <button class="remove-btn" type="button" aria-label="Quitar ${escapeHtml(v.name)}" onclick="toggleVehicle('${v.id}')">×</button>
+      </div>`).join('');
+    }
+
+    function metricWinner(metric, direction = 'max') {
+      const candidates = state.selected.filter(v => Number.isFinite(v.metrics[metric]));
+      if (!candidates.length) return null;
+      return candidates.reduce((best, v) => !best || (direction === 'min' ? v.metrics[metric] < best.metrics[metric] : v.metrics[metric] > best.metrics[metric]) ? v : best, null);
+    }
+
+    function metricIcon(metric) {
+      const icons = {
+        price: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 13 13 20l-9-9V4h7l9 9Z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>',
+        range: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 20 8 4M20 20 16 4M12 20V4"/><path d="M11 8h2M11 13h2M11 18h2"/></svg>',
+        battery: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="7" y="4" width="10" height="17" rx="2"/><path d="M10 2h4M10 8h4M10 12h4M10 16h4"/></svg>',
+        trunk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 15h16M6 15l1-6h10l1 6M8 9l1-3h6l1 3M6 19v-4M18 19v-4"/><circle cx="7.5" cy="17" r="1"/><circle cx="16.5" cy="17" r="1"/></svg>',
+        power: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/></svg>'
+      };
+      return icons[metric] || carSvg();
+    }
+
+    function summaryCard(label, metric, format, direction = 'max') {
+      const winner = metricWinner(metric, direction);
+      return `<div class="summary-card ${winner ? '' : 'empty'}">
+        <div class="summary-icon">${metricIcon(metric)}</div>
+        <div class="summary-copy">
+          <div class="label">${label}</div>
+          <div class="value">${winner ? format(winner.metrics[metric]) : '—'}</div>
+          <div class="winner">${winner ? escapeHtml(winner.name) : 'Agregá vehículos para ver el dato'}</div>
+        </div>
+      </div>`;
+    }
+
+    function miniChart(title, unit, metric, formatter, direction = 'max') {
+      const values = state.selected.map(v => ({ v, n: v.metrics[metric] })).filter(x => Number.isFinite(x.n));
+      const max = Math.max(...values.map(x => x.n), 1);
+      const best = values.length ? values.reduce((a, b) => direction === 'min' ? (b.n < a.n ? b : a) : (b.n > a.n ? b : a)) : null;
+      return `<div class="mini-chart"><div class="mini-chart-head"><strong>${title}</strong><span>${unit}</span></div><div class="bars">${values.length ? values.map(({ v, n }) => `<div class="bar-row"><div class="bar-label"><span>${escapeHtml(v.name)}</span><b>${formatter(n)}${best && best.v.id === v.id ? ' ★' : ''}</b></div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(3, (n / max) * 100)}%"></div></div></div>`).join('') : '<div class="empty-strip">Sin datos</div>'}</div></div>`;
+    }
+
+    function radarScore(vehicle, metric) {
+      const value = vehicle.metrics[metric];
+      if (!Number.isFinite(value)) return 0;
+      const bounds = state.metricBounds[metric] || { min: 0, max: 1 };
+      if (bounds.max === bounds.min) return 50;
+      let score = ((value - bounds.min) / (bounds.max - bounds.min)) * 100;
+      score = Math.max(0, Math.min(100, score));
+      return metric === 'price' ? 100 - score : score;
+    }
+
+    function polarPoint(cx, cy, radius, index, count = 5) {
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / count;
+      return { x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius };
+    }
+
+    function pointsString(points) { return points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '); }
+
+    function renderRadar() {
+      const metrics = [
+        { key: 'battery', label: 'Batería' },
+        { key: 'trunk', label: 'Baúl' },
+        { key: 'range', label: 'Autonomía' },
+        { key: 'price', label: 'Precio' },
+        { key: 'power', label: 'Potencia' }
+      ];
+      const cx = 270, cy = 205, radius = 145;
+      const rings = [25, 50, 75, 100].map(level => {
+        const pts = metrics.map((_, i) => polarPoint(cx, cy, radius * level / 100, i));
+        return `<polygon class="radar-grid" points="${pointsString(pts)}"/>`;
+      }).join('');
+      const axes = metrics.map((_, i) => {
+        const p = polarPoint(cx, cy, radius, i);
+        return `<line class="radar-axis" x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}"/>`;
+      }).join('');
+      const labels = metrics.map((metric, i) => {
+        const p = polarPoint(cx, cy, radius + 34, i);
+        const anchor = p.x < cx - 8 ? 'end' : p.x > cx + 8 ? 'start' : 'middle';
+        const yAdjust = i === 0 ? -3 : 4;
+        return `<text class="radar-label" x="${p.x}" y="${p.y + yAdjust}" text-anchor="${anchor}">${metric.label}</text>`;
+      }).join('');
+      const shapes = state.selected.map((vehicle, vi) => {
+        const color = RADAR_COLORS[vi % RADAR_COLORS.length];
+        const pts = metrics.map((metric, i) => polarPoint(cx, cy, radius * radarScore(vehicle, metric.key) / 100, i));
+        const points = pts.map(p => `<circle class="radar-point" cx="${p.x}" cy="${p.y}" r="3.5" fill="${color}" stroke="var(--surface-solid)"/>`).join('');
+        return `<polygon class="radar-shape" points="${pointsString(pts)}" fill="${color}" stroke="${color}"/>${points}`;
+      }).join('');
+      const legend = state.selected.map((vehicle, i) => `<div class="legend-item"><span class="legend-dot" style="background:${RADAR_COLORS[i % RADAR_COLORS.length]}"></span><span>${escapeHtml(vehicle.name)}</span></div>`).join('');
+
+      return `<article class="chart-card"><div class="chart-title"><div><strong>Perfil comparativo</strong><div style="margin-top:4px;color:var(--muted);font-size:11px">Valores normalizados sobre toda la planilla</div></div><span>En precio, más alto significa más accesible</span></div><div class="radar-wrap"><svg class="radar-svg" viewBox="0 0 540 420" role="img" aria-label="Gráfico pentagonal comparativo">${rings}${axes}<text class="radar-scale" x="${cx + 4}" y="${cy - radius * .5}">50</text><text class="radar-scale" x="${cx + 4}" y="${cy - radius}">100</text>${shapes}${labels}</svg></div>${state.selected.length ? `<div class="radar-legend">${legend}</div>` : '<div class="radar-empty-note">Agregá vehículos para ver el perfil comparativo.</div>'}</article>`;
+    }
+
+    const sectionNames = new Set([
+      'MEDIDAS Y PESO',
+      'CARACTERÍSTICAS EV',
+      'MOTOR Y TRACCIÓN',
+      'EQUIPAMIENTO',
+      'ADAS Y SEGURIDAD',
+      'CRASH TEST',
+      // Compatibilidad con versiones anteriores de la planilla.
+      'ADAS'
+    ].map(norm));
+
+    const rowRules = {};
+    function registerRowRule(names, rule) {
+      names.forEach(name => { rowRules[norm(name)] = rule; });
+    }
+
+    registerRowRule(['Precio USD', 'Precio'], { metric: 'price', direction: 'min' });
+    registerRowRule(['Autonomía WLTP', 'Autonomía Ciclo WLTP', 'Autonomía'], { metric: 'range', direction: 'max' });
+    registerRowRule(['Capacidad de Batería', 'Batería en KW', 'Capacidad batería'], { metric: 'battery', direction: 'max' });
+    registerRowRule(['Potencia', 'Potencia máxima'], { metric: 'power', direction: 'max' });
+    registerRowRule(['Capacidad del Baúl', 'Baúl en litros', 'Baul en litros', 'Capacidad de Baúl'], { metric: 'trunk', direction: 'max' });
+    registerRowRule(['Airbags'], { direction: 'max', parse: asNumber });
+    registerRowRule(['Velocidad de Carga DC', 'Carga DC'], { direction: 'max', parse: asNumber });
+    registerRowRule(['Velocidad de Carga AC', 'Carga AC'], { direction: 'max', parse: asNumber });
+    registerRowRule(['Aceleración 0 a 100', '0 a 100 km/h'], { direction: 'min', parse: asNumber });
+    registerRowRule(['PUNTUACION', 'Puntuación'], { metric: 'score', direction: 'max' });
+
+    function bestIndicesForAttribute(attr) {
+      const rule = rowRules[norm(attr)];
+      if (!rule) return new Set();
+      const vals = state.selected.map((v, i) => {
+        const n = rule.metric ? v.metrics[rule.metric] : (rule.parse || asNumber)(v.data[attr]);
+        return { i, n };
+      }).filter(x => Number.isFinite(x.n));
+      if (!vals.length) return new Set();
+      const target = rule.direction === 'min' ? Math.min(...vals.map(x => x.n)) : Math.max(...vals.map(x => x.n));
+      return new Set(vals.filter(x => x.n === target).map(x => x.i));
+    }
+
+    function formatCellValue(value, emptyAsNo = false) {
+      if (value === null || value === undefined || String(value).trim() === '') {
+        return emptyAsNo ? '<span class="boolean-badge no" title="No" aria-label="No">×</span>' : '—';
+      }
+      const normalized = norm(value);
+      if (['si', 'sí', 'yes', 'true'].includes(normalized)) return '<span class="boolean-badge yes" title="Sí" aria-label="Sí">✓</span>';
+      if (['no', 'false'].includes(normalized)) return '<span class="boolean-badge no" title="No" aria-label="No">×</span>';
+      return escapeHtml(value);
+    }
+
+    function emptyCellsShouldBeNo(sectionName) {
+      const section = norm(sectionName);
+      return section === norm('EQUIPAMIENTO') || section === norm('ADAS Y SEGURIDAD') || section === norm('ADAS');
+    }
+
+    function renderComparison() {
+      const summary = `<section class="summary-grid">
+        ${summaryCard('Menor precio', 'price', money, 'min')}
+        ${summaryCard('Mayor autonomía', 'range', n => `${n} km`)}
+        ${summaryCard('Mayor batería', 'battery', n => `${n} kWh`)}
+        ${summaryCard('Mayor baúl', 'trunk', n => `${n} L`)}
+        ${summaryCard('Mayor potencia', 'power', n => `${n} cv`)}
+      </section>`;
+
+      const valuesCard = state.selected.length
+        ? `<article class="chart-card"><div class="chart-title"><strong>Valores principales</strong><span>La estrella indica el mejor resultado</span></div><div class="bars-stack">${miniChart('Precio', 'USD', 'price', money, 'min')}${miniChart('Autonomía WLTP', 'km', 'range', n => `${n} km`)}${miniChart('Capacidad de batería', 'kWh', 'battery', n => `${n} kWh`)}</div></article>`
+        : `<article class="chart-card values-empty"><div><div class="empty-icon">${carSvg()}</div><strong>Aún no hay vehículos para comparar</strong><p>Agregá hasta cinco modelos desde el panel superior para ver los valores detallados.</p></div></article>`;
+
+      const visuals = `<section class="panel visual-panel"><div class="section-head"><div><h2>Comparación visual</h2><p>El pentágono equilibra cinco aspectos clave; los gráficos de barras muestran los valores reales.</p></div></div><div class="visual-grid">${renderRadar()}${valuesCard}</div></section>`;
+
+      if (!state.selected.length) {
+        $('comparisonContent').innerHTML = summary + visuals;
+        return;
+      }
+
+      const mostEfficient = metricWinner('efficiency', 'max');
+      let desktopRowsHtml = '';
+      let mobileRowsHtml = '';
+      let currentSection = '';
+
+      for (const attr of state.attributes) {
+        if (sectionNames.has(norm(attr))) {
+          currentSection = attr;
+          desktopRowsHtml += `<tr class="group-row"><td colspan="${state.selected.length + 1}">${escapeHtml(attr)}</td></tr>`;
+          mobileRowsHtml += `<tr class="attribute-row section-row"><td colspan="${state.selected.length}">${escapeHtml(attr)}</td></tr>`;
+          continue;
+        }
+
+        const best = bestIndicesForAttribute(attr);
+        const emptyAsNo = emptyCellsShouldBeNo(currentSection);
+        desktopRowsHtml += `<tr><td>${escapeHtml(attr)}</td>${state.selected.map((v, i) => `<td class="${best.has(i) ? 'best-cell' : ''}">${formatCellValue(v.data[attr], emptyAsNo)}</td>`).join('')}</tr>`;
+        mobileRowsHtml += `<tr class="attribute-row"><td colspan="${state.selected.length}">${escapeHtml(attr)}</td></tr>`;
+        mobileRowsHtml += `<tr class="values-row">${state.selected.map((v, i) => `<td class="${best.has(i) ? 'best-cell' : ''}">${formatCellValue(v.data[attr], emptyAsNo)}</td>`).join('')}</tr>`;
+      }
+
+      desktopRowsHtml += `<tr class="group-row"><td colspan="${state.selected.length + 1}">INDICADORES CALCULADOS</td></tr>`;
+      mobileRowsHtml += `<tr class="attribute-row section-row"><td colspan="${state.selected.length}">INDICADORES CALCULADOS</td></tr>`;
+      const effBest = mostEfficient ? mostEfficient.metrics.efficiency : null;
+      desktopRowsHtml += `<tr><td>Relación autonomía / batería</td>${state.selected.map(v => `<td class="${effBest && v.metrics.efficiency === effBest ? 'best-cell' : ''}">${v.metrics.efficiency ? `${v.metrics.efficiency.toFixed(1)} km/kWh` : '—'}</td>`).join('')}</tr>`;
+      mobileRowsHtml += `<tr class="attribute-row"><td colspan="${state.selected.length}">Relación autonomía / batería</td></tr>`;
+      mobileRowsHtml += `<tr class="values-row">${state.selected.map(v => `<td class="${effBest && v.metrics.efficiency === effBest ? 'best-cell' : ''}">${v.metrics.efficiency ? `${v.metrics.efficiency.toFixed(1)} km/kWh` : '—'}</td>`).join('')}</tr>`;
+
+      const modelHeaders = state.selected.map(v => `<th><div class="model-head"><strong>${escapeHtml(v.name)}</strong><span>${escapeHtml(v.segment)} · ${v.metrics.price ? money(v.metrics.price) : 'Precio s/d'}</span></div></th>`).join('');
+      const table = `<section class="panel compare-panel"><div class="section-head"><div><h2>Ficha comparativa completa</h2><p>En PC se mantiene la tabla tradicional; en móvil se usa una matriz compacta para comparar los valores frente a frente.</p></div></div><div class="table-wrap desktop-compare-wrap"><table><thead><tr><th>Característica</th>${modelHeaders}</tr></thead><tbody>${desktopRowsHtml}</tbody></table></div><div class="table-wrap mobile-compare-wrap"><table class="compare-matrix" style="--selected-count:${state.selected.length}"><thead><tr>${modelHeaders}</tr></thead><tbody>${mobileRowsHtml}</tbody></table></div></section>`;
+      $('comparisonContent').innerHTML = summary + visuals + table;
+    }
+
+    function renderAll() {
+      renderSelectors();
+      renderComparison();
+      syncShareUrl();
+    }
+
+    function showToast(message) {
+      const toast = $('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    async function shareComparison() {
+      if (!state.selected.length) return showToast('Agregá al menos un modelo para compartir.');
+      const url = shareUrlForSelection().toString();
+      const title = `Comparativa EVUruguay: ${state.selected.map(v => v.name).join(' vs ')}`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text: 'Mirá esta comparativa de vehículos eléctricos en EVUruguay.', url });
+          return;
+        } catch (error) {
+          if (error?.name === 'AbortError') return;
+        }
+      }
+
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Link de la comparativa copiado.');
+      } catch (error) {
+        window.prompt('Copiá el link de la comparativa:', url);
+      }
+    }
+
+
+    $('shareBtn').addEventListener('click', shareComparison);
+    $('clearBtn').addEventListener('click', () => { state.selected = []; renderAll(); });
+
+    renderSelectors();
+    renderComparison();
+    loadDefaultFile();
+  </script>
+  <script src="/assets/js/ad-whatsapp.js" defer></script>
+</body>
+</html>
