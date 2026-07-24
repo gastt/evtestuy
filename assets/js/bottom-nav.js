@@ -1,41 +1,162 @@
 (function () {
-  const iconAttrs = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
-  const icons = {
-    inicio: `<svg ${iconAttrs} aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V20h5v-5h4v5h5v-9.5"/></svg>`,
-    redes: `<svg ${iconAttrs} aria-hidden="true"><path d="M12 21s7-5.6 7-12a7 7 0 0 0-14 0c0 6.4 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>`,
-    comprar: `<svg ${iconAttrs} aria-hidden="true"><path d="M5 11 7 6h10l2 5"/><path d="M4 11h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-2"/><path d="M6 18H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1"/><path d="M7 18h10"/><circle cx="7" cy="15" r="2"/><circle cx="17" cy="15" r="2"/></svg>`,
-    instalacion: `<svg ${iconAttrs} aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0 5 5L11 20a2.8 2.8 0 0 1-4-4l8.7-8.7Z"/><path d="m16 5 3 3"/><path d="M7.5 17.5h.01"/></svg>`,
-    brujula: `<svg ${iconAttrs} aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>`
-  };
+  const SCROLL_RESET_KEY = "evuy-bottom-nav-scroll-reset";
 
-  const navItems = [
-    { key: "inicio", label: "Inicio", href: "/", icon: icons.inicio, match: (path) => path === "/" || path === "/index.html" || (path.endsWith("/index.html") && !path.includes("/brujula/") && !path.includes("/instalacion/")) },
-    { key: "redes", label: "Redes", href: "/carga.html", icon: icons.redes, match: (path) => path.includes("/carga") },
-    { key: "comprar", label: "Comprar EV", href: "/carbuy/recomendador.html", icon: icons.comprar, match: (path) => path.includes("/carbuy") },
-    { key: "instalacion", label: "Instalación", href: "/instalacion/", icon: icons.instalacion, match: (path) => path.includes("/instalacion") },
-    { key: "brujula", label: "Brújula", href: "/brujula/", icon: icons.brujula, match: (path) => path.includes("/brujula") }
-  ];
+  function scheduleScrollReset() {
+    let targetPath;
+
+    try {
+      targetPath = window.sessionStorage.getItem(SCROLL_RESET_KEY);
+      if (targetPath !== window.location.pathname) return;
+      window.sessionStorage.removeItem(SCROLL_RESET_KEY);
+    } catch (error) {
+      return;
+    }
+
+    // iOS can restore the scroll position from the previous page after the
+    // new document has started rendering. Reset twice so that a restoration
+    // performed during the first frame cannot leave a blank scrollable area.
+    const reset = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    window.requestAnimationFrame(() => {
+      reset();
+      window.requestAnimationFrame(reset);
+    });
+  }
 
   function mountBottomNav() {
     if (document.querySelector(".ev-bottom-nav")) return;
 
     const path = (window.location.pathname || "/").toLowerCase();
+
+    if (path.includes("/brujula")) return;
+
+    const items = [
+      {
+        id: "inicio",
+        label: "Inicio",
+        href: "/",
+        active: !path.includes("/carga") && !path.includes("/carbuy") && !path.includes("/comparador") && !path.includes("/instalacion") && !path.includes("/brujula"),
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M3 11.2 12 4l9 7.2V21a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.8z"/></svg>`
+      },
+      {
+        id: "redes",
+        label: "Redes",
+        href: "/carga.html",
+        active: path.includes("/carga"),
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>`
+      },
+      {
+        id: "comprar",
+        label: "Comprar EV",
+        href: "/carbuy/recomendador.html",
+        active: path.includes("/carbuy"),
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M5 11l1.5-4.5h11L19 11h1a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1v1a1 1 0 0 1-2 0v-1H7v1a1 1 0 0 1-2 0v-1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h1zm2.2-2.5L6.4 11h11.2l-.8-2.5H7.2zM7 14a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm10 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>`
+      },
+      {
+        id: "comparador",
+        label: "Comparar",
+        href: "/comparador/",
+        active: path.includes("/comparador"),
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M6 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3v-2H6V5h3V3H6zm9 0v2h3v14h-3v2h3a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3zM8 8h8v2H8V8zm0 6h8v2H8v-2zm3-12h2v20h-2V2z"/></svg>`
+      },
+      {
+        id: "instalacion",
+        label: "Instalación",
+        href: "/instalacion/",
+        active: path.includes("/instalacion"),
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94L14.7 6.3z"/></svg>`
+      },
+      {
+        id: "brujula",
+        label: "Brújula",
+        href: "/brujula/",
+        active: path.includes("/brujula"),
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 5.5-2.5 5-5 2.5 2.5-5 5-2.5zM12 11a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>`
+      }
+    ];
+
     const nav = document.createElement("nav");
     nav.className = "ev-bottom-nav";
-    nav.setAttribute("aria-label", "Navegación principal");
+    nav.setAttribute("aria-label", "Navegación principal EVUruguay");
 
-    nav.innerHTML = navItems.map((item) => {
-      const active = item.match(path);
-      return `
-        <a class="ev-bottom-nav-item${active ? " active" : ""}" href="${item.href}" aria-label="${item.label}"${active ? ' aria-current="page"' : ""} data-nav="${item.key}">
-          <span class="ev-bottom-nav-icon" aria-hidden="true">${item.icon}</span>
-          <span class="ev-bottom-nav-label">${item.label}</span>
-        </a>`;
-    }).join("");
+    nav.innerHTML = items.map((item) => `
+      <a class="ev-bottom-nav-item ${item.active ? "active" : ""}"
+         data-nav="${item.id}"
+         href="${item.href}"
+         aria-label="${item.label}"
+         ${item.active ? 'aria-current="page"' : ""}>
+        <span class="ev-bottom-nav-icon" aria-hidden="true">${item.icon}</span>
+        <span class="ev-bottom-nav-label">${item.label}</span>
+      </a>
+    `).join("");
 
     document.body.classList.add("has-ev-bottom-nav");
     document.body.appendChild(nav);
+
+    nav.addEventListener("click", (event) => {
+      const link = event.target.closest("a.ev-bottom-nav-item");
+      if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const destination = new URL(link.href, window.location.href);
+      if (destination.origin !== window.location.origin || destination.pathname === window.location.pathname) return;
+
+      try {
+        window.sessionStorage.setItem(SCROLL_RESET_KEY, destination.pathname);
+      } catch (error) {
+        // Navigation must still work when storage is unavailable.
+      }
+    });
+
+    // On phones, keep the navigation out of the way while people read, but
+    // bring the labels back as soon as they reverse direction.  The small
+    // threshold prevents the bar from flickering during natural scroll bounce.
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let lastScrollY = window.scrollY;
+    let isCompact = false;
+    let ticking = false;
+
+    function setCompact(compact) {
+      if (isCompact === compact) return;
+      isCompact = compact;
+      nav.classList.toggle("is-compact", compact);
+    }
+
+    function updateNavOnScroll() {
+      ticking = false;
+
+      if (!mobileQuery.matches || reducedMotionQuery.matches) {
+        setCompact(false);
+        lastScrollY = window.scrollY;
+        return;
+      }
+
+      const currentScrollY = Math.max(0, window.scrollY);
+      const distance = currentScrollY - lastScrollY;
+
+      if (currentScrollY < 24) {
+        setCompact(false);
+      } else if (distance > 8) {
+        setCompact(true);
+      } else if (distance < -8) {
+        setCompact(false);
+      }
+
+      lastScrollY = currentScrollY;
+    }
+
+    function requestNavUpdate() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateNavOnScroll);
+    }
+
+    window.addEventListener("scroll", requestNavUpdate, { passive: true });
+    mobileQuery.addEventListener("change", requestNavUpdate);
+    reducedMotionQuery.addEventListener("change", requestNavUpdate);
+    requestNavUpdate();
   }
+
+  scheduleScrollReset();
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", mountBottomNav, { once: true });
