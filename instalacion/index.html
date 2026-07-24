@@ -2,14 +2,214 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Simulador de Instalación EV — EVUruguay</title>
-  <meta name="theme-color" content="#f1f9f5" />
+  <meta name="theme-color" content="#0f7b5f" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <script type="module" crossorigin src="/instalacion/assets/index-D7KJObQq.js"></script>
   <link rel="stylesheet" href="/evuy-design.css" />
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
-<body>
+<body class="instalacion-page">
+  <div class="ad-banner-wrap ad-top">
+    <span class="ad-label">Publicidad</span>
+    <div class="ad-slot">
+      <a href="#" data-ad-whatsapp="top" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
+    </div>
+  </div>
   <div id="root"></div>
+  <div class="ad-banner-wrap ad-bottom">
+    <div class="ad-slot">
+      <a href="#" data-ad-whatsapp="bottom" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad2.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      </a>
+    </div>
+    <span class="ad-label">Publicidad</span>
+  </div>
+  <script>
+    (function () {
+      function buildBrandLink() {
+        const link = document.createElement('a');
+        link.href = '/';
+        link.className = 'ev-brand ev-brand-centered';
+        link.setAttribute('aria-label', 'Ir al inicio de EVUruguay');
+        link.innerHTML = '<div class="ev-brand-logo">EV</div><div class="ev-brand-text">EV<span>Uruguay</span></div>';
+        return link;
+      }
+
+      function replaceSimulatorBadge() {
+        if (document.querySelector('[data-ev-brand-replaced="true"]')) return true;
+        const target = Array.from(document.querySelectorAll('span')).find((span) =>
+          span.textContent && span.textContent.trim().toLowerCase() === 'simulador ev · uruguay'
+        );
+        if (!target || !target.parentElement) return false;
+
+        const badge = target.parentElement;
+        badge.dataset.evBrandReplaced = 'true';
+        badge.replaceChildren(buildBrandLink());
+        badge.style.background = 'transparent';
+        badge.style.border = '0';
+        badge.style.borderRadius = '0';
+        badge.style.padding = '0';
+        badge.style.marginBottom = '10px';
+        badge.style.justifyContent = 'center';
+        badge.style.width = 'auto';
+        badge.style.display = 'inline-flex';
+        return true;
+      }
+
+      function enhanceInstallHeader() {
+        const root = document.getElementById('root');
+        const title = root && root.querySelector('h1');
+        if (!title) return false;
+        if (title.dataset.evHeaderEnhanced === 'true') return true;
+
+        title.dataset.evHeaderEnhanced = 'true';
+        title.classList.add('ev-heading', 'ev-heading-xl', 'instalacion-tool-title');
+
+        const parent = title.parentElement;
+        if (!parent) return true;
+        parent.classList.add('ev-page-header', 'ev-tool-header', 'instalacion-tool-header');
+
+        const subtitle = document.createElement('p');
+        subtitle.className = 'ev-subtitle instalacion-tool-subtitle';
+        subtitle.textContent = 'Simulá el punto de carga ideal para tu hogar según vehículo, potencia, distancia al tablero, cableado y ubicación.';
+
+        const description = document.createElement('p');
+        description.className = 'ev-tool-description instalacion-tool-description';
+        description.textContent = 'Calculá una instalación doméstica compatible con normativa UTE, revisando materiales, protecciones y recomendaciones prácticas antes de avanzar con un técnico.';
+
+        const pills = document.createElement('div');
+        pills.className = 'ev-chip-row ev-pill-row instalacion-tool-pills';
+        pills.setAttribute('aria-label', 'Características del simulador');
+        pills.innerHTML = '<div class="ev-pill">Dimensioná <strong>cable y protecciones</strong></div><div class="ev-pill">Estimá <strong>materiales</strong></div><div class="ev-pill">Pensado para <strong>hogares</strong></div>';
+
+        title.insertAdjacentElement('afterend', subtitle);
+        subtitle.insertAdjacentElement('afterend', description);
+        description.insertAdjacentElement('afterend', pills);
+        return true;
+      }
+
+      function enhanceInstallationDiagram() {
+        const root = document.getElementById('root');
+        const diagram = root && root.querySelector('svg[viewBox="0 0 780 310"]');
+        if (!diagram) return false;
+        if (diagram.dataset.evDiagramEnhanced === 'true') return true;
+
+        // El SVG original reserva un tercio de su ancho para las referencias.
+        // Llevamos esas referencias a una grilla inferior para darle protagonismo
+        // al recorrido de la instalación sin perder ninguna información técnica.
+        diagram.dataset.evDiagramEnhanced = 'true';
+        diagram.classList.add('ev-installation-diagram');
+        diagram.setAttribute('viewBox', '0 0 780 760');
+        diagram.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+        const groups = Array.from(diagram.querySelectorAll(':scope > g'));
+        const illustrationGroups = groups.slice(0, 7);
+        const referenceGroups = groups.slice(7, 13);
+        const groundLine = diagram.querySelector(':scope > line');
+
+        if (groundLine) {
+          groundLine.setAttribute('y1', '340');
+          groundLine.setAttribute('y2', '340');
+        }
+
+        illustrationGroups.forEach((group) => {
+          group.setAttribute('transform', 'translate(10 8) scale(1.28)');
+        });
+
+        const vehicleGroup = illustrationGroups[5];
+        if (vehicleGroup) {
+          const body = vehicleGroup.querySelector('rect');
+          const x = Number(body && body.getAttribute('x')) || 410;
+          const y = Number(body && body.getAttribute('y')) || 188;
+          const width = Number(body && body.getAttribute('width')) || 115;
+          const height = Number(body && body.getAttribute('height')) || 42;
+          const bodyFill = (body && body.getAttribute('fill')) || '#dbece4';
+          const outline = (body && body.getAttribute('stroke')) || '#7da393';
+          const wheel = vehicleGroup.querySelector('circle');
+          const cabinFill = (wheel && wheel.getAttribute('fill')) || '#ffffff';
+          const accent = '#2DD4A8';
+
+          // Sustituye el bloque rectangular por una silueta de auto con cabina,
+          // cristales, ruedas, luces y puerto de carga reconocibles.
+          vehicleGroup.innerHTML = `
+            <ellipse cx="${x + width / 2}" cy="${y + height + 13}" rx="${width * 0.47}" ry="5" fill="${outline}" opacity="0.16" />
+            <path d="M ${x + 5} ${y + height - 8} L ${x + 12} ${y + 13} Q ${x + 16} ${y + 5} ${x + 27} ${y + 5} L ${x + width * 0.64} ${y + 5} Q ${x + width * 0.73} ${y + 5} ${x + width * 0.81} ${y + 15} L ${x + width - 4} ${y + 22} Q ${x + width} ${y + 25} ${x + width} ${y + 31} L ${x + width - 2} ${y + height - 6} Q ${x + width - 5} ${y + height} ${x + width - 13} ${y + height} L ${x + 13} ${y + height} Q ${x + 5} ${y + height} ${x + 5} ${y + height - 8} Z" fill="${bodyFill}" stroke="${outline}" stroke-width="1.6" stroke-linejoin="round" />
+            <path d="M ${x + 24} ${y + 15} Q ${x + 28} ${y + 9} ${x + 36} ${y + 9} L ${x + width * 0.62} ${y + 9} Q ${x + width * 0.7} ${y + 10} ${x + width * 0.76} ${y + 19} L ${x + 22} ${y + 19} Z" fill="${cabinFill}" stroke="${outline}" stroke-width="1" />
+            <path d="M ${x + width * 0.47} ${y + 10} L ${x + width * 0.47} ${y + 30} M ${x + width * 0.7} ${y + 20} L ${x + width * 0.7} ${y + height - 2}" fill="none" stroke="${outline}" stroke-width="0.8" opacity="0.8" />
+            <path d="M ${x + 12} ${y + 28} L ${x + width - 3} ${y + 28}" fill="none" stroke="${outline}" stroke-width="0.7" opacity="0.55" />
+            <rect x="${x + width * 0.5}" y="${y + 26}" width="8" height="1.8" rx="0.9" fill="${outline}" opacity="0.85" />
+            <rect x="${x + width - 5}" y="${y + 25}" width="3" height="6" rx="1" fill="#fbbf24" />
+            <rect x="${x + 5}" y="${y + 25}" width="3" height="6" rx="1" fill="#fb7185" />
+            <circle cx="${x + width * 0.24}" cy="${y + height}" r="10" fill="${cabinFill}" stroke="${outline}" stroke-width="1.8" />
+            <circle cx="${x + width * 0.24}" cy="${y + height}" r="4" fill="${bodyFill}" stroke="${outline}" stroke-width="1" />
+            <circle cx="${x + width * 0.78}" cy="${y + height}" r="10" fill="${cabinFill}" stroke="${outline}" stroke-width="1.8" />
+            <circle cx="${x + width * 0.78}" cy="${y + height}" r="4" fill="${bodyFill}" stroke="${outline}" stroke-width="1" />
+            <circle cx="${x + width - 14}" cy="${y + 17}" r="3.5" fill="${accent}" stroke="${cabinFill}" stroke-width="1.2"><animate attributeName="opacity" values="0.45;1;0.45" dur="2s" repeatCount="indefinite" /></circle>
+          `;
+        }
+
+        const referenceCards = [
+          { transform: 'translate(-474 352)', height: 52 }, // Medidor UTE
+          { transform: 'translate(-474 368)', height: 52 }, // Cableado
+          { transform: 'translate(-474 384)', height: 70 }, // Tablero
+          { transform: 'translate(-474 404)', height: 52 }, // Wallbox / toma
+          { transform: 'translate(-474 420)', height: 68 }, // Vehículo
+          { transform: 'translate(-474 440)', height: 52 }  // Puesta a tierra
+        ];
+
+        referenceGroups.forEach((group, index) => {
+          const card = referenceCards[index];
+          const background = group.querySelector('rect');
+          const labels = Array.from(group.querySelectorAll('text'));
+
+          group.setAttribute('transform', card.transform);
+          // Las líneas guía pertenecían a la composición lateral; en la grilla
+          // inferior no aportan contexto y compiten con el dibujo principal.
+          group.querySelectorAll('line').forEach((line) => line.setAttribute('display', 'none'));
+
+          if (background) {
+            background.setAttribute('width', '724');
+            background.setAttribute('height', String(card.height));
+            background.setAttribute('rx', '9');
+            background.setAttribute('stroke-width', '1.2');
+          }
+
+          labels.forEach((label, labelIndex) => {
+            label.setAttribute('font-size', labelIndex === 0 ? '15' : '11.5');
+            if (labelIndex === 0) label.setAttribute('font-weight', '700');
+          });
+        });
+
+        return true;
+      }
+
+      const root = document.getElementById('root');
+      const applyEnhancements = () => ({
+        brand: replaceSimulatorBadge(),
+        header: enhanceInstallHeader(),
+        diagram: enhanceInstallationDiagram()
+      });
+
+      const initial = applyEnhancements();
+      if (initial.brand && initial.header && initial.diagram) return;
+      if (!root) return;
+      const observer = new MutationObserver(() => {
+        const result = applyEnhancements();
+        if (result.brand && result.header && result.diagram) observer.disconnect();
+      });
+      observer.observe(root, { childList: true, subtree: true });
+    })();
+  </script>
+  <script src="/assets/js/install-prompt.js" defer></script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
   <script src="/assets/js/bottom-nav.js" defer></script>
+  <script src="/assets/glass/displacement-utils.js" defer></script>
+  <script src="/assets/js/glass-nav.js" defer></script>
+  <script src="/assets/js/ad-whatsapp.js" defer></script>
 </body>
 </html>
