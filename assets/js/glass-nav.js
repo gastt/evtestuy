@@ -9,6 +9,16 @@
     if (!testElement.style.backdropFilter) return false;
 
     var userAgent = navigator.userAgent.toLowerCase();
+
+    // Every browser on iOS/iPadOS (Safari, Chrome/CriOS, Firefox/FxiOS, Edge/EdgiOS...)
+    // is required by Apple to run on WebKit under the hood, regardless of its name or
+    // icon, and WebKit does not support SVG filters inside backdrop-filter. Without this
+    // check, "crios" below would be misread as real Chrome and get a filter WebKit
+    // silently drops, leaving no blur and no glass at all.
+    var isIOS = /iphone|ipad|ipod/.test(userAgent) ||
+      (userAgent.indexOf("mac") !== -1 && navigator.maxTouchPoints > 1);
+    if (isIOS) return false;
+
     var isChrome = /chrome|chromium|crios|edg/.test(userAgent) && !/firefox|fxios/.test(userAgent);
     var isFirefox = /firefox|fxios/.test(userAgent);
     var isSafari = /safari/.test(userAgent) && !/chrome|chromium|crios|edg/.test(userAgent);
