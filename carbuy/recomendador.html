@@ -2,23 +2,26 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="theme-color" content="#0f7b5f" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Recomendador de Vehículos Eléctricos</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <style>
     :root {
-      --bg-main: #050816;
-      --bg-card: #111827;
-      --bg-card-soft: #020617;
-      --accent: #22d3ee;
-      --accent-soft: rgba(34, 211, 238, 0.14);
-      --accent-strong: #06b6d4;
+      --bg-main: var(--bg-page, #050816);
+      --bg-card: var(--bg-surface-raised, #111827);
+      --bg-card-soft: var(--bg-surface, #020617);
+      --accent: var(--color-accent-bright, #2dd4a8);
+      --accent-soft: var(--bg-accent-subtle, rgba(45, 212, 168, 0.14));
+      --accent-strong: var(--color-accent, #16a07a);
       --accent-green-soft: rgba(22, 163, 74, 0.16);
       --accent-green-border: rgba(34, 197, 94, 0.75);
       --accent-green-text: #bbf7d0;
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --border-subtle: #1f2937;
+      --text-main: var(--color-text, #e5e7eb);
+      --text-muted: var(--color-text-secondary, #9ca3af);
+      --border-subtle: var(--color-border, #1f2937);
       --danger: #f97373;
       --radius-lg: 18px;
       --radius-pill: 999px;
@@ -30,13 +33,13 @@
 
     html {
       height: 100%;
-      background: #000;
+      background: var(--bg-main);
       overscroll-behavior-y: none;
     }
 
     body {
       min-height: 100svh;
-      background-color: #000;
+      background-color: var(--bg-main);
       overscroll-behavior-y: none;
       -webkit-tap-highlight-color: transparent;
     }
@@ -45,7 +48,7 @@
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
         "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1f2937, #020617 55%, #000 100%);
+      background: var(--bg-main);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
@@ -73,7 +76,7 @@
       gap: 6px;
       padding: 3px 10px;
       border-radius: var(--radius-pill);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(5, 5, 5, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.25);
       color: var(--text-muted);
       font-size: 11px;
@@ -86,7 +89,7 @@
       height: 6px;
       border-radius: 999px;
       background: var(--accent);
-      box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.18);
+      box-shadow: 0 0 0 5px rgba(45, 212, 168, 0.18);
     }
 
     header.app-header h1 {
@@ -116,6 +119,8 @@
       gap: 16px;
     }
 
+    .mobile-form-jump { display: none; }
+
     @media (max-width: 840px) {
       .layout {
         grid-template-columns: minmax(0, 1fr);
@@ -137,7 +142,7 @@
       position: absolute;
       inset: -40%;
       background:
-        radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.16), transparent 55%),
+        radial-gradient(circle at 0 0, rgba(45, 212, 168, 0.16), transparent 55%),
         radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.16), transparent 60%);
       opacity: 0.23;
       pointer-events: none;
@@ -221,7 +226,7 @@
       appearance: none;
       border-radius: 10px;
       border: 1px solid rgba(31, 41, 55, 0.9);
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(5, 5, 5, 0.95);
       padding: 7px 10px;
       color: var(--text-main);
       font-size: 13px;
@@ -237,8 +242,8 @@
     .field-input:focus,
     .field-select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.35);
-      background: rgba(15, 23, 42, 0.98);
+      box-shadow: 0 0 0 1px rgba(45, 212, 168, 0.35);
+      background: rgba(5, 5, 5, 0.98);
       transform: translateY(-0.5px);
     }
 
@@ -271,7 +276,7 @@
       color: var(--text-muted);
       padding: 4px 9px;
       border-radius: var(--radius-pill);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(5, 5, 5, 0.9);
       border: 1px solid rgba(55, 65, 81, 0.8);
     }
 
@@ -287,7 +292,7 @@
       border: none;
       border-radius: 999px;
       padding: 8px 18px;
-      background: radial-gradient(circle at 0 0, #22d3ee, #0ea5e9);
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
       color: #0b1120;
       font-weight: 600;
       font-size: 13px;
@@ -354,7 +359,7 @@
       padding: 3px 8px;
       border-radius: var(--radius-pill);
       border: 1px solid rgba(55, 65, 81, 0.9);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(5, 5, 5, 0.9);
       font-size: 11px;
       color: var(--text-muted);
     }
@@ -394,7 +399,7 @@
     .result-card {
       border-radius: 14px;
       border: 1px solid rgba(31, 41, 55, 0.9);
-      background: radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.07), #020617);
+      background: radial-gradient(circle at 0 0, rgba(45, 212, 168, 0.07), var(--bg-card-soft));
       padding: 9px 11px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -406,15 +411,15 @@
     }
 
     .result-card:hover {
-      border-color: rgba(34, 211, 238, 0.7);
+      border-color: rgba(45, 212, 168, 0.7);
       transform: translateY(-1px);
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.9);
+      box-shadow: 0 14px 30px rgba(5, 5, 5, 0.9);
     }
 
     .result-card.selected {
       border-color: var(--accent);
-      box-shadow: 0 16px 36px rgba(34, 211, 238, 0.4);
-      background: radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.18), #020617);
+      box-shadow: 0 16px 36px rgba(45, 212, 168, 0.4);
+      background: radial-gradient(circle at 0 0, rgba(45, 212, 168, 0.18), var(--bg-card-soft));
     }
 
     @media (max-width: 640px) {
@@ -481,7 +486,7 @@
       border-radius: 10px;
       object-fit: cover;
       border: 1px solid rgba(55, 65, 81, 0.9);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(5, 5, 5, 0.9);
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
       display: block;
     }
@@ -492,7 +497,7 @@
       justify-content: center;
       font-size: 18px;
       color: rgba(229, 231, 235, 0.75);
-      background: radial-gradient(circle at 0 0, rgba(34, 211, 238, 0.12), rgba(15, 23, 42, 0.9));
+      background: radial-gradient(circle at 0 0, rgba(45, 212, 168, 0.12), rgba(5, 5, 5, 0.9));
     }
 
     .chip {
@@ -500,7 +505,7 @@
       padding: 3px 7px;
       border-radius: var(--radius-pill);
       border: 1px solid rgba(55, 65, 81, 0.9);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(5, 5, 5, 0.9);
       color: var(--text-muted);
       display: inline-flex;
       align-items: center;
@@ -555,7 +560,7 @@
       padding: 14px 11px;
       font-size: 12px;
       color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(5, 5, 5, 0.75);
     }
 
     .empty-state strong {
@@ -566,7 +571,7 @@
     .details-panel {
       border-radius: 12px;
       border: 1px solid rgba(31, 41, 55, 0.95);
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(5, 5, 5, 0.9);
       padding: 10px 11px;
       font-size: 11.5px;
       color: var(--text-muted);
@@ -592,8 +597,8 @@
       gap: 6px;
       padding: 3px 8px;
       border-radius: var(--radius-pill);
-      background: rgba(34, 211, 238, 0.12);
-      border: 1px solid rgba(34, 211, 238, 0.6);
+      background: rgba(45, 212, 168, 0.12);
+      border: 1px solid rgba(45, 212, 168, 0.6);
       color: #a5f3fc;
       font-size: 10px;
       text-transform: uppercase;
@@ -668,8 +673,8 @@
       margin-top: 10px;
       padding: 10px;
       border-radius: 12px;
-      border: 1px solid rgba(34, 211, 238, 0.35);
-      background: rgba(34, 211, 238, 0.08);
+      border: 1px solid rgba(45, 212, 168, 0.35);
+      background: rgba(45, 212, 168, 0.08);
     }
 
     .adas-box-title {
@@ -686,7 +691,7 @@
       height: 8px;
       border-radius: 999px;
       background: var(--accent);
-      box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.18);
+      box-shadow: 0 0 0 5px rgba(45, 212, 168, 0.18);
     }
 
     .adas-list {
@@ -710,8 +715,8 @@
       width: 18px;
       height: 18px;
       border-radius: 6px;
-      background: rgba(34, 211, 238, 0.14);
-      border: 1px solid rgba(34, 211, 238, 0.55);
+      background: rgba(45, 212, 168, 0.14);
+      border: 1px solid rgba(45, 212, 168, 0.55);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -720,6 +725,53 @@
       margin-top: 1px;
       font-size: 12px;
     }
+
+    .recommender-hint {
+      border: 1px solid rgba(45, 212, 168, 0.2);
+      border-radius: 14px;
+      background: rgba(45, 212, 168, 0.08);
+      color: #c7f9e9;
+      padding: 10px 12px;
+      line-height: 1.35;
+    }
+
+    .recommender-hint strong { color: var(--accent-green-text); }
+
+    .match-badge {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-left: 8px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-green-soft);
+      border: 1px solid var(--accent-green-border);
+      color: var(--accent-green-text);
+      font-size: 10px;
+      vertical-align: middle;
+    }
+
+    .match-badge strong { font-size: 11px; }
+
+    .result-match-reason {
+      color: #a7f3d0;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .match-panel {
+      display: grid;
+      gap: 4px;
+      margin: 8px 0 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(45, 212, 168, 0.28);
+      background: linear-gradient(135deg, rgba(45, 212, 168, 0.12), rgba(45, 212, 168, 0.06));
+      color: #d1fae5;
+    }
+
+    .match-panel strong { color: var(--accent-green-text); font-size: 13px; }
+    .match-panel span { font-size: 11px; line-height: 1.35; }
 
     /* Footer */
     .site-footer {
@@ -746,29 +798,854 @@
 
   </style>
   <link rel="stylesheet" href="/evuy-design.css" />
+  <style id="recommender-redesign">
+    .carbuy-page {
+      background:
+        radial-gradient(circle at 10% -5%, rgba(45, 212, 168, 0.18), transparent 30%),
+        radial-gradient(circle at 90% 0%, rgba(13, 125, 95, 0.10), transparent 34%),
+        var(--bg-page);
+      color: var(--color-text);
+    }
+
+    .app-shell {
+      max-width: 1060px;
+      margin: 0 auto 28px;
+      padding: 18px clamp(14px, 2.4vw, 28px) 88px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid rgba(13, 125, 95, 0.12);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 24px 70px rgba(6, 78, 59, 0.10), 0 0 0 1px rgba(255,255,255,0.7) inset;
+      backdrop-filter: blur(18px);
+      padding: 0;
+      color: var(--color-text);
+    }
+
+    .card::before { display: none; }
+    .card-inner { padding: 0; }
+
+    .layout > .card:first-child .card-inner {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .ev-callout,
+    .card-title-row,
+    .card-subtitle,
+    #filters-form,
+    .results-header,
+    .results-layout {
+      padding-left: clamp(22px, 4vw, 42px);
+      padding-right: clamp(22px, 4vw, 42px);
+    }
+
+    .ev-callout.carbuy-filter-callout {
+      position: relative;
+      min-height: 124px;
+      align-items: center;
+      margin: 0;
+      padding-top: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid rgba(13, 125, 95, 0.10);
+      border-radius: 28px 28px 0 0;
+      background: rgba(255, 255, 255, 0.38);
+    }
+
+    .ev-callout.carbuy-filter-callout::before {
+      content: "1.";
+      color: var(--ev-teal);
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 900;
+      margin-right: 6px;
+    }
+
+    .ev-callout.carbuy-filter-callout::after,
+    .layout > .card:first-child .card-title-row::after {
+      width: 64px;
+      height: 64px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      margin-left: auto;
+      background: linear-gradient(135deg, rgba(45, 212, 168, 0.18), rgba(13, 125, 95, 0.08));
+      color: var(--ev-green);
+      font-size: 28px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+      flex: 0 0 auto;
+    }
+
+    .ev-callout.carbuy-filter-callout::after { content: "⌕"; }
+
+    .ev-callout-dot { display: none; }
+
+    .ev-callout-text {
+      color: var(--color-text) !important;
+      font-family: var(--font-display);
+      font-size: clamp(20px, 2.6vw, 26px);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+
+    .ev-callout-hint {
+      display: block;
+      max-width: 560px;
+      margin-top: 14px;
+      color: var(--color-text-secondary) !important;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.55;
+      letter-spacing: 0;
+    }
+
+    .layout > .card:first-child .card-title-row {
+      position: relative;
+      min-height: 94px;
+      margin: 0;
+      padding-top: 26px;
+      padding-bottom: 8px;
+    }
+
+    .layout > .card:first-child .card-title-row::before {
+      content: "2.";
+      color: var(--ev-teal);
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 900;
+      margin-right: 6px;
+    }
+
+    .layout > .card:first-child .card-title-row::after { content: "♙"; }
+
+    .card-title {
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: clamp(20px, 2.4vw, 25px);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .card-title-icon { display: none; }
+
+    .card-subtitle {
+      max-width: 680px;
+      margin: 0;
+      padding-bottom: 24px;
+      color: var(--color-text-secondary);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    #filters-form { padding-bottom: 30px; }
+
+    .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px 24px;
+    }
+
+    .form-field {
+      position: relative;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .field-label {
+      color: var(--color-text);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .field-help {
+      color: var(--color-text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .field-input,
+    .field-select {
+      width: 100%;
+      min-height: 56px;
+      padding: 0 18px 0 48px;
+      border: 1.5px solid rgba(71, 85, 105, 0.14);
+      border-radius: 16px;
+      background-color: rgba(255,255,255,0.92);
+      color: var(--color-text);
+      font-size: 15px;
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.95);
+    }
+
+    .field-input::placeholder { color: #94a3b8; font-weight: 700; }
+
+    .field-input:focus,
+    .field-select:focus {
+      border-color: var(--ev-teal);
+      box-shadow: 0 0 0 5px rgba(45, 212, 168, 0.18), 0 16px 34px rgba(6, 78, 59, 0.10);
+      background-color: #fff;
+      transform: none;
+    }
+
+    .field-select {
+      background-image: linear-gradient(45deg, transparent 50%, var(--color-text-secondary) 50%),
+        linear-gradient(135deg, var(--color-text-secondary) 50%, transparent 50%);
+      background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+      background-size: 6px 6px, 6px 6px;
+    }
+
+    .form-field.field-budget::before,
+    .form-field.field-type::before,
+    .form-field.field-range::before,
+    .form-field.field-adas::before,
+    .form-field.field-usage::before,
+    .form-field.field-priority::before {
+      position: absolute;
+      left: 18px;
+      bottom: 16px;
+      z-index: 1;
+      color: var(--color-text-secondary);
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .field-budget::before { content: "$"; font-weight: 900; }
+    .field-type::before { content: "▰"; }
+    .field-range::before { content: "◒"; }
+    .field-adas::before { content: "◇"; }
+    .field-usage::before { content: "◎"; }
+    .field-priority::before { content: "★"; }
+
+    .recommender-hint {
+      margin-top: 2px;
+      padding: 14px 16px;
+      border: 1px solid rgba(45, 212, 168, 0.24);
+      border-radius: 18px;
+      background: rgba(45, 212, 168, 0.08);
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    .recommender-hint strong { color: var(--ev-green-deep); }
+
+    .button-row {
+      margin-top: 0;
+      padding-top: 4px;
+      align-items: center;
+    }
+
+    .status-pill,
+    .pill-filter,
+    .chip {
+      border-color: rgba(13, 125, 95, 0.13);
+      background: rgba(255,255,255,0.82);
+      color: var(--color-text-secondary);
+    }
+
+    .btn-primary {
+      min-height: 48px;
+      padding: 0 24px;
+      background: linear-gradient(135deg, var(--ev-green), var(--ev-teal));
+      color: #fff;
+      box-shadow: 0 16px 30px rgba(13, 125, 95, 0.24);
+    }
+
+    .layout > .card:nth-child(2) {
+      padding: 0;
+    }
+
+    .results-header {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin: 0;
+      padding-top: 30px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(13, 125, 95, 0.10);
+    }
+
+    .results-title {
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 850;
+      letter-spacing: -0.035em;
+    }
+
+    .results-summary {
+      max-width: 760px;
+      color: var(--color-text-secondary);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .results-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill-filter {
+      padding: 8px 12px;
+      font-size: 12px;
+      border-radius: var(--radius-pill);
+    }
+
+    .chip-label { color: var(--color-text); font-weight: 800; }
+
+    .results-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 0;
+      padding-top: 18px;
+      padding-bottom: 34px;
+    }
+
+    .details-panel-wrapper { order: -1; }
+
+    #results-list,
+    .results-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      border-color: rgba(13, 125, 95, 0.16);
+      background: rgba(45, 212, 168, 0.06);
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .empty-state strong { color: var(--ev-green-deep); }
+
+    .result-card {
+      position: relative;
+      isolation: isolate;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 14px;
+      min-height: 156px;
+      padding: 14px;
+      border: 1px solid rgba(13, 125, 95, 0.12);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(230,245,237,0.78));
+      box-shadow: 0 14px 36px rgba(6, 78, 59, 0.08);
+      color: var(--color-text);
+      overflow: hidden;
+    }
+
+    .result-card:hover,
+    .result-card.selected {
+      border-color: rgba(13, 125, 95, 0.28);
+      box-shadow: 0 20px 48px rgba(6, 78, 59, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .result-card.selected { outline: 3px solid rgba(45, 212, 168, 0.18); }
+
+    .result-media {
+      position: relative;
+      min-height: 124px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--ev-mint), rgba(45, 212, 168, 0.14));
+      border: 1px solid rgba(13, 125, 95, 0.10);
+    }
+
+    .result-thumb {
+      width: 100%;
+      height: 100%;
+      min-height: 124px;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      object-fit: cover;
+      background: transparent;
+    }
+
+    .result-thumb.placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 124px;
+      display: grid;
+      place-items: center;
+      color: var(--ev-green);
+      font-size: 34px;
+      background: transparent;
+    }
+
+    .result-rank {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 13px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--ev-green), var(--ev-teal));
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(6, 78, 59, 0.18);
+    }
+
+    .result-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .result-main { gap: 8px; }
+
+    .result-name {
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 850;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+
+    .result-subtitle { color: var(--color-text-secondary); font-size: 12px; }
+
+    .result-price {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      color: var(--ev-green-deep);
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .match-badge {
+      margin-left: 0;
+      padding: 5px 8px;
+      border-color: rgba(13, 125, 95, 0.20);
+      background: rgba(45, 212, 168, 0.10);
+      color: var(--ev-green-deep);
+    }
+
+    .result-score { min-width: 88px; text-align: right; }
+    .score-number { color: var(--ev-green-deep); font-family: var(--font-display); font-size: 23px; font-weight: 900; line-height: 1; }
+    .score-label { color: var(--color-text-secondary); font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+    .score-track { height: 7px; margin-top: 7px; border-radius: var(--radius-pill); background: rgba(13, 125, 95, 0.10); overflow: hidden; }
+    .score-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--ev-green), var(--ev-teal)); }
+
+    .result-match-reason { color: var(--ev-green-deep); font-size: 12px; font-weight: 750; }
+    .result-meta { gap: 8px; }
+    .chip { padding: 6px 9px; font-size: 11px; }
+    .chip-accent,
+    .chip-patente-contado { color: var(--ev-green-deep); background: rgba(45, 212, 168, 0.12); border-color: rgba(13, 125, 95, 0.18); }
+    .chip-adas-no { color: #991b1b; background: rgba(254, 226, 226, 0.82); border-color: rgba(185, 28, 28, 0.18); }
+
+    .details-panel {
+      border: 1px solid rgba(13, 125, 95, 0.12);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.78);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      color: var(--color-text);
+      padding: 16px;
+      min-height: 0;
+      touch-action: pan-y;
+    }
+
+    .details-hero {
+      align-items: center;
+      gap: 18px;
+    }
+
+    .details-title { color: var(--color-text); font-family: var(--font-display); font-size: clamp(24px, 3vw, 34px); font-weight: 900; line-height: 1; }
+    .details-subtitle,
+    .details-body,
+    .details-note,
+    .details-placeholder { color: var(--color-text-secondary); }
+    .details-price { color: var(--ev-green-deep); font-size: 18px; font-weight: 900; }
+    .vehicle-image { width: min(32vw, 260px); height: 168px; border-radius: 22px; border-color: rgba(13, 125, 95, 0.12); background: var(--ev-mint); }
+    .match-panel,
+    .adas-box,
+    .details-badge { background: rgba(45, 212, 168, 0.10); border-color: rgba(13, 125, 95, 0.18); color: var(--color-text); }
+    .match-panel strong,
+    .adas-box-title,
+    .adas-item,
+    .details-note strong { color: var(--ev-green-deep); }
+    .connector-warning {
+      margin: 10px 0;
+      padding: 12px 14px;
+      border: 1px solid rgba(245, 158, 11, 0.30);
+      border-radius: 16px;
+      background: rgba(254, 243, 199, 0.72);
+      color: #78350f;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .connector-warning strong {
+      color: #92400e;
+      font-weight: 900;
+    }
+
+
+    .details-topline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .details-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .details-nav-button {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(13, 125, 95, 0.16);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.86);
+      color: var(--ev-green-deep);
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(6, 78, 59, 0.08);
+      transition: transform 140ms ease-out, border-color 140ms ease-out, background 140ms ease-out;
+    }
+
+    .details-nav-button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(13, 125, 95, 0.30);
+      background: #fff;
+    }
+
+    .details-counter {
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      font-weight: 800;
+      min-width: 54px;
+      text-align: center;
+    }
+
+    .details-swipe-hint {
+      display: none;
+      color: var(--color-text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .results-extra-title {
+      grid-column: 1 / -1;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      margin: 2px 0 -4px;
+    }
+
+    #results-list,
+    .results-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    .result-card {
+      grid-template-columns: 86px minmax(0, 1fr);
+      min-height: 118px;
+      padding: 12px;
+      gap: 12px;
+      border-radius: 20px;
+    }
+
+    .result-card.selected {
+      background: linear-gradient(145deg, rgba(230,245,237,0.96), rgba(255,255,255,0.98));
+    }
+
+    .result-media,
+    .result-thumb,
+    .result-thumb.placeholder {
+      min-height: 94px;
+    }
+
+    .result-media { border-radius: 16px; }
+
+    .result-rank {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    .result-card-top { display: block; }
+
+    .result-name {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 16px;
+      line-height: 1.08;
+      min-height: 35px;
+    }
+
+    .result-price {
+      margin-top: 6px;
+      font-size: 16px;
+      line-height: 1.1;
+    }
+
+    .result-subtitle,
+    .result-match-reason,
+    .result-meta,
+    .result-score,
+    .match-badge {
+      display: none;
+    }
+
+    .match-panel span { color: var(--color-text-secondary); }
+
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .field-input,
+    [data-theme="dark"] .field-select,
+    [data-theme="dark"] .result-card,
+    [data-theme="dark"] .details-panel,
+    [data-theme="dark"] .status-pill,
+    [data-theme="dark"] .pill-filter,
+    [data-theme="dark"] .chip {
+      background: rgba(12, 24, 16, 0.94);
+      color: var(--color-text);
+      border-color: var(--color-border);
+    }
+
+    [data-theme="dark"] .ev-callout.carbuy-filter-callout { background: rgba(5, 5, 5, 0.58); border-color: var(--color-border); }
+    [data-theme="dark"] .result-card { background: linear-gradient(145deg, rgba(17,31,22,0.97), rgba(13,31,23,0.90)); }
+    [data-theme="dark"] .field-input::placeholder { color: var(--color-text-tertiary); }
+    [data-theme="dark"] .field-label,
+    [data-theme="dark"] .card-title,
+    [data-theme="dark"] .results-title,
+    [data-theme="dark"] .result-name,
+    [data-theme="dark"] .details-title,
+    [data-theme="dark"] .chip-label { color: var(--color-text); }
+    [data-theme="dark"] .card-subtitle,
+    [data-theme="dark"] .field-help,
+    [data-theme="dark"] .ev-callout-hint,
+    [data-theme="dark"] .results-summary,
+    [data-theme="dark"] .result-subtitle,
+    [data-theme="dark"] .details-body,
+    [data-theme="dark"] .details-note,
+    [data-theme="dark"] .details-placeholder,
+    [data-theme="dark"] .match-panel span { color: var(--color-text-secondary) !important; }
+    [data-theme="dark"] .details-nav-button {
+      background: rgba(5,5,5,0.90);
+      color: var(--color-accent-bright);
+      border-color: var(--color-border);
+    }
+
+    [data-theme="dark"] .result-price,
+    [data-theme="dark"] .score-number,
+    [data-theme="dark"] .result-match-reason,
+    [data-theme="dark"] .match-badge,
+    [data-theme="dark"] .details-price,
+    [data-theme="dark"] .match-panel strong,
+    [data-theme="dark"] .adas-box-title,
+    [data-theme="dark"] .adas-item,
+    [data-theme="dark"] .details-note strong { color: var(--color-accent-bright); }
+
+    [data-theme="dark"] .connector-warning {
+      background: rgba(120, 53, 15, 0.24);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    [data-theme="dark"] .connector-warning strong { color: #fde68a; }
+
+    .mobile-form-jump { display: none; }
+
+    @media (max-width: 840px) {
+      html { scroll-behavior: smooth; }
+      #filters-form,
+      .results-header { scroll-margin-top: 12px; }
+      .mobile-form-jump {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        align-self: center;
+        margin-top: 8px;
+        padding: 10px 16px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(13, 125, 95, 0.16);
+        background: rgba(45, 212, 168, 0.10);
+        color: var(--ev-green-deep);
+        font-weight: 800;
+        text-decoration: none;
+      }
+      [data-theme="dark"] .mobile-form-jump { color: var(--color-accent-bright); border-color: var(--color-border); }
+      .form-grid { grid-template-columns: 1fr; }
+      body.carbuy-page .field-input,
+      body.carbuy-page .field-select { font-size: 16px; }
+      #results-list,
+      .results-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .ev-callout.carbuy-filter-callout::after,
+      .layout > .card:first-child .card-title-row::after { width: 52px; height: 52px; border-radius: 20px; }
+    }
+
+    @media (max-width: 560px) {
+      .app-shell { padding-left: 10px; padding-right: 10px; }
+      .card { border-radius: 22px; }
+      .ev-callout,
+      .card-title-row,
+      .card-subtitle,
+      #filters-form,
+      .results-header,
+      .results-layout { padding-left: 16px; padding-right: 16px; }
+      .ev-callout.carbuy-filter-callout {
+        min-height: 82px;
+        padding-top: 18px;
+        padding-bottom: 14px;
+      }
+      .ev-callout.carbuy-filter-callout::before,
+      .layout > .card:first-child .card-title-row::before { font-size: 18px; }
+      .ev-callout-text,
+      .card-title { font-size: 18px; line-height: 1.08; }
+      .ev-callout-hint {
+        margin-top: 6px;
+        font-size: 12px;
+        line-height: 1.32;
+      }
+      .layout > .card:first-child .card-title-row {
+        min-height: 64px;
+        padding-top: 16px;
+        padding-bottom: 4px;
+      }
+      .ev-callout.carbuy-filter-callout::after,
+      .layout > .card:first-child .card-title-row::after {
+        width: 44px;
+        height: 44px;
+        border-radius: 16px;
+        font-size: 21px;
+      }
+      .card-subtitle {
+        padding-bottom: 14px;
+        font-size: 12.5px;
+        line-height: 1.35;
+      }
+      #filters-form { padding-bottom: 18px; }
+      .form-grid { gap: 12px; }
+      .form-field { gap: 6px; font-size: 12px; }
+      .field-label { font-size: 13px; line-height: 1.15; }
+      .field-help { font-size: 10px; line-height: 1.1; }
+      .field-input,
+      .field-select {
+        min-height: 44px;
+        border-radius: 14px;
+        padding-left: 40px;
+        padding-right: 14px;
+        font-size: 14px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.045), inset 0 1px 0 rgba(255,255,255,0.95);
+      }
+      .field-select {
+        background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+      }
+      .form-field.field-budget::before,
+      .form-field.field-type::before,
+      .form-field.field-range::before,
+      .form-field.field-adas::before,
+      .form-field.field-usage::before,
+      .form-field.field-priority::before {
+        left: 14px;
+        bottom: 13px;
+        font-size: 15px;
+      }
+      .recommender-hint {
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-size: 12px;
+        line-height: 1.3;
+      }
+      .button-row { flex-direction: column; align-items: stretch; gap: 8px; }
+      .status-pill { justify-content: center; font-size: 10.5px; }
+      .btn-primary { justify-content: center; min-height: 44px; }
+      #results-list,
+      .results-list { grid-template-columns: 1fr; }
+      body.carbuy-page .result-card {
+        grid-template-columns: 82px minmax(0, 1fr) !important;
+        gap: 12px !important;
+        padding: 12px !important;
+      }
+      body.carbuy-page .result-media { min-width: 0; }
+      body.carbuy-page .result-thumb,
+      body.carbuy-page .result-thumb.placeholder {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 88px !important;
+      }
+      .details-topline { align-items: flex-start; }
+      .details-nav { width: 100%; justify-content: space-between; }
+      .details-swipe-hint { display: inline; }
+      .details-hero { align-items: flex-start; }
+      .vehicle-image { width: 118px; height: 86px; }
+    }
+  </style>
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
-<body>
+<body class="carbuy-page">
+  <div class="ad-banner-wrap ad-top">
+    <span class="ad-label">Publicidad</span>
+    <div class="ad-slot">
+      <a href="#" data-ad-whatsapp="top" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
+      </a>
+    </div>
+  </div>
   <div class="app-shell">
-    <header class="app-header">
-      <div class="badge">
-        <span class="badge-dot"></span>
-        <span>EVUruguay - Recomendador de EV</span>
-      </div>
-      <h1>
-        ¿Qué
-        <span class="accent">vehículo eléctrico</span>
-        te conviene?
-      </h1>
-      <p>
-        Completá tu presupuesto, el tipo de vehículo, autonomía mínima y si necesitás ADAS.
-        El recomendador filtra modelos reales y arma un resumen de equipamiento sólo del modelo que selecciones.
+    <header class="app-header ev-page-header ev-tool-header">
+      <a href="/" class="ev-brand ev-brand-centered" aria-label="Ir al inicio de EVUruguay">
+        <div class="ev-brand-logo">EV</div>
+        <div class="ev-brand-text">EV<span>Uruguay</span></div>
+      </a>
+      <h1 class="ev-heading ev-heading-xl">Recomendador de vehículos eléctricos</h1>
+      <p class="ev-subtitle">
+        Encontrá el eléctrico que mejor encaja con tu presupuesto, autonomía mínima, tipo de uso y equipamiento deseado.
       </p>
+      <p class="ev-tool-description">
+        Compará opciones reales de precios, autonomías, seguridad, extras y patente estimada.
+      </p>
+      <div class="ev-chip-row ev-pill-row carbuy-hero-pills" aria-label="Características de la herramienta">
+        <div class="ev-pill">Filtrá por <strong>presupuesto</strong></div>
+        <div class="ev-pill">Priorizá <strong>autonomía y uso</strong></div>
+        <div class="ev-pill">Revisá <strong>equipamiento</strong></div>
+      </div>
+      <a class="mobile-form-jump" href="#filters-form">Completar datos ↓</a>
     </header>
 
     <main class="layout">
       <!-- Panel izquierdo: filtros / preguntas -->
       <section class="card">
         <div class="card-inner">
+          <div class="ev-callout carbuy-filter-callout">
+            <span class="ev-callout-dot"></span>
+            <span class="ev-callout-text">Definí tu búsqueda<span class="ev-callout-hint">Usamos presupuesto, autonomía, uso y equipamiento para ordenar las recomendaciones.</span></span>
+          </div>
           <div class="card-title-row">
             <div class="card-title">
               <div class="card-title-icon">⚡</div>
@@ -776,31 +1653,31 @@
             </div>
           </div>
           <p class="card-subtitle">
-            Respondé estas preguntas simples. La recomendación se basa directamente en la planilla de
-            comparación de eléctricos.
+            Completá los siguientes campos para recomendarte la opción que mas se ajuste a ti.
           </p>
 
           <form id="filters-form" onsubmit="event.preventDefault(); handleRecommendClick();">
             <div class="form-grid">
               <!-- Presupuesto -->
-              <div class="form-field">
+              <div class="form-field field-budget">
                 <label class="field-label" for="budget">
                   Presupuesto máximo
                   <span class="field-help">(USD)</span>
                 </label>
                 <input
                   id="budget"
-                  type="number"
-                  min="0"
-                  step="500"
+                  type="text"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  autocomplete="off"
                   placeholder="Ej. 25000"
-                  class="field-input"
+                  class="field-input numeric-only"
                   required
                 />
               </div>
 
               <!-- Tipo de vehículo -->
-              <div class="form-field">
+              <div class="form-field field-type">
                 <label class="field-label" for="vehicleType">
                   Tipo de vehículo
                   <span class="field-help">auto, SUV o hatchback</span>
@@ -814,24 +1691,25 @@
               </div>
 
               <!-- Autonomía mínima -->
-              <div class="form-field">
+              <div class="form-field field-range">
                 <label class="field-label" for="range">
                   Autonomía mínima
                   <span class="field-help">km (WLTP aprox.)</span>
                 </label>
                 <input
                   id="range"
-                  type="number"
-                  min="0"
-                  step="10"
+                  type="text"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  autocomplete="off"
                   placeholder="Ej. 300"
-                  class="field-input"
+                  class="field-input numeric-only"
                   required
                 />
               </div>
 
               <!-- ADAS -->
-              <div class="form-field">
+              <div class="form-field field-adas">
                 <label class="field-label" for="adas">
                   ¿Necesitás ADAS?
                   <span class="field-help">ayudas a la conducción</span>
@@ -841,6 +1719,36 @@
                   <option value="si">Sí, quiero que tenga ADAS</option>
                   <option value="no_adas">Prefiero que no tenga</option>
                 </select>
+              </div>
+
+              <div class="form-field field-usage">
+                <label class="field-label" for="usageProfile">
+                  Uso principal
+                  <span class="field-help">para afinar la recomendación</span>
+                </label>
+                <select id="usageProfile" class="field-select">
+                  <option value="mixto">Mixto / familiar</option>
+                  <option value="ciudad">Ciudad y trayectos cortos</option>
+                  <option value="ruta">Ruta e interior</option>
+                  <option value="confort">Confort y tecnología</option>
+                </select>
+              </div>
+
+              <div class="form-field field-priority">
+                <label class="field-label" for="priority">
+                  Prioridad
+                  <span class="field-help">cómo ordenar las opciones</span>
+                </label>
+                <select id="priority" class="field-select">
+                  <option value="equilibrado">Mejor equilibrio general</option>
+                  <option value="precio">Menor precio</option>
+                  <option value="autonomia">Más autonomía</option>
+                  <option value="equipamiento">Más equipamiento / seguridad</option>
+                </select>
+              </div>
+
+              <div class="form-field full-span recommender-hint">
+                <strong>Nuevo:</strong> además de filtrar, ahora calculamos un puntaje de afinidad según tu uso y prioridad para explicar por qué conviene cada modelo.
               </div>
 
               <div class="form-field full-span">
@@ -900,10 +1808,10 @@
       <p>
         Esta herramienta tiene carácter meramente <strong>estimativo e informativo</strong>. 
         Los valores de precios, patentes, autonomías y equipamientos se calculan en base a datos disponibles 
-        al momento de elaborar la planilla y <strong>pueden variar</strong>, contener errores u omisiones.
+        al momento de elaborar la base de datos y <strong>pueden variar</strong>, contener errores u omisiones.
       </p>
       <p>
-        La planilla no incluye necesariamente <strong>todos los vehículos eléctricos disponibles en plaza</strong> 
+        La base de datos no incluye necesariamente <strong>todos los vehículos eléctricos disponibles en plaza</strong> 
         y la configuración de cada modelo puede diferir según versión, año, mercado y equipamiento opcional.
       </p>
       <p>
@@ -928,6 +1836,7 @@
     let excelLoaded = false;
     let excelError = null;
     let lastRenderedList = [];
+    let currentSelectedIndex = 0;
 
     let dolarRate = null;
     let dolarError = null;
@@ -1154,7 +2063,17 @@
       }
     }
 
+    function attachNumericInputGuards() {
+      document.querySelectorAll(".numeric-only").forEach((input) => {
+        input.addEventListener("input", () => {
+          const digitsOnly = input.value.replace(/\D/g, "");
+          if (input.value !== digitsOnly) input.value = digitsOnly;
+        });
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
+      attachNumericInputGuards();
       loadExcelIfNeeded();
       loadDolarIfNeeded();
     });
@@ -1200,17 +2119,29 @@
       return vehicle.patenteContadoUSD * dolarRate;
     }
 
+    function scrollToRecommendedVehicle() {
+      window.requestAnimationFrame(() => {
+        const target = document.getElementById("details-panel") || document.querySelector(".results-header");
+        if (!target) return;
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
     function handleRecommendClick() {
       showError("");
       const budgetInput = document.getElementById("budget");
       const rangeInput = document.getElementById("range");
       const typeSelect = document.getElementById("vehicleType");
       const adasSelect = document.getElementById("adas");
+      const usageSelect = document.getElementById("usageProfile");
+      const prioritySelect = document.getElementById("priority");
 
       const budget = Number(budgetInput.value);
       const rangeMin = Number(rangeInput.value);
       const vehicleType = typeSelect.value;
       const adasPref = adasSelect.value;
+      const usageProfile = usageSelect ? usageSelect.value : "mixto";
+      const priority = prioritySelect ? prioritySelect.value : "equilibrado";
 
       if (!Number.isFinite(budget) || budget <= 0) {
         showError("Ingresá un presupuesto máximo válido en USD.");
@@ -1230,8 +2161,11 @@
             budget,
             rangeMin,
             vehicleType,
-            adasPref
+            adasPref,
+            usageProfile,
+            priority
           });
+          scrollToRecommendedVehicle();
           return;
         }
 
@@ -1265,29 +2199,105 @@
           });
         }
 
-        filtered.sort((a, b) => {
-          const sa = a.score ?? 0;
-          const sb = b.score ?? 0;
+        const scored = filtered.map((vehicle) => ({
+          ...vehicle,
+          match: calculatePreferenceMatch(vehicle, { budget, rangeMin, vehicleType, adasPref, usageProfile, priority })
+        }));
 
-          if (sa !== sb) return sb - sa;
+        scored.sort((a, b) => {
+          const ma = a.match?.score ?? 0;
+          const mb = b.match?.score ?? 0;
+          if (ma !== mb) return mb - ma;
+
+          const legacyScoreA = a.score ?? 0;
+          const legacyScoreB = b.score ?? 0;
+          if (legacyScoreA !== legacyScoreB) return legacyScoreB - legacyScoreA;
 
           const pa = a.price ?? Infinity;
           const pb = b.price ?? Infinity;
           return pa - pb;
         });
 
-        renderResults(filtered, {
+        renderResults(scored, {
           budget,
           rangeMin,
           vehicleType,
-          adasPref
+          adasPref,
+          usageProfile,
+          priority
         });
+        scrollToRecommendedVehicle();
       });
+    }
+
+    function clamp(num, min, max) {
+      return Math.min(max, Math.max(min, num));
+    }
+
+    function calculatePreferenceMatch(vehicle, opts) {
+      const range = vehicle.rangeWLTP ?? vehicle.rangeEPA ?? 0;
+      const budgetHeadroom = opts.budget > 0 && vehicle.price
+        ? clamp((opts.budget - vehicle.price) / opts.budget, 0, 1)
+        : 0;
+      const rangeSurplus = opts.rangeMin > 0
+        ? clamp((range - opts.rangeMin) / Math.max(opts.rangeMin, 1), 0, 1)
+        : clamp(range / 500, 0, 1);
+      const equipmentSignals = [
+        vehicle.adas,
+        hasYes(vehicle.raw, "Apple CarPlay / Android Auto"),
+        hasYes(vehicle.raw, "Camara 360"),
+        hasYes(vehicle.raw, "Techo Solar"),
+        hasYes(vehicle.raw, "Butacas calefaccionadas"),
+        hasYes(vehicle.raw, "Velocidad crucero adaptativo"),
+        hasYes(vehicle.raw, "Frenado de Emergencia")
+      ].filter(Boolean).length;
+      const equipmentScore = clamp(equipmentSignals / 7, 0, 1);
+
+      const weights = { price: 0.34, range: 0.32, equipment: 0.24, fit: 0.10 };
+      if (opts.priority === "precio") { weights.price = 0.52; weights.range = 0.22; weights.equipment = 0.16; }
+      if (opts.priority === "autonomia") { weights.price = 0.20; weights.range = 0.52; weights.equipment = 0.18; }
+      if (opts.priority === "equipamiento") { weights.price = 0.18; weights.range = 0.22; weights.equipment = 0.50; }
+
+      let fitScore = 0.65;
+      if (opts.usageProfile === "ciudad") {
+        fitScore = vehicle.bodyTypeNorm === "hatch" || vehicle.bodyTypeNorm === "auto" ? 1 : 0.72;
+      } else if (opts.usageProfile === "ruta") {
+        fitScore = range >= 380 ? 1 : range >= 320 ? 0.78 : 0.55;
+      } else if (opts.usageProfile === "confort") {
+        fitScore = equipmentScore >= 0.55 ? 1 : 0.7;
+      }
+
+      const score = Math.round(
+        100 * (
+          budgetHeadroom * weights.price +
+          rangeSurplus * weights.range +
+          equipmentScore * weights.equipment +
+          fitScore * weights.fit
+        )
+      );
+
+      const reasons = [];
+      if (budgetHeadroom >= 0.18) reasons.push("queda con buen margen dentro del presupuesto");
+      else reasons.push("entra justo en el presupuesto indicado");
+      if (rangeSurplus >= 0.25) reasons.push("supera con holgura la autonomía mínima");
+      else reasons.push("cumple la autonomía mínima solicitada");
+      if (equipmentScore >= 0.45) reasons.push("suma buen paquete de seguridad y tecnología");
+      if (opts.usageProfile === "ciudad") reasons.push("perfil práctico para uso urbano");
+      if (opts.usageProfile === "ruta") reasons.push("perfil más conveniente para ruta");
+
+      return { score: clamp(score, 0, 100), reasons: reasons.slice(0, 3), budgetHeadroom, rangeSurplus, equipmentScore };
     }
 
     function hasYes(d, key) {
       const val = d[key];
       return typeof val === "string" && val.trim().toUpperCase() === "SI";
+    }
+
+    function isGbtConnector(vehicle) {
+      const connector = cleanValue(vehicle?.raw?.["Conector"]);
+      if (!connector) return false;
+      const normalized = connector.toUpperCase().replace(/[\s\-_/]/g, "");
+      return normalized.includes("GBT") || connector.toUpperCase().includes("GB/T");
     }
 
     function getAdasFeatureLabels(vehicle) {
@@ -1448,6 +2458,46 @@
       return pieces.join(" ");
     }
 
+
+    function closeVehicleImageModal() {
+      const modal = document.getElementById("vehicle-image-modal");
+      if (!modal) return;
+      modal.classList.remove("show");
+      document.body.classList.remove("vehicle-modal-open");
+    }
+
+    function openVehicleImageModal(src, alt) {
+      if (!src) return;
+      let modal = document.getElementById("vehicle-image-modal");
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "vehicle-image-modal";
+        modal.className = "vehicle-image-modal";
+        modal.innerHTML = `
+          <div class="vehicle-image-modal-backdrop" data-close="true"></div>
+          <div class="vehicle-image-modal-dialog" role="dialog" aria-modal="true" aria-label="Imagen ampliada del vehículo">
+            <button type="button" class="vehicle-image-modal-close" aria-label="Cerrar imagen ampliada">×</button>
+            <img class="vehicle-image-modal-img" alt="">
+          </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener("click", (event) => {
+          if (event.target.dataset.close === "true" || event.target.classList.contains("vehicle-image-modal-close")) {
+            closeVehicleImageModal();
+          }
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") closeVehicleImageModal();
+        });
+      }
+
+      const img = modal.querySelector(".vehicle-image-modal-img");
+      img.src = src;
+      img.alt = alt || "Imagen ampliada del vehículo";
+      modal.classList.add("show");
+      document.body.classList.add("vehicle-modal-open");
+    }
+
     function renderDetailsPanel(vehicle, isRecommended) {
       const panel = document.getElementById("details-panel");
       if (!panel) return;
@@ -1468,18 +2518,39 @@
       const summaryText = buildEquipmentSummary(vehicle);
       const patenteUyu = computePatenteUyu(vehicle);
       const patenteContadoUyu = computePatenteContadoUyu(vehicle);
+      const totalResults = lastRenderedList.length;
+      const detailIndex = Math.max(0, lastRenderedList.indexOf(vehicle));
+      const counterText = totalResults ? `${detailIndex + 1} / ${totalResults}` : "";
 
       panel.innerHTML = `
-        ${isRecommended ? '<div class="details-badge">Candidato recomendado</div>' : ''}
+        <div class="details-topline">
+          ${isRecommended ? '<div class="details-badge">Candidato recomendado</div>' : '<div></div>'}
+          ${totalResults > 1 ? `
+            <div class="details-nav" aria-label="Navegar recomendaciones">
+              <button type="button" class="details-nav-button" data-direction="prev" aria-label="Ver vehículo anterior">‹</button>
+              <span class="details-counter">${counterText}</span>
+              <button type="button" class="details-nav-button" data-direction="next" aria-label="Ver siguiente vehículo">›</button>
+              <span class="details-swipe-hint" aria-hidden="true">Deslizá para cambiar</span>
+            </div>
+          ` : ""}
+        </div>
 
         <div class="details-hero">
-          ${vehicle.imageUrl ? `<img class="vehicle-image" src="${vehicle.imageUrl}" alt="${vehicle.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : ''}
+          ${vehicle.imageUrl ? `<img class="vehicle-image vehicle-image-zoom" src="${vehicle.imageUrl}" alt="${vehicle.name}" loading="lazy" referrerpolicy="no-referrer" title="Abrir imagen ampliada" tabindex="0" onerror="this.style.display='none'">` : ''}
           <div style="min-width:0; flex:1;">
             <div class="details-title">${vehicle.name}</div>
             <div class="details-subtitle">${vehicle.bodyLabel || 'Vehículo eléctrico'}</div>
             <div class="details-price">${formatUsd(vehicle.price)}</div>
           </div>
         </div>
+
+        ${vehicle.match ? `<div class="match-panel"><strong>${vehicle.match.score}% de afinidad</strong><span>${vehicle.match.reasons.join(" · ")}</span></div>` : ""}
+
+        ${isGbtConnector(vehicle) ? `
+          <div class="connector-warning">
+            <strong>Precaución con el conector GB/T:</strong> este modelo usa un conector que no es la norma adoptada por Uruguay. Para utilizar redes de carga de UTE y operadores privados probablemente necesites un adaptador de GB/T a CCS2.
+          </div>
+        ` : ""}
 
         <div class="details-body">
           ${summaryText}
@@ -1525,10 +2596,86 @@
             : ''
         }
       `;
+
+      panel.querySelectorAll(".details-nav-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const direction = button.getAttribute("data-direction");
+          const delta = direction === "prev" ? -1 : 1;
+          selectResultByIndex(currentSelectedIndex + delta, true);
+        });
+      });
+
+      attachDetailsSwipeNavigation(panel);
+
+      const zoomImage = panel.querySelector(".vehicle-image-zoom");
+      if (zoomImage) {
+        const openZoom = () => openVehicleImageModal(zoomImage.currentSrc || zoomImage.src, zoomImage.alt || vehicle.name);
+        zoomImage.addEventListener("click", openZoom);
+        zoomImage.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openZoom();
+          }
+        });
+      }
+    }
+
+    function attachDetailsSwipeNavigation(panel) {
+      let touchStart = null;
+
+      panel.addEventListener("touchstart", (event) => {
+        if (event.touches.length !== 1) {
+          touchStart = null;
+          return;
+        }
+
+        const touch = event.touches[0];
+        touchStart = { x: touch.clientX, y: touch.clientY };
+      }, { passive: true });
+
+      panel.addEventListener("touchend", (event) => {
+        if (!touchStart || event.changedTouches.length !== 1 || lastRenderedList.length < 2) {
+          touchStart = null;
+          return;
+        }
+
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStart.x;
+        const deltaY = touch.clientY - touchStart.y;
+        touchStart = null;
+
+        const isHorizontalSwipe = Math.abs(deltaX) >= 48 && Math.abs(deltaX) > Math.abs(deltaY);
+        if (!isHorizontalSwipe) return;
+
+        selectResultByIndex(currentSelectedIndex + (deltaX < 0 ? 1 : -1), false);
+      }, { passive: true });
+
+      panel.addEventListener("touchcancel", () => {
+        touchStart = null;
+      }, { passive: true });
+    }
+
+    function selectResultByIndex(index, shouldScrollDetail = false) {
+      if (!lastRenderedList.length) return;
+      const total = lastRenderedList.length;
+      const normalizedIndex = ((index % total) + total) % total;
+      currentSelectedIndex = normalizedIndex;
+
+      const cards = document.querySelectorAll("#results-list .result-card");
+      cards.forEach((card) => {
+        card.classList.toggle("selected", Number(card.getAttribute("data-index")) === normalizedIndex);
+      });
+
+      renderDetailsPanel(lastRenderedList[normalizedIndex], normalizedIndex === 0);
+
+      if (shouldScrollDetail) {
+        const panel = document.getElementById("details-panel");
+        if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
 
     function renderResults(list, opts) {
-      const { budget, rangeMin, vehicleType, adasPref } = opts;
+      const { budget, rangeMin, vehicleType, adasPref, usageProfile, priority } = opts;
 
       lastRenderedList = list;
 
@@ -1579,6 +2726,19 @@
         );
       }
 
+      const usageLabels = { ciudad: "Ciudad", ruta: "Ruta", confort: "Confort", mixto: "Mixto" };
+      const priorityLabels = { precio: "Precio", autonomia: "Autonomía", equipamiento: "Equipamiento", equilibrado: "Equilibrio" };
+      pills.push(
+        '<div class="pill-filter"><span class="chip-label">Uso</span><span>' +
+          (usageLabels[usageProfile] || "Mixto") +
+          "</span></div>"
+      );
+      pills.push(
+        '<div class="pill-filter"><span class="chip-label">Prioridad</span><span>' +
+          (priorityLabels[priority] || "Equilibrio") +
+          "</span></div>"
+      );
+
       if (adasPref === "si") {
         pills.push(
           '<div class="pill-filter"><span class="chip-label">ADAS</span><span>Debe tener</span></div>'
@@ -1607,82 +2767,66 @@
 
       const cardsHTML = list
         .map((v, idx) => {
-          const rangeMain = v.rangeWLTP ?? v.rangeEPA;
-          const rangeLabelShort =
-            v.rangeWLTP != null
-              ? "WLTP aprox."
-              : v.rangeEPA != null
-              ? "EPA aprox."
-              : "aprox.";
-
-          const adasChip = v.adas
-            ? '<div class="chip chip-accent"><span class="chip-accent-dot"></span><span>ADAS disponible</span></div>'
-            : '<div class="chip chip-adas-no">Sin ADAS</div>';
-
-          const patenteUyu = computePatenteUyu(v);
-          const patenteContadoUyu = computePatenteContadoUyu(v);
-
-          const patenteChipBase = patenteUyu != null
-            ? `<div class="chip"><span class="chip-label">Patente</span><span>${formatUyu(patenteUyu)}</span></div>`
-            : "";
-
-          const patenteChipContado = patenteContadoUyu != null
-            ? `<div class="chip chip-patente-contado"><span class="chip-label">Contado</span><span>${formatUyu(patenteContadoUyu)}</span></div>`
-            : "";
-
-          const patenteChip = patenteChipBase + patenteChipContado;
+          const score = v.match?.score ?? 0;
+          const isRecommended = idx === 0;
 
           return `
-            <article class="result-card" data-index="${idx}">
-              <div class="result-main">
-                <div class="result-name">${v.name}</div>
-                <div class="result-subtitle">${v.bodyLabel || "Vehículo eléctrico"}</div>
-                <div class="result-price">${formatUsd(v.price)}</div>
-                <div class="result-meta">
-                  <div class="chip">
-                    <span class="chip-label">Autonomía</span>
-                    <span>${formatKm(rangeMain)} · ${rangeLabelShort}</span>
-                  </div>
-                  ${adasChip}
-                  ${patenteChip}
-                </div>
-              </div>
-              <div class="result-side">
+            <article class="result-card" data-index="${idx}" aria-label="Ver detalle de ${v.name}">
+              <div class="result-media">
+                <span class="result-rank">#${idx + 1}</span>
                 ${v.imageUrl ? `
                   <img class="result-thumb" src="${v.imageUrl}" alt="${v.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;result-thumb placeholder&quot;>🚗</div>'">
                 ` : `<div class="result-thumb placeholder">🚗</div>`}
+              </div>
+              <div class="result-main">
+                <div class="result-card-top">
+                  <div>
+                    <div class="result-name">${v.name}</div>
+                    <div class="result-subtitle">${v.bodyLabel || "Vehículo eléctrico"}</div>
+                  </div>
+                  <div class="result-score" aria-label="Afinidad ${score}%">
+                    <div class="score-number">${score}%</div>
+                    <div class="score-label">afinidad</div>
+                  </div>
+                </div>
+                <div class="result-price">${formatUsd(v.price)}</div>
+                ${isRecommended ? '<div class="result-match-reason">Mejor coincidencia</div>' : ""}
               </div>
             </article>
           `;
         })
         .join("");
 
-      resultsListEl.innerHTML = cardsHTML;
+      resultsListEl.innerHTML = '<div class="results-extra-title">Otras sugerencias</div>' + cardsHTML;
 
       const cards = resultsListEl.querySelectorAll(".result-card");
       cards.forEach((card) => {
         card.addEventListener("click", () => {
-          cards.forEach((c) => c.classList.remove("selected"));
-          card.classList.add("selected");
           const idx = Number(card.getAttribute("data-index"));
-          const vehicle = lastRenderedList[idx];
-          renderDetailsPanel(vehicle, idx === 0);
-
-          if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
-            const panel = document.getElementById('details-panel');
-            if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
+          selectResultByIndex(idx, window.matchMedia && window.matchMedia('(max-width: 720px)').matches);
         });
       });
 
       if (cards.length > 0) {
-        cards[0].classList.add("selected");
-        renderDetailsPanel(lastRenderedList[0], true);
+        selectResultByIndex(0, false);
       } else {
         renderDetailsPanel(null);
       }
     }
   </script>
+  <div class="ad-banner-wrap ad-bottom">
+    <div class="ad-slot">
+      <a href="#" data-ad-whatsapp="bottom" title="Anunciate en EVUruguay">
+        <img src="/img/publicidad2.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      </a>
+    </div>
+    <span class="ad-label">Publicidad</span>
+  </div>
+  <script src="/assets/js/install-prompt.js" defer></script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
   <script src="/assets/js/bottom-nav.js" defer></script>
+  <script src="/assets/glass/displacement-utils.js" defer></script>
+  <script src="/assets/js/glass-nav.js" defer></script>
+  <script src="/assets/js/ad-whatsapp.js" defer></script>
 </body>
 </html>
