@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>Calculá los costos de carga y tu ahorro en EVUruguay</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#16a07a" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f7b5f" />
   <meta name="description" content="Calculá el costo de carga de tu vehículo eléctrico en Uruguay, compará tarifas, cargadores y ahorro frente a combustión." />
   <meta name="application-name" content="EVUruguay" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="EVUruguay" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="msapplication-TileColor" content="#16a07a" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="msapplication-TileColor" content="#0f7b5f" />
   <meta name="msapplication-TileImage" content="icons/icon-144x144.png" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="favicon.ico" sizes="any" />
@@ -29,6 +29,76 @@
     }
     @media (max-width: 800px) {
       .ev-app { grid-template-columns: 1fr; }
+    }
+
+    /* SOC dual range slider */
+    #panelSoc .soc-wrap { margin-top: 8px; }
+    #panelSoc .soc-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    #panelSoc .soc-val { font-size: 0.78rem; color: var(--color-text-secondary); font-weight: 500; }
+    #panelSoc .soc-track {
+      position: relative;
+      height: 32px;
+      margin-top: 10px;
+      padding: 0 3px;
+      overflow: hidden;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      background: var(--ev-mint);
+      box-shadow: inset 0 1px 3px rgba(6, 78, 59, 0.06);
+    }
+    #panelSoc .soc-fill {
+      position: absolute;
+      right: 0;
+      left: 0;
+      height: 100%;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, var(--ev-green), var(--ev-teal));
+      opacity: 0.35;
+    }
+    #panelSoc .range { position: absolute; top: -12px; left: 0; width: 100%; height: 50px; pointer-events: none; }
+    #panelSoc .range input[type="range"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      margin: 0;
+      pointer-events: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    #panelSoc .range input[type="range"]::-webkit-slider-runnable-track { height: 16px; background: transparent; }
+    #panelSoc .range input[type="range"]::-moz-range-track { height: 16px; background: transparent; }
+    #panelSoc .range input[type="range"]::-webkit-slider-thumb {
+      width: 24px;
+      height: 24px;
+      cursor: grab;
+      pointer-events: auto;
+      border: 2px solid var(--ev-green);
+      border-radius: 999px;
+      background: linear-gradient(135deg, #fff 0%, var(--ev-cream) 100%);
+      box-shadow: 0 4px 12px rgba(6, 78, 59, 0.2);
+      -webkit-appearance: none;
+    }
+    #panelSoc .range input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      cursor: grab;
+      pointer-events: auto;
+      border: 2px solid var(--ev-green);
+      border-radius: 999px;
+      background: linear-gradient(135deg, #fff 0%, var(--ev-cream) 100%);
+      box-shadow: 0 4px 12px rgba(6, 78, 59, 0.2);
+    }
+    #panelSoc #socStart { z-index: 6; }
+    #panelSoc #socEnd { z-index: 7; }
+    [data-theme="dark"] #panelSoc .soc-track { background: var(--ev-mint); border-color: rgba(45, 212, 168, 0.15); }
+    [data-theme="dark"] #panelSoc .range input[type="range"]::-webkit-slider-thumb,
+    [data-theme="dark"] #panelSoc .range input[type="range"]::-moz-range-thumb {
+      border-color: var(--ev-teal);
+      background: linear-gradient(135deg, var(--ev-sage), var(--ev-mint));
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
     /* Share card (offscreen for html2canvas capture) */
@@ -118,45 +188,12 @@
     .comp-bar-fill-ev { background: linear-gradient(90deg, var(--ev-green), var(--ev-teal)); }
     .comp-bar-fill-ice { background: linear-gradient(90deg, #e63946, #f87171); }
 
-    /* Red panel override */
-    #panelComparadorRedes { background: linear-gradient(135deg, #fef2f2 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.12) !important; }
-    #panelComparadorRedes .ev-card-title span { color: #b91c1c !important; }
-    #panelComparadorRedes .ev-collapse-btn { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.06) !important; color: #e63946 !important; }
-    #panelComparadorRedes a.ev-link { border-color: rgba(230, 57, 70, 0.2) !important; background: rgba(230, 57, 70, 0.04) !important; color: #b91c1c !important; }
-
-    /* Amber panel override */
-    #panelCarBuy { background: linear-gradient(135deg, #fefce8 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.12) !important; }
-    #panelCarBuy .ev-card-title span { color: #a16207 !important; }
-    #panelCarBuy .ev-collapse-btn { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.06) !important; color: #ca8a04 !important; }
-    #panelCarBuy a.ev-link { border-color: rgba(202, 138, 4, 0.2) !important; background: rgba(202, 138, 4, 0.04) !important; color: #a16207 !important; }
-
-    /* Green panel override — Simulador Instalación */
-    #panelInstalacion { background: linear-gradient(135deg, #ecfdf5 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.15) !important; }
-    #panelInstalacion .ev-card-title span { color: #0f7b5f !important; }
-    #panelInstalacion .ev-collapse-btn { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.08) !important; color: #16a07a !important; }
-    #panelInstalacion a.ev-link { border-color: rgba(45, 212, 168, 0.25) !important; background: rgba(45, 212, 168, 0.06) !important; color: #0f7b5f !important; }
-
-    /* Dark mode: page-specific overrides */
-    [data-theme="dark"] #panelComparadorRedes { background: linear-gradient(135deg, rgba(230, 57, 70, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(230, 57, 70, 0.15) !important; }
-    [data-theme="dark"] #panelComparadorRedes .ev-card-title span { color: #fca5a5 !important; }
-    [data-theme="dark"] #panelComparadorRedes .ev-collapse-btn { color: #fca5a5 !important; }
-    [data-theme="dark"] #panelComparadorRedes a.ev-link { color: #fca5a5 !important; }
-
-    [data-theme="dark"] #panelCarBuy { background: linear-gradient(135deg, rgba(202, 138, 4, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(202, 138, 4, 0.15) !important; }
-    [data-theme="dark"] #panelCarBuy .ev-card-title span { color: #fde68a !important; }
-    [data-theme="dark"] #panelCarBuy .ev-collapse-btn { color: #fde68a !important; }
-    [data-theme="dark"] #panelCarBuy a.ev-link { color: #fde68a !important; }
-
-    /* Dark mode: Simulador Instalación panel */
-    [data-theme="dark"] #panelInstalacion { background: linear-gradient(135deg, rgba(45, 212, 168, 0.06) 0%, var(--ev-cream) 100%) !important; border-color: rgba(45, 212, 168, 0.18) !important; }
-    [data-theme="dark"] #panelInstalacion .ev-card-title span { color: #a7f3d0 !important; }
-    [data-theme="dark"] #panelInstalacion .ev-collapse-btn { color: #a7f3d0 !important; }
-    [data-theme="dark"] #panelInstalacion a.ev-link { color: #a7f3d0 !important; }
-
     /* Dark mode: savings highlight */
-    [data-theme="dark"] .savings-highlight { background: rgba(45, 212, 168, 0.06); border-color: rgba(45, 212, 168, 0.15); color: #a7f3d0; }
+    [data-theme="dark"] .savings-highlight { background: rgba(45, 212, 168, 0.06); border-color: rgba(45, 212, 168, 0.15); color: var(--ev-forest); }
     [data-theme="dark"] .savings-highlight strong { color: var(--ev-teal); }
     [data-theme="dark"] .comparison-card .ev-card-title span { color: #93c5fd !important; }
+
+
 
     .ad-banner-wrap {
       width: 100%;
@@ -172,12 +209,6 @@
       padding: 4px 0 10px;
     }
 
-    .compass-banner-wrap {
-      padding-top: 2px;
-    }
-    .compass-banner-slot {
-      max-width: 720px;
-    }
     .ad-label {
       font-size: 0.58rem;
       font-weight: 600;
@@ -296,29 +327,6 @@
     body {
       padding-bottom: calc(94px + env(safe-area-inset-bottom));
     }
-    .install-app-btn {
-      position: fixed;
-      right: 18px;
-      bottom: calc(104px + env(safe-area-inset-bottom));
-      z-index: 9998;
-      display: none;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid rgba(45,212,168,0.28);
-      border-radius: var(--radius-pill);
-      padding: 10px 16px;
-      background: linear-gradient(135deg, var(--ev-green), var(--ev-teal));
-      color: #fff;
-      font: 700 0.82rem var(--font-display);
-      box-shadow: 0 10px 28px rgba(22,160,122,0.24);
-      cursor: pointer;
-    }
-    .install-app-btn.show { display: inline-flex; }
-    .install-app-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 34px rgba(22,160,122,0.3); }
-    @media (max-width: 560px) {
-      .install-app-btn { right: 12px; bottom: calc(96px + env(safe-area-inset-bottom)); padding: 9px 13px; font-size: 0.76rem; }
-    }
-
     @media (max-width: 560px) {
       .savings-card .ev-table th:nth-child(5),
       .savings-card .ev-table td:nth-child(5),
@@ -331,40 +339,24 @@
       .status { text-align: center; }
     }
   </style>
+  <script src="/assets/js/theme-sync.js"></script>
 </head>
 <body>
-  <!-- Theme toggle -->
-  <button class="ev-theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro">
-    <span class="icon-light">💡</span>
-    <span class="icon-dark">🌙</span>
-  </button>
-
-  <button class="install-app-btn" id="installAppBtn" type="button" aria-label="Instalar EVUruguay en este dispositivo">
-    📱 Instalar EVUruguay
-  </button>
-
   <div class="ad-banner-wrap ad-top">
     <span class="ad-label">Publicidad</span>
     <div class="ad-slot">
-      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
+      <a href="#" data-ad-whatsapp="top" title="Anunciate en EVUruguay">
         <img src="img/publicidad.png" alt="Anunciate en EVUruguay" loading="eager" />
       </a>
     </div>
   </div>
 
-  <div class="ad-banner-wrap ad-top compass-banner-wrap">
-    <div class="ad-slot compass-banner-slot">
-      <a href="https://evuruguay.com/brujula/" title="Ir a la Brújula de Eficiencia">
-        <img src="img/brujula.png" alt="Brújula de Eficiencia EVUruguay" loading="eager" />
-      </a>
-    </div>
-  </div>
 
   <div class="ev-shell">
   <div class="ev-app">
     <!-- Panel Izquierdo -->
     <div>
-      <header>
+      <header class="ev-page-header ev-tool-header">
         <a href="/" class="ev-brand" style="text-decoration:none;">
           <div class="ev-brand-logo">EV</div>
           <div class="ev-brand-text">EV<span>Uruguay</span></div>
@@ -546,15 +538,21 @@
           </button>
         </div>
         <div class="collapsible-body">
-          <div class="ev-grid-2">
-            <div class="ev-field">
-              <label class="ev-label" for="socStart">SOC inicial (%)</label>
-              <input class="ev-input" id="socStart" type="number" min="0" max="100" step="1" value="0" />
+          <div class="soc-wrap">
+            <div class="soc-top">
+              <div class="ev-field" style="flex:1;">
+                <label class="ev-label" for="socStart">Tramo de carga (SOC)</label>
+                <div class="soc-val" id="socLabel">0% → 100%</div>
+              </div>
             </div>
-            <div class="ev-field">
-              <label class="ev-label" for="socEnd">SOC final (%)</label>
-              <input class="ev-input" id="socEnd" type="number" min="0" max="100" step="1" value="100" />
+            <div class="soc-track">
+              <div id="socFill" class="soc-fill"></div>
+              <div class="range">
+                <input id="socStart" type="range" min="0" max="100" value="0" aria-label="SOC inicial" />
+                <input id="socEnd" type="range" min="0" max="100" value="100" aria-label="SOC final" />
+              </div>
             </div>
+            <p class="ev-note" style="margin-top:8px;">Arrastrá los extremos para elegir el tramo de carga, por ejemplo <strong>20% → 80%</strong>.</p>
           </div>
           <div class="ev-error" id="socError" style="display:none;"></div>
         </div>
@@ -681,51 +679,6 @@
       </div>
     </div>
 
-    <!-- Comparador de redes -->
-    <div class="ev-section-card chargers-card collapsible" id="panelComparadorRedes" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>Compará el costo de tu carga en las diferentes redes de carga de Uruguay</span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelComparadorRedes">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Accedé a la herramienta donde podés comparar cuánto cuesta la misma carga en cada red pública y privada del país.</p>
-        <a class="ev-link" href="/carga.html">Ir al comparador de redes →</a>
-      </div>
-    </div>
-
-    <!-- Recomendador -->
-    <div class="ev-section-card chargers-card collapsible" id="panelCarBuy" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>Qué vehículo puedo comprar? <span style="opacity:.6">(BETA)</span></span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelCarBuy">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Probá la herramienta beta para ayudarte a elegir un vehículo eléctrico según tus preferencias y presupuesto.</p>
-        <a class="ev-link" href="/carbuy/recomendador.html">Ir a "Qué vehículo puedo comprar?" →</a>
-      </div>
-    </div>
-
-    <!-- Simulador de Instalación -->
-    <div class="ev-section-card chargers-card collapsible" id="panelInstalacion" data-open="false">
-      <div class="ev-card-title card-title" style="cursor:pointer;">
-        <span>⚡ Simulador de Instalación EV para el hogar</span>
-        <button class="ev-collapse-btn collapse-btn" type="button" data-target="panelInstalacion">
-          <span class="collapse-btn-label">Mostrar</span>
-          <span class="ev-collapse-icon collapse-btn-icon">▼</span>
-        </button>
-      </div>
-      <div class="collapsible-body">
-        <p class="ev-note">Dimensioná el cableado, protecciones, tablero y materiales necesarios para instalar un punto de carga en tu hogar, según la normativa de UTE (Cap. XXX). Incluye lista de materiales con links a MercadoLibre y diagrama animado de la instalación.</p>
-        <a class="ev-link" href="/instalacion/">Ir al simulador de instalación →</a>
-      </div>
-    </div>
-
     <!-- Footer -->
     <div class="ev-footer">
       <div class="ev-footer-line"></div>
@@ -744,8 +697,8 @@
 
   <div class="ad-banner-wrap ad-bottom">
     <div class="ad-slot">
-      <a href="mailto:contacto@evuruguay.com?subject=Quiero%20anunciar%20en%20EVUruguay" title="Anunciate en EVUruguay">
-        <img src="img/publicidad.png" alt="Anunciate en EVUruguay" loading="lazy" />
+      <a href="#" data-ad-whatsapp="bottom" title="Anunciate en EVUruguay">
+        <img src="img/publicidad2.png" alt="Anunciate en EVUruguay" loading="lazy" />
       </a>
     </div>
     <span class="ad-label">Publicidad</span>
@@ -1414,6 +1367,42 @@
       if (!isNaN(n) && n > 0) return n;
 
       return null;
+    }
+
+    let socActive = "end";
+
+    function updateSocSlider(active = socActive) {
+      let start = Number(socStartInput.value);
+      let end = Number(socEndInput.value);
+
+      if (!Number.isFinite(start)) start = 0;
+      if (!Number.isFinite(end)) end = 100;
+      start = Math.round(Math.min(100, Math.max(0, start)));
+      end = Math.round(Math.min(100, Math.max(0, end)));
+
+      if (end <= start) {
+        if (active === "start") {
+          end = Math.min(100, start + 1);
+          if (end <= start) start = end - 1;
+        } else {
+          start = Math.max(0, end - 1);
+          if (end <= start) end = start + 1;
+        }
+      }
+
+      socStartInput.value = String(start);
+      socEndInput.value = String(end);
+      document.getElementById("socFill").style.left = `${start}%`;
+      document.getElementById("socFill").style.right = `${100 - end}%`;
+      document.getElementById("socLabel").textContent = `${start}% → ${end}%`;
+      socStartInput.setAttribute("aria-valuetext", `${start}% inicial`);
+      socEndInput.setAttribute("aria-valuetext", `${end}% final`);
+    }
+
+    function bringSocHandleToFront(handle) {
+      socActive = handle;
+      socStartInput.style.zIndex = handle === "start" ? "8" : "7";
+      socEndInput.style.zIndex = handle === "end" ? "8" : "7";
     }
 
     function validateSoc() {
@@ -2086,8 +2075,22 @@
       updateChargersComparison();
     });
 
-    socStartInput.addEventListener("input", recalculate);
-    socEndInput.addEventListener("input", recalculate);
+    ["pointerdown", "touchstart", "mousedown"].forEach((eventName) => {
+      socStartInput.addEventListener(eventName, () => bringSocHandleToFront("start"), { passive: true });
+      socEndInput.addEventListener(eventName, () => bringSocHandleToFront("end"), { passive: true });
+    });
+
+    socStartInput.addEventListener("input", () => {
+      bringSocHandleToFront("start");
+      updateSocSlider("start");
+      recalculate();
+    });
+    socEndInput.addEventListener("input", () => {
+      bringSocHandleToFront("end");
+      updateSocSlider("end");
+      recalculate();
+    });
+    updateSocSlider();
 
     tarifaTipoSelect.addEventListener("change", () => {
       initFranjas();
@@ -2383,62 +2386,11 @@
   <!-- Librerías para compartir -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <!-- Theme toggle logic -->
-  <script>
-  (function() {
-    const toggle = document.getElementById('themeToggle');
-    const html = document.documentElement;
-    const saved = localStorage.getItem('ev-theme');
-    if (saved === 'dark') html.setAttribute('data-theme', 'dark');
-
-    toggle.addEventListener('click', () => {
-      const isDark = html.getAttribute('data-theme') === 'dark';
-      if (isDark) {
-        html.removeAttribute('data-theme');
-        localStorage.setItem('ev-theme', 'light');
-      } else {
-        html.setAttribute('data-theme', 'dark');
-        localStorage.setItem('ev-theme', 'dark');
-      }
-    });
-  })();
-  </script>
-
-  <script>
-    // PWA: muestra el botón de instalación cuando el navegador lo permite.
-    (function () {
-      let deferredInstallPrompt = null;
-      const installBtn = document.getElementById('installAppBtn');
-
-      window.addEventListener('beforeinstallprompt', function (event) {
-        event.preventDefault();
-        deferredInstallPrompt = event;
-        if (installBtn) installBtn.classList.add('show');
-      });
-
-      if (installBtn) {
-        installBtn.addEventListener('click', async function () {
-          if (!deferredInstallPrompt) return;
-          deferredInstallPrompt.prompt();
-          await deferredInstallPrompt.userChoice;
-          deferredInstallPrompt = null;
-          installBtn.classList.remove('show');
-        });
-      }
-
-      window.addEventListener('appinstalled', function () {
-        if (installBtn) installBtn.classList.remove('show');
-        deferredInstallPrompt = null;
-      });
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('sw.js').catch(function () {});
-        });
-      }
-    })();
-  </script>
-
+  <script src="/assets/js/install-prompt.js" defer></script>
+  <script src="/assets/js/top-app-bar.js" defer></script>
   <script src="/assets/js/bottom-nav.js" defer></script>
+  <script src="/assets/glass/displacement-utils.js" defer></script>
+  <script src="/assets/js/glass-nav.js" defer></script>
+  <script src="/assets/js/ad-whatsapp.js" defer></script>
 </body>
 </html>

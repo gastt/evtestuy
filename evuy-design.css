@@ -50,31 +50,35 @@
 
 /* ---- Dark mode override ---- */
 [data-theme="dark"] {
-  --ev-white: #0f1a14;
-  --ev-cream: #0a1210;
-  --ev-mint: #0d1f17;
-  --ev-sage: #1a3328;
+  --ev-white: #121212;
+  --ev-cream: #050505;
+  --ev-mint: #101010;
+  --ev-sage: #1c1c1c;
   --ev-forest: #a7f3d0;
   --ev-slate: #e2e8f0;
   --ev-slate-mid: #cbd5e1;
   --ev-slate-light: #94a3b8;
 
-  --bg-page: #060e0a;
-  --bg-surface: #0c1810;
-  --bg-surface-raised: #111f16;
+  --bg-page: #050505;
+  --bg-surface: #0c0c0c;
+  --bg-surface-raised: #121212;
   --bg-accent-subtle: rgba(45, 212, 168, 0.08);
   --color-text: #e2e8f0;
   --color-text-secondary: #cbd5e1;
   --color-text-tertiary: #94a3b8;
   --color-accent: #2dd4a8;
   --color-accent-bright: #5eead4;
-  --color-border: rgba(45, 212, 168, 0.12);
-  --color-border-hover: rgba(45, 212, 168, 0.25);
+  --color-border: rgba(45, 212, 168, 0.14);
+  --color-border-hover: rgba(45, 212, 168, 0.28);
   --color-focus-ring: rgba(45, 212, 168, 0.25);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(45, 212, 168, 0.06);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(45, 212, 168, 0.05);
-  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(45, 212, 168, 0.08);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(45, 212, 168, 0.07);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+
+  /* Solid-black glass tint shared by the top bar, bottom nav and other floating chrome. */
+  --ev-glass-tint-dark: rgba(5, 5, 5, 0.72);
+  --ev-glass-tint-dark-soft: rgba(5, 5, 5, 0.5);
 }
 
 [data-theme="dark"] html,
@@ -82,9 +86,9 @@ html[data-theme="dark"] {
   color-scheme: dark;
 }
 
-[data-theme="dark"] body::before { opacity: 0.15; }
+[data-theme="dark"] body::before { opacity: 0.18; }
 [data-theme="dark"] body::after {
-  background: radial-gradient(ellipse, rgba(45, 212, 168, 0.03) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(45, 212, 168, 0.035) 0%, transparent 70%);
 }
 
 [data-theme="dark"] ::selection {
@@ -830,9 +834,14 @@ a.ev-brand:hover {
 /* ---- Mobile polish ---- */
 @media (max-width: 560px) {
   .ev-grid-2 { grid-template-columns: 1fr; gap: 10px; }
-  .ev-input, .ev-select { padding: 11px 14px; font-size: 0.92rem; }
+  .ev-input, .ev-select { padding: 11px 14px; font-size: 16px; }
   .ev-callout { flex-direction: row; }
   .ev-share-row { justify-content: center; }
+}
+
+/* iOS Safari zooms the page when a focused control uses text smaller than 16px. */
+@media (min-width: 561px) and (max-width: 840px) {
+  .ev-input, .ev-select { font-size: 16px; }
 }
 
 /* ---- Dark mode: colored section cards ---- */
@@ -1007,7 +1016,7 @@ button,
 
 [data-theme="dark"] .ev-bottom-nav,
 html[data-theme="dark"] .ev-bottom-nav {
-  background: rgba(15, 23, 42, 0.94);
+  background: rgba(5, 5, 5, 0.94);
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
 }
@@ -1045,5 +1054,1359 @@ html[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"] {
   .ev-bottom-nav-icon {
     width: 20px;
     height: 20px;
+  }
+}
+
+/* ── CarBuy: align recommender with EVUruguay main app language ── */
+body.carbuy-page {
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 168, 0.16), transparent 34rem),
+    linear-gradient(180deg, var(--ev-cream, #f8f7f2) 0%, var(--ev-mint, #eef9f4) 100%) !important;
+  color: var(--color-text, #16231d) !important;
+  font-family: var(--font-display, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif) !important;
+}
+
+body.carbuy-page .app-shell {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  padding: 22px 16px 24px;
+}
+
+body.carbuy-page .app-header {
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: var(--radius-xl, 28px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(236, 253, 245, 0.92));
+  border: 1px solid rgba(22, 160, 122, 0.16);
+  box-shadow: var(--shadow-card, 0 18px 44px rgba(6, 78, 59, 0.10));
+}
+
+body.carbuy-page .badge,
+body.carbuy-page .status-pill,
+body.carbuy-page .pill-filter,
+body.carbuy-page .chip {
+  background: rgba(255, 255, 255, 0.76) !important;
+  border-color: rgba(22, 160, 122, 0.16) !important;
+  color: var(--color-text-secondary, #64746d) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .badge,
+[data-theme="dark"] body.carbuy-page .status-pill,
+[data-theme="dark"] body.carbuy-page .pill-filter,
+[data-theme="dark"] body.carbuy-page .chip,
+html[data-theme="dark"] body.carbuy-page .badge,
+html[data-theme="dark"] body.carbuy-page .status-pill,
+html[data-theme="dark"] body.carbuy-page .pill-filter,
+html[data-theme="dark"] body.carbuy-page .chip {
+  background: rgba(5, 5, 5, 0.58) !important;
+  border-color: rgba(45, 212, 168, 0.16) !important;
+  color: var(--color-text-secondary, #cbd5e1) !important;
+}
+
+body.carbuy-page .badge-dot,
+body.carbuy-page .status-dot,
+body.carbuy-page .chip-accent-dot,
+body.carbuy-page .adas-box-title .dot {
+  background: var(--ev-teal, #2dd4a8) !important;
+  box-shadow: 0 0 0 5px rgba(45, 212, 168, 0.18) !important;
+}
+
+body.carbuy-page .app-header h1 {
+  color: var(--color-text, #16231d) !important;
+  letter-spacing: -0.03em;
+}
+
+body.carbuy-page .app-header h1 .accent,
+body.carbuy-page .result-price,
+body.carbuy-page .details-price,
+body.carbuy-page .note strong,
+body.carbuy-page .site-footer a {
+  color: var(--ev-primary, #16a07a) !important;
+}
+
+body.carbuy-page .app-header p,
+body.carbuy-page .card-subtitle,
+body.carbuy-page .results-summary,
+body.carbuy-page .result-subtitle,
+body.carbuy-page .result-quick,
+body.carbuy-page .details-subtitle,
+body.carbuy-page .details-placeholder,
+body.carbuy-page .details-body,
+body.carbuy-page .details-note,
+body.carbuy-page .note,
+body.carbuy-page .site-footer {
+  color: var(--color-text-secondary, #64746d) !important;
+}
+
+body.carbuy-page .card {
+  background: var(--bg-surface) !important;
+  border: 1px solid rgba(22, 160, 122, 0.14) !important;
+  border-radius: var(--radius-xl, 28px) !important;
+  box-shadow: var(--shadow-card, 0 18px 44px rgba(6, 78, 59, 0.10)) !important;
+}
+
+body.carbuy-page .card::before {
+  background: radial-gradient(circle at 0 0, rgba(45, 212, 168, 0.12), transparent 58%) !important;
+  opacity: 1 !important;
+}
+
+body.carbuy-page .card-title,
+body.carbuy-page .results-title,
+body.carbuy-page .result-name,
+body.carbuy-page .details-title,
+body.carbuy-page .adas-box-title,
+body.carbuy-page .field-label,
+body.carbuy-page .chip-label,
+body.carbuy-page .pill-filter strong {
+  color: var(--color-text, #16231d) !important;
+}
+
+body.carbuy-page .card-title-icon,
+body.carbuy-page .adas-tick {
+  background: rgba(45, 212, 168, 0.12) !important;
+  border-color: rgba(45, 212, 168, 0.32) !important;
+  color: var(--ev-primary, #16a07a) !important;
+}
+
+body.carbuy-page .field-input,
+body.carbuy-page .field-select,
+body.carbuy-page .details-panel,
+body.carbuy-page .empty-state,
+body.carbuy-page .result-thumb {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-color: var(--color-border, rgba(22, 160, 122, 0.16)) !important;
+  color: var(--color-text, #16231d) !important;
+  box-shadow: inset 0 1px 2px rgba(6, 78, 59, 0.04);
+}
+
+body.carbuy-page .field-input:focus,
+body.carbuy-page .field-select:focus {
+  border-color: var(--ev-primary, #16a07a) !important;
+  box-shadow: 0 0 0 3px rgba(45, 212, 168, 0.18) !important;
+}
+
+body.carbuy-page .btn-primary {
+  background: linear-gradient(135deg, var(--ev-teal, #2dd4a8), var(--ev-primary, #16a07a)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 30px rgba(22, 160, 122, 0.28) !important;
+}
+
+body.carbuy-page .result-card {
+  background: rgba(255, 255, 255, 0.84) !important;
+  border-color: rgba(22, 160, 122, 0.14) !important;
+  border-radius: var(--radius-md, 18px) !important;
+}
+
+body.carbuy-page .result-card:hover,
+body.carbuy-page .result-card.selected {
+  border-color: rgba(22, 160, 122, 0.48) !important;
+  box-shadow: 0 14px 30px rgba(6, 78, 59, 0.12) !important;
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.94), rgba(255, 255, 255, 0.96)) !important;
+}
+
+body.carbuy-page .details-badge,
+body.carbuy-page .chip-accent,
+body.carbuy-page .chip-patente-contado,
+body.carbuy-page .details-note-contado,
+body.carbuy-page .adas-box {
+  background: rgba(45, 212, 168, 0.10) !important;
+  border-color: rgba(22, 160, 122, 0.28) !important;
+  color: var(--ev-forest, #0f7b5f) !important;
+}
+
+body.carbuy-page .site-footer {
+  border-top-color: rgba(22, 160, 122, 0.14) !important;
+}
+
+[data-theme="dark"] body.carbuy-page,
+html[data-theme="dark"] body.carbuy-page {
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 168, 0.10), transparent 34rem),
+    var(--bg-page) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .app-header,
+html[data-theme="dark"] body.carbuy-page .app-header,
+[data-theme="dark"] body.carbuy-page .card,
+html[data-theme="dark"] body.carbuy-page .card {
+  background: rgba(5, 5, 5, 0.72) !important;
+  border-color: rgba(45, 212, 168, 0.14) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .field-input,
+[data-theme="dark"] body.carbuy-page .field-select,
+[data-theme="dark"] body.carbuy-page .details-panel,
+[data-theme="dark"] body.carbuy-page .empty-state,
+[data-theme="dark"] body.carbuy-page .result-card,
+html[data-theme="dark"] body.carbuy-page .field-input,
+html[data-theme="dark"] body.carbuy-page .field-select,
+html[data-theme="dark"] body.carbuy-page .details-panel,
+html[data-theme="dark"] body.carbuy-page .empty-state,
+html[data-theme="dark"] body.carbuy-page .result-card {
+  background: rgba(5, 5, 5, 0.70) !important;
+  border-color: rgba(45, 212, 168, 0.14) !important;
+}
+
+/* ── Shared advertising banners ── */
+.ad-banner-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ad-banner-wrap.ad-top {
+  padding: 10px 12px 4px;
+}
+
+.ad-banner-wrap.ad-bottom {
+  padding: 4px 12px 10px;
+}
+
+.ad-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary, #94a3b8);
+  align-self: center;
+}
+
+.ad-slot {
+  width: 100%;
+  max-width: 728px;
+  height: 90px !important;
+  min-height: 90px;
+  box-sizing: border-box;
+  border-radius: var(--radius-md, 18px);
+  overflow: hidden;
+  background: var(--bg-surface);
+  border: 1px dashed rgba(15, 23, 42, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-slot a,
+.ad-slot img {
+  display: block;
+  width: 100%;
+  height: 100% !important;
+}
+
+.ad-slot a {
+  text-decoration: none;
+}
+
+.ad-slot img {
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+
+@media (max-width: 560px) {
+  .ad-slot {
+    height: 60px !important;
+    min-height: 60px;
+  }
+}
+
+[data-theme="dark"] .ad-slot,
+html[data-theme="dark"] .ad-slot {
+  background: rgba(5, 5, 5, 0.72);
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+/* Improve equipment contrast in the EV recommender detail card. */
+body.carbuy-page .adas-item,
+body.carbuy-page .details-note strong {
+  color: var(--color-text, #16231d) !important;
+}
+
+body.carbuy-page .adas-box .adas-item span:last-child {
+  color: var(--color-text, #16231d) !important;
+}
+
+[data-theme="dark"] body.carbuy-page .adas-item,
+[data-theme="dark"] body.carbuy-page .adas-box .adas-item span:last-child,
+[data-theme="dark"] body.carbuy-page .details-note strong,
+html[data-theme="dark"] body.carbuy-page .adas-item,
+html[data-theme="dark"] body.carbuy-page .adas-box .adas-item span:last-child,
+html[data-theme="dark"] body.carbuy-page .details-note strong {
+  color: rgba(226, 232, 240, 0.92) !important;
+}
+
+/* Keep CarBuy page sections stacked vertically when shared ad banners are present. */
+body.carbuy-page {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100%;
+}
+
+body.carbuy-page .ad-banner-wrap,
+body.carbuy-page .app-shell {
+  flex: 0 0 auto;
+}
+
+body.carbuy-page .layout {
+  width: 100%;
+}
+
+/* ── CarBuy desktop results: wider list and larger vehicle imagery ── */
+body.carbuy-page .results-layout {
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+}
+
+body.carbuy-page .details-panel-wrapper {
+  order: -1;
+}
+
+body.carbuy-page #results-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+body.carbuy-page .result-card {
+  grid-template-columns: minmax(0, 1fr) 112px !important;
+  gap: 10px 14px !important;
+  padding: 14px !important;
+}
+
+body.carbuy-page .result-thumb {
+  width: 112px !important;
+  height: 76px !important;
+  border-radius: 16px !important;
+}
+
+body.carbuy-page .details-hero {
+  align-items: center;
+  gap: 18px;
+}
+
+body.carbuy-page .vehicle-image {
+  width: min(38vw, 360px) !important;
+  min-width: 220px;
+  height: 220px !important;
+  border-radius: 22px !important;
+  object-fit: cover;
+  box-shadow: 0 18px 42px rgba(6, 78, 59, 0.16);
+}
+
+body.carbuy-page .vehicle-image-zoom {
+  cursor: zoom-in;
+}
+
+body.carbuy-page .vehicle-image-zoom:focus-visible {
+  outline: 3px solid rgba(45, 212, 168, 0.45);
+  outline-offset: 3px;
+}
+
+.vehicle-modal-open {
+  overflow: hidden;
+}
+
+.vehicle-image-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.vehicle-image-modal.show {
+  display: flex;
+}
+
+.vehicle-image-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.vehicle-image-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 980px);
+  max-height: 88vh;
+  border-radius: 28px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.36);
+}
+
+.vehicle-image-modal-img {
+  display: block;
+  width: 100%;
+  max-height: 88vh;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.vehicle-image-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  body.carbuy-page #results-list {
+    grid-template-columns: 1fr;
+  }
+
+  body.carbuy-page .result-card {
+    grid-template-columns: minmax(0, 1fr) 86px !important;
+  }
+
+  body.carbuy-page .result-thumb {
+    width: 86px !important;
+    height: 62px !important;
+  }
+
+  body.carbuy-page .details-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.carbuy-page .vehicle-image {
+    width: 100% !important;
+    min-width: 0;
+    height: 210px !important;
+  }
+}
+
+/* ── Shared centered EVUruguay page brand ── */
+.ev-page-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ev-brand-centered,
+.ev-page-header .ev-brand {
+  justify-content: center;
+  align-self: center;
+  text-decoration: none;
+}
+
+.ev-page-header .ev-brand {
+  margin-inline: auto;
+}
+
+body.carbuy-page .app-header.ev-page-header {
+  align-items: center;
+  text-align: center;
+}
+
+body.carbuy-page .app-header.ev-page-header p {
+  margin-inline: auto;
+}
+
+body.carbuy-page .app-header .ev-brand-centered {
+  margin-bottom: 6px;
+}
+
+/* ── Bottom app navigation (filled icon version) ── */
+body {
+  padding-bottom: calc(94px + env(safe-area-inset-bottom));
+}
+
+.ev-bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 9997;
+  width: min(calc(100% - 20px), 760px);
+  min-height: auto;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  padding: 8px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px;
+  /* Translucent enough that assets/js/glass-nav.js's real SVG refraction
+     filter (Chromium) has something behind it to distort — html:not(.ev-glass-svg)
+     below replaces this entirely with the opaque CSS-only fallback look. */
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14), 0 4px 14px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ev-bottom-nav-item {
+  min-width: 0;
+  min-height: 58px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 18px;
+  color: var(--color-text-tertiary, #94a3b8);
+  text-decoration: none !important;
+  font: 700 0.64rem var(--font-display, system-ui, sans-serif);
+  line-height: 1.05;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.ev-bottom-nav-item:hover {
+  transform: translateY(-1px);
+  background: rgba(45, 212, 168, 0.07);
+  color: var(--ev-green, #16a07a);
+}
+
+.ev-bottom-nav-item.active,
+.ev-bottom-nav-item[aria-current="page"] {
+  color: var(--ev-green-deep, #0f7b5f);
+  background: linear-gradient(135deg, rgba(45, 212, 168, 0.18), rgba(22, 160, 122, 0.10));
+}
+
+.ev-bottom-nav-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-bottom-nav-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+  display: block;
+}
+
+.ev-bottom-nav-label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .ev-bottom-nav,
+html[data-theme="dark"] .ev-bottom-nav {
+  background: var(--ev-glass-tint-dark-soft);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38), 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item,
+html[data-theme="dark"] .ev-bottom-nav-item {
+  color: rgba(226, 232, 240, 0.58);
+}
+
+[data-theme="dark"] .ev-bottom-nav-item:hover,
+[data-theme="dark"] .ev-bottom-nav-item.active,
+[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"],
+html[data-theme="dark"] .ev-bottom-nav-item:hover,
+html[data-theme="dark"] .ev-bottom-nav-item.active,
+html[data-theme="dark"] .ev-bottom-nav-item[aria-current="page"] {
+  color: var(--ev-teal, #2dd4a8);
+  background: rgba(45, 212, 168, 0.12);
+}
+
+.install-app-btn {
+  bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 560px) {
+  .install-app-btn {
+    bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .ev-bottom-nav {
+    width: calc(100% - 14px);
+    padding: 7px 6px;
+    border-radius: 22px;
+  }
+
+  .ev-bottom-nav-item {
+    min-height: 54px;
+    font-size: 0.61rem;
+    border-radius: 16px;
+  }
+
+  .ev-bottom-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ev-bottom-nav-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+/* ── Liquid Glass navigation (CSS fallback) ──
+   A translucent, saturated surface approximates Liquid Glass for browsers
+   without SVG backdrop-filter support. assets/js/glass-nav.js supplies the
+   real SVG refraction filter on Chromium and marks <html class="ev-glass-svg">,
+   which suppresses these rules there so the inline filter wins instead. Runs
+   at every width now, not just mobile. */
+html:not(.ev-glass-svg) .ev-bottom-nav {
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.24) 46%, rgba(214, 255, 242, 0.3) 100%),
+    rgba(236, 255, 248, 0.34);
+  border-color: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(28px) saturate(190%) brightness(1.08);
+  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.08);
+}
+
+html:not(.ev-glass-svg) .ev-bottom-nav::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 38%, transparent 62%);
+}
+
+html:not(.ev-glass-svg) .ev-bottom-nav-item {
+  position: relative;
+  z-index: 1;
+}
+
+html:not(.ev-glass-svg)[data-theme="dark"] .ev-bottom-nav,
+html:not(.ev-glass-svg) [data-theme="dark"] .ev-bottom-nav {
+  background:
+    linear-gradient(125deg, rgba(45, 212, 168, 0.16) 0%, rgba(5, 5, 5, 0.32) 48%, rgba(5, 5, 5, 0.55) 100%),
+    rgba(5, 5, 5, 0.42);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Top app bar gets the same enhanced blur. Light mode keeps its branded green
+   gradient (see "Light mode topbar" below) and only borrows the stronger
+   blur/saturation; dark mode gets the black+teal glass tint. */
+html:not(.ev-glass-svg) body:not(.has-ev-compass-top-app-bar) .ev-top-app-bar {
+  backdrop-filter: blur(28px) saturate(190%) brightness(1.08);
+  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.08);
+}
+
+html:not(.ev-glass-svg)[data-theme="dark"] body:not(.has-ev-compass-top-app-bar) .ev-top-app-bar,
+html:not(.ev-glass-svg) [data-theme="dark"] body:not(.has-ev-compass-top-app-bar) .ev-top-app-bar {
+  background:
+    linear-gradient(125deg, rgba(45, 212, 168, 0.14) 0%, rgba(5, 5, 5, 0.3) 55%, rgba(5, 5, 5, 0.55) 100%),
+    rgba(5, 5, 5, 0.42);
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 767px) {
+  .ev-bottom-nav {
+    transition: width 0.26s ease, padding 0.26s ease, border-radius 0.26s ease,
+      box-shadow 0.26s ease, background-color 0.26s ease;
+  }
+
+  .ev-bottom-nav-item {
+    transition: min-height 0.26s ease, gap 0.2s ease, color 0.18s ease,
+      background 0.18s ease, transform 0.18s ease;
+  }
+
+  .ev-bottom-nav-label {
+    transition: opacity 0.16s ease, max-height 0.2s ease, transform 0.2s ease;
+  }
+
+  .ev-bottom-nav.is-compact {
+    /* 80% of the previous compact width: the collapsed state is 20% smaller. */
+    width: min(calc(80% - 58px), 296px);
+    padding: 6px 8px;
+    border-radius: 20px;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .ev-bottom-nav.is-compact .ev-bottom-nav-item {
+    min-height: 42px;
+    gap: 0;
+  }
+
+  .ev-bottom-nav.is-compact .ev-bottom-nav-label {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ev-bottom-nav,
+  .ev-bottom-nav-item,
+  .ev-bottom-nav-label {
+    transition: none;
+  }
+}
+
+/* ── Instalación: fix dark title/brand rendering from bundled inline styles ── */
+body.instalacion-page #root [data-ev-brand-replaced="true"] {
+  width: auto !important;
+  max-width: max-content !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  margin-inline: auto !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1,
+[data-theme="dark"] body.instalacion-page #root h1 {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #e8f5ee !important;
+  color: #e8f5ee !important;
+  text-shadow: 0 10px 30px rgba(45, 212, 168, 0.12);
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1 br,
+[data-theme="dark"] body.instalacion-page #root h1 br {
+  display: block;
+}
+
+/* Instalación: prevent title gradient from painting as a full-width bar in any theme. */
+body.instalacion-page #root h1 {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: var(--ev-green-deep, #0f7b5f) !important;
+  color: var(--ev-green-deep, #0f7b5f) !important;
+}
+
+html[data-theme="dark"] body.instalacion-page #root h1,
+[data-theme="dark"] body.instalacion-page #root h1 {
+  -webkit-text-fill-color: #e8f5ee !important;
+  color: #e8f5ee !important;
+}
+
+/* ── Tool intro copy: align CarBuy and Instalación with Inicio/Redes ── */
+.ev-tool-description {
+  max-width: 680px;
+  margin: 8px auto 0;
+  color: var(--color-text-tertiary, #7c8a83);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+body.carbuy-page .app-header.ev-page-header .ev-overline,
+body.instalacion-page .instalacion-tool-overline {
+  margin-top: 8px;
+}
+
+body.carbuy-page .app-header.ev-page-header .ev-heading,
+body.instalacion-page .instalacion-tool-title {
+  margin: 8px 0 4px !important;
+  text-align: center;
+}
+
+body.instalacion-page .instalacion-tool-header {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+body.instalacion-page .instalacion-tool-subtitle {
+  max-width: 720px;
+  margin: 8px auto 0 !important;
+  text-align: center;
+}
+
+html[data-theme="dark"] .ev-tool-description,
+[data-theme="dark"] .ev-tool-description {
+  color: rgba(226, 232, 240, 0.68);
+}
+
+/* ── Unified tool headers across Inicio, Redes, Comprar EV and Instalación ── */
+.ev-tool-header {
+  width: 100%;
+  text-align: center;
+  align-items: center;
+}
+
+.ev-tool-header .ev-brand {
+  margin: 0 auto 8px;
+}
+
+.ev-tool-header .ev-heading,
+.ev-tool-header h1 {
+  margin: 8px auto 6px !important;
+  text-align: center;
+}
+
+.ev-tool-header .ev-subtitle,
+.ev-tool-header .ev-tool-description {
+  max-width: 720px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center;
+}
+
+body.carbuy-page .app-header.ev-tool-header {
+  gap: 6px;
+}
+
+body.instalacion-page .instalacion-tool-header {
+  width: min(100%, 780px);
+}
+
+/* ── Fixed top app bar ── */
+body.has-ev-top-app-bar {
+  padding-top: calc(82px + env(safe-area-inset-top));
+}
+
+.ev-top-app-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  height: calc(70px + env(safe-area-inset-top));
+  padding: calc(12px + env(safe-area-inset-top)) 22px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ev-top-app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-decoration: none !important;
+}
+
+.ev-top-app-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: #ffffff;
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--ev-teal, #2dd4a8), var(--ev-primary, #16a07a));
+  box-shadow: 0 10px 24px rgba(22, 160, 122, 0.24);
+}
+
+.ev-top-app-name {
+  color: var(--ev-green-deep, #0f7b5f);
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+}
+
+.ev-top-app-name span {
+  color: var(--ev-teal, #2dd4a8);
+}
+
+.ev-top-app-theme.ev-theme-toggle {
+  position: static;
+  flex: 0 0 auto;
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+}
+
+body.has-ev-top-app-bar > .ev-theme-toggle:not(.ev-top-app-theme) {
+  display: none !important;
+}
+
+body.has-ev-top-app-bar .ev-tool-header .ev-brand,
+body.has-ev-top-app-bar #root [data-ev-brand-replaced="true"] {
+  display: none !important;
+}
+
+html[data-theme="dark"] .ev-top-app-bar,
+[data-theme="dark"] .ev-top-app-bar {
+  background: var(--ev-glass-tint-dark-soft);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .ev-top-app-name,
+[data-theme="dark"] .ev-top-app-name {
+  color: #a7f3d0;
+}
+
+html[data-theme="dark"] .ev-top-app-theme.ev-theme-toggle,
+[data-theme="dark"] .ev-top-app-theme.ev-theme-toggle {
+  background: rgba(5, 5, 5, 0.82);
+}
+
+@media (max-width: 520px) {
+  .ev-top-app-bar {
+    height: calc(64px + env(safe-area-inset-top));
+    padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  }
+
+  body.has-ev-top-app-bar {
+    padding-top: calc(74px + env(safe-area-inset-top));
+  }
+
+  .ev-top-app-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .ev-top-app-name {
+    font-size: 1.42rem;
+  }
+
+  .ev-top-app-theme.ev-theme-toggle {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Brújula: move existing controls into the shared top app bar and hide the legacy title bar. */
+.ev-top-app-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.ev-top-app-action.icon-btn {
+  position: static;
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.ev-top-app-action.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  color: currentColor;
+}
+
+body.has-ev-top-app-bar .topbar {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  .ev-top-app-actions {
+    gap: 8px;
+  }
+
+  .ev-top-app-action.icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Brújula: keep the shared top bar inside the instrument layout so the full UI fits. */
+html.has-ev-compass-top-app-bar,
+html.has-ev-compass-top-app-bar body {
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.has-ev-compass-top-app-bar {
+  padding-top: 0;
+}
+
+body.has-ev-compass-top-app-bar .app {
+  height: 100svh;
+  min-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+body.has-ev-compass-top-app-bar .ev-top-app-bar {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  height: 46px;
+  flex: 0 0 46px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.has-ev-compass-top-app-bar .ev-top-app-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+body.has-ev-compass-top-app-bar .ev-top-app-name {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+body.has-ev-compass-top-app-bar .ev-top-app-actions {
+  gap: 8px;
+}
+
+body.has-ev-compass-top-app-bar .ev-top-app-action.icon-btn {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 13px;
+}
+
+body.has-ev-compass-top-app-bar .start-btn {
+  position: relative;
+  bottom: auto;
+  z-index: auto;
+}
+
+@media (max-width: 520px) {
+  body.has-ev-compass-top-app-bar .app {
+    height: 100svh;
+    min-height: 0;
+    margin-top: 0;
+    gap: 9px;
+  }
+}
+
+/* ── Final polish: make Recomendador and Instalación headers match Inicio/Redes ── */
+body.carbuy-page .app-header.ev-tool-header,
+body.instalacion-page .instalacion-tool-header {
+  padding: 22px 18px 20px !important;
+  border-radius: var(--radius-xl, 28px) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(45, 212, 168, 0.14), transparent 58%),
+    rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(22, 160, 122, 0.13) !important;
+  box-shadow: 0 18px 44px rgba(6, 78, 59, 0.09) !important;
+}
+
+body.carbuy-page .app-header.ev-tool-header .ev-heading,
+body.instalacion-page .instalacion-tool-title {
+  max-width: 860px;
+  font-weight: 800 !important;
+  letter-spacing: -0.035em !important;
+}
+
+body.carbuy-page .app-header.ev-tool-header .ev-subtitle,
+body.instalacion-page .instalacion-tool-subtitle {
+  max-width: 720px;
+  font-size: clamp(0.98rem, 2.4vw, 1.18rem) !important;
+  line-height: 1.55 !important;
+  color: var(--color-text-secondary, #64746d) !important;
+}
+
+body.carbuy-page .app-header.ev-tool-header .ev-tool-description,
+body.instalacion-page .instalacion-tool-description {
+  max-width: 760px;
+  margin-top: 8px !important;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--color-text-tertiary, #7c8a83) !important;
+}
+
+body.carbuy-page .carbuy-hero-pills,
+body.instalacion-page .instalacion-tool-pills {
+  justify-content: center;
+  margin-top: 14px !important;
+}
+
+body.carbuy-page .carbuy-hero-pills .ev-pill,
+body.instalacion-page .instalacion-tool-pills .ev-pill {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(22, 160, 122, 0.14);
+  color: var(--color-text-secondary, #64746d);
+}
+
+body.carbuy-page .carbuy-filter-callout {
+  margin-bottom: 16px;
+}
+
+body.carbuy-page .carbuy-filter-callout .ev-callout-text,
+body.carbuy-page .carbuy-filter-callout .ev-callout-hint {
+  color: var(--color-text, #16231d);
+}
+
+html[data-theme="dark"] body.carbuy-page .app-header.ev-tool-header,
+[data-theme="dark"] body.carbuy-page .app-header.ev-tool-header,
+html[data-theme="dark"] body.instalacion-page .instalacion-tool-header,
+[data-theme="dark"] body.instalacion-page .instalacion-tool-header {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(45, 212, 168, 0.16), transparent 60%),
+    rgba(5, 5, 5, 0.72) !important;
+  border-color: rgba(45, 212, 168, 0.14) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.26) !important;
+}
+
+html[data-theme="dark"] body.carbuy-page .carbuy-hero-pills .ev-pill,
+[data-theme="dark"] body.carbuy-page .carbuy-hero-pills .ev-pill,
+html[data-theme="dark"] body.instalacion-page .instalacion-tool-pills .ev-pill,
+[data-theme="dark"] body.instalacion-page .instalacion-tool-pills .ev-pill {
+  background: rgba(5, 5, 5, 0.58);
+  border-color: rgba(45, 212, 168, 0.16);
+  color: rgba(226, 232, 240, 0.78);
+}
+
+/* ── Match Inicio background and title treatment on Comprar EV / Instalación ── */
+body.carbuy-page,
+body.instalacion-page {
+  background: var(--bg-page) !important;
+  color: var(--color-text) !important;
+  font-family: var(--font-body, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif) !important;
+}
+
+body.carbuy-page #root,
+body.instalacion-page #root {
+  background: transparent !important;
+}
+
+body.instalacion-page #root > div:first-child {
+  background: transparent !important;
+}
+
+body.carbuy-page .app-header.ev-tool-header .ev-heading,
+body.carbuy-page .app-header.ev-tool-header h1,
+body.instalacion-page .instalacion-tool-title,
+body.instalacion-page #root h1.instalacion-tool-title {
+  font-family: var(--font-display, 'Outfit', system-ui, -apple-system, sans-serif) !important;
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.2 !important;
+  color: var(--color-text, #1e293b) !important;
+  -webkit-text-fill-color: var(--color-text, #1e293b) !important;
+}
+
+html[data-theme="dark"] body.carbuy-page .app-header.ev-tool-header .ev-heading,
+[data-theme="dark"] body.carbuy-page .app-header.ev-tool-header .ev-heading,
+html[data-theme="dark"] body.carbuy-page .app-header.ev-tool-header h1,
+[data-theme="dark"] body.carbuy-page .app-header.ev-tool-header h1,
+html[data-theme="dark"] body.instalacion-page .instalacion-tool-title,
+[data-theme="dark"] body.instalacion-page .instalacion-tool-title,
+html[data-theme="dark"] body.instalacion-page #root h1.instalacion-tool-title,
+[data-theme="dark"] body.instalacion-page #root h1.instalacion-tool-title {
+  color: var(--color-text, #e2e8f0) !important;
+  -webkit-text-fill-color: var(--color-text, #e2e8f0) !important;
+}
+
+/* ── Light mode topbar: inverted brand colors for a more dressed app shell ── */
+html:not([data-theme="dark"]) body:not(.has-ev-compass-top-app-bar) .ev-top-app-bar {
+  background: linear-gradient(135deg, var(--ev-green-deep, #0f7b5f), var(--ev-green, #16a07a) 52%, var(--ev-teal, #2dd4a8));
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 14px 34px rgba(6, 78, 59, 0.22);
+}
+
+html:not([data-theme="dark"]) body:not(.has-ev-compass-top-app-bar) .ev-top-app-logo {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.32), 0 10px 24px rgba(6, 78, 59, 0.20);
+}
+
+html:not([data-theme="dark"]) body:not(.has-ev-compass-top-app-bar) .ev-top-app-name,
+html:not([data-theme="dark"]) body:not(.has-ev-compass-top-app-bar) .ev-top-app-name span {
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(6, 78, 59, 0.18);
+}
+
+html:not([data-theme="dark"]) body:not(.has-ev-compass-top-app-bar) .ev-top-app-theme.ev-theme-toggle {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.28), 0 10px 24px rgba(6, 78, 59, 0.18);
+}
+
+/* ── iOS/Safari safe-area color bridge above the fixed topbar ── */
+html {
+  --ev-browser-chrome-color: #0f7b5f;
+}
+
+html[data-theme="dark"],
+[data-theme="dark"] {
+  --ev-browser-chrome-color: #030303;
+}
+
+html:not(.has-ev-compass-top-app-bar) {
+  background-color: var(--ev-browser-chrome-color);
+}
+
+body.has-ev-top-app-bar .ev-top-app-bar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -120px;
+  height: 120px;
+  background: var(--ev-browser-chrome-color);
+  pointer-events: none;
+}
+
+/* ── Contextual webapp install bubble ── */
+.ev-install-bubble {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: calc(104px + env(safe-area-inset-bottom));
+  z-index: 9996;
+  width: min(420px, calc(100vw - 28px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(13, 125, 95, 0.14);
+  box-shadow: 0 20px 46px rgba(6, 78, 59, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform: translateY(18px) scale(0.98);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.ev-install-bubble.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.ev-install-bubble-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font: 900 0.9rem var(--font-display, system-ui, sans-serif);
+  background: linear-gradient(135deg, var(--ev-green, #16a07a), var(--ev-teal, #2dd4a8));
+  box-shadow: 0 10px 24px rgba(22, 160, 122, 0.22);
+}
+
+.ev-install-bubble-body {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.ev-install-bubble-body strong {
+  color: var(--color-text, #1e293b);
+  font: 800 0.92rem var(--font-display, system-ui, sans-serif);
+  letter-spacing: -0.01em;
+}
+
+.ev-install-bubble-body span,
+.ev-install-bubble-body li {
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.ev-install-bubble-body ol {
+  display: none;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.ev-install-bubble.show-steps {
+  align-items: start;
+}
+
+.ev-install-bubble.show-steps .ev-install-bubble-body ol {
+  display: block;
+}
+
+.ev-install-bubble-action {
+  border: 0;
+  border-radius: var(--radius-pill, 999px);
+  padding: 9px 13px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ev-green, #16a07a), var(--ev-teal, #2dd4a8));
+  font: 800 0.75rem var(--font-display, system-ui, sans-serif);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ev-install-bubble-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-tertiary, #94a3b8);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .ev-install-bubble,
+[data-theme="dark"] .ev-install-bubble {
+  background: rgba(5, 5, 5, 0.92);
+  border-color: rgba(45, 212, 168, 0.16);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.34);
+}
+
+@media (max-width: 560px) {
+  .ev-install-bubble {
+    left: 10px;
+    right: 10px;
+    bottom: calc(92px + env(safe-area-inset-bottom));
+    width: auto;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ev-install-bubble-action {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 }
